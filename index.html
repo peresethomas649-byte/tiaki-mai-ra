@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiaki Mai Rā — AI Creative Technology Solutions</title>
+    <meta name="description"
+        content="Tiaki Mai Rā is an AI Creative Technologist solutions agency crafting immersive digital experiences through generative AI, 3D design, and emerging technology.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Inter:wght@400;500;700&family=Playfair+Display:ital@0;1&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Spline Viewer - Preloaded for easy 3D model integration -->
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1/build/spline-viewer.js"></script>
+</head>
+
+<body>
+    <!-- ===== NAVIGATION ===== -->
+    <header class="nav" id="main-nav">
+        <a href="/" class="nav__logo" id="nav-logo">
+            <img src="assets/images/logo.png" alt="Tiaki Mai Rā Logo" class="nav__logo-img">
+        </a>
+        <nav class="nav__links" id="nav-links">
+            <a href="#home" class="nav__link" id="nav-home">HOME</a>
+            <a href="#projects" class="nav__link" id="nav-projects">PROJECTS</a>
+            <a href="#testimonials" class="nav__link" id="nav-testimonials">TESTIMONIALS</a>
+            <a href="#contact" class="nav__link" id="nav-contact">CONTACT</a>
+        </nav>
+        <a href="#contact" class="nav__cta" id="nav-cta">GET IN TOUCH</a>
+        <button class="nav__hamburger" id="nav-hamburger" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </header>
+
+    <!-- ===== MOBILE MENU ===== -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="#home" class="mobile-menu__link">HOME</a>
+        <a href="#projects" class="mobile-menu__link">PROJECTS</a>
+        <a href="#testimonials" class="mobile-menu__link">TESTIMONIALS</a>
+        <a href="#contact" class="mobile-menu__link">CONTACT</a>
+        <a href="#contact" class="mobile-menu__link mobile-menu__cta">GET IN TOUCH</a>
+    </div>
+
+    <!-- ===== HERO SECTION ===== -->
+    <main>
+        <section class="hero" id="home">
+
+            <div class="hero__orb hero__orb--left" id="hero-orb-left">
+                <div class="hero__orb-inner">
+                    <div class="hero__orb-void"></div>
+                    <div class="hero__orb-ring hero__orb-ring--1"></div>
+                    <div class="hero__orb-ring hero__orb-ring--2"></div>
+                    <div class="hero__orb-ring hero__orb-ring--3"></div>
+                    <div class="hero__orb-ring hero__orb-ring--4"></div>
+                    <div class="hero__orb-ring hero__orb-ring--5"></div>
+                </div>
+            </div>
+            <div class="hero__orb hero__orb--right" id="hero-orb-right">
+                <div class="hero__orb-inner">
+                    <div class="hero__orb-void"></div>
+                    <div class="hero__orb-ring hero__orb-ring--1"></div>
+                    <div class="hero__orb-ring hero__orb-ring--2"></div>
+                    <div class="hero__orb-ring hero__orb-ring--3"></div>
+                    <div class="hero__orb-ring hero__orb-ring--4"></div>
+                    <div class="hero__orb-ring hero__orb-ring--5"></div>
+                </div>
+            </div>
+
+            <!-- Spline 3D Robot — Cinematic hero background -->
+            <div class="hero__spline-robot" id="hero-spline-robot">
+                <div class="hero__spline-loader" id="spline-loader">
+                    <div class="hero__spline-loader-pulse"></div>
+                </div>
+                <spline-viewer url="https://prod.spline.design/Y9ut7mO0JN3DIM9l/scene.splinecode"
+                    id="spline-robot-viewer"></spline-viewer>
+            </div>
+
+            <div class="hero__content">
+                <h1 class="hero__title" id="hero-title">
+                    We craft experiences beyond
+                    <span class="hero__title--italic">the&nbsp;imaginable</span>
+                </h1>
+                <p class="hero__subtitle" id="hero-subtitle">
+                    Fusing Generative AI, Immersive 3D, and Creative Technology<br>
+                    to Build What's Never Been Built Before
+                </p>
+                <a href="#contact" class="hero__cta" id="hero-cta">
+                    <span>START YOUR JOURNEY</span>
+                    <svg class="hero__cta-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Hero Scroll Down Indicator -->
+            <div class="hero__scroll-indicator">
+                <div class="hero__scroll-mouse">
+                    <div class="hero__scroll-wheel"></div>
+                </div>
+                <!-- Double Chevron Down Arrow -->
+                <svg class="hero__scroll-arrows" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M6 7l6 6 6-6M6 13l6 6 6-6" stroke="var(--color-accent-azure)" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+        </section>
+
+        <!-- ===== TRUSTED BY SECTION ===== -->
+        <section class="trusted" id="trusted">
+            <p class="trusted__label" id="trusted-label">TRUSTED BY LEADING INNOVATORS WORLDWIDE</p>
+            <div class="trusted__logos" id="trusted-logos">
+                <!-- Placeholder logos — replace with actual brand logos later -->
+                <div class="trusted__logo" id="trusted-logo-1">
+                    <svg class="trusted__logo-svg" width="120" height="36" viewBox="0 0 120 36" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="8" width="20" height="20" rx="4" fill="currentColor" opacity="0.6" />
+                        <rect x="28" y="10" width="92" height="6" rx="3" fill="currentColor" opacity="0.4" />
+                        <rect x="28" y="20" width="60" height="6" rx="3" fill="currentColor" opacity="0.25" />
+                    </svg>
+                </div>
+                <div class="trusted__logo" id="trusted-logo-2">
+                    <svg class="trusted__logo-svg" width="110" height="36" viewBox="0 0 110 36" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="18" cy="18" r="12" fill="currentColor" opacity="0.5" />
+                        <circle cx="18" cy="18" r="7" fill="white" opacity="0.8" />
+                        <rect x="36" y="12" width="74" height="6" rx="3" fill="currentColor" opacity="0.4" />
+                        <rect x="36" y="22" width="50" height="4" rx="2" fill="currentColor" opacity="0.2" />
+                    </svg>
+                </div>
+                <div class="trusted__logo" id="trusted-logo-3">
+                    <svg class="trusted__logo-svg" width="100" height="36" viewBox="0 0 100 36" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="14,4 24,28 4,28" fill="currentColor" opacity="0.5" />
+                        <rect x="30" y="10" width="70" height="6" rx="3" fill="currentColor" opacity="0.4" />
+                        <rect x="30" y="20" width="45" height="6" rx="3" fill="currentColor" opacity="0.25" />
+                    </svg>
+                </div>
+                <div class="trusted__logo" id="trusted-logo-4">
+                    <svg class="trusted__logo-svg" width="115" height="36" viewBox="0 0 115 36" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="6" width="12" height="24" rx="2" fill="currentColor" opacity="0.45" />
+                        <rect x="15" y="10" width="12" height="16" rx="2" fill="currentColor" opacity="0.35" />
+                        <rect x="30" y="14" width="12" height="8" rx="2" fill="currentColor" opacity="0.5" />
+                        <rect x="50" y="12" width="65" height="6" rx="3" fill="currentColor" opacity="0.4" />
+                        <rect x="50" y="22" width="42" height="4" rx="2" fill="currentColor" opacity="0.2" />
+                    </svg>
+                </div>
+                <div class="trusted__logo" id="trusted-logo-5">
+                    <svg class="trusted__logo-svg" width="105" height="36" viewBox="0 0 105 36" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 6 L26 18 L14 30 L2 18Z" fill="currentColor" opacity="0.5" />
+                        <rect x="34" y="11" width="71" height="6" rx="3" fill="currentColor" opacity="0.4" />
+                        <rect x="34" y="21" width="48" height="5" rx="2.5" fill="currentColor" opacity="0.22" />
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PROJECTS SECTION ===== -->
+        <section class="projects" id="projects">
+            <!-- Spline 3D Background -->
+            <div class="projects__spline-bg" id="projects-spline-bg">
+                <spline-viewer url="https://prod.spline.design/tyWEALp7LIbK8lej/scene.splinecode"
+                    id="projects-spline-viewer"></spline-viewer>
+            </div>
+
+            <div class="projects__content">
+                <p class="projects__label scroll-reveal" id="projects-label">SELECTED WORK</p>
+                <h2 class="projects__heading scroll-reveal" id="projects-heading">Projects that push<br><span
+                        class="projects__heading--italic">boundaries</span></h2>
+
+                <div class="testi-grid">
+                    <div class="testi-card testi-card--tall scroll-reveal"
+                        style="--card-bg: linear-gradient(135deg, #0077B6 0%, #00D4FF 60%, #7DD3FC 100%)">
+                        <a href="https://youtu.be/wJCQBSAyWDU" target="_blank" rel="noopener noreferrer"
+                            class="testi-card__link">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 17L17 7M17 7H7M17 7V17" />
+                            </svg>
+                        </a>
+                        <div class="testi-card__overlay"><span class="testi-card__tag">XR · VisionOS</span><strong
+                                class="testi-card__name">Guardians of Matariki</strong>
+                            <p class="testi-card__quote">An immersive spatial storytelling experience for Apple
+                                VisionOS, bridging cutting-edge RealityKit environments with indigenous cultural
+                                narratives.</p>
+                        </div>
+                    </div>
+                    <div class="testi-card scroll-reveal"
+                        style="--card-bg: linear-gradient(160deg, #020617 0%, #0A0F1A 40%, #0077B6 100%)">
+                        <a href="https://www.linkedin.com/posts/thomas-perese-140441190_mentalwellness-immersivetechnology-vrtraining-activity-6981319841764827136-eb1U?utm_source=share&utm_medium=member_desktop&rcm=ACoAACzqO4ABsgDZSxdOosHSbz38uYWFHW-3hwM"
+                            target="_blank" rel="noopener noreferrer" class="testi-card__link">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 17L17 7M17 7H7M17 7V17" />
+                            </svg>
+                        </a>
+                        <div class="testi-card__overlay"><span class="testi-card__tag">VR · Enterprise</span><strong
+                                class="testi-card__name">SkillsVR Training Modules</strong>
+                            <p class="testi-card__quote">High-fidelity, interactive VR safety simulations architected in
+                                Unity to deliver scalable, hyper-realistic instructional design.</p>
+                        </div>
+                    </div>
+                    <div class="testi-card testi-card--wide scroll-reveal"
+                        style="--card-bg: linear-gradient(120deg, #1B3A5C 0%, #00A8E8 50%, #00D4FF 100%)">
+                        <a href="https://youtu.be/cHgGJdDxML8?si=fxr7_j06RbcumndU" target="_blank"
+                            rel="noopener noreferrer" class="testi-card__link">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 17L17 7M17 7H7M17 7V17" />
+                            </svg>
+                        </a>
+                        <div class="testi-card__overlay"><span class="testi-card__tag">AR · Mobile
+                                Prototypes</span><strong class="testi-card__name">Indigenous AR Concepts</strong>
+                            <p class="testi-card__quote">Bespoke iOS augmented reality prototypes leveraging ARKit to
+                                seamlessly weave traditional Māori and Polynesian narratives into the physical world.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="testi-card testi-card--tall scroll-reveal"
+                        style="--card-bg: linear-gradient(180deg, #7DD3FC 0%, #00A8E8 40%, #020617 100%)">
+                        <a href="https://youtu.be/ezRUdjYpfCM?si=EBV8lt5MTKJsWo0j" target="_blank"
+                            rel="noopener noreferrer" class="testi-card__link">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 17L17 7M17 7H7M17 7V17" />
+                            </svg>
+                        </a>
+                        <div class="testi-card__overlay"><span class="testi-card__tag">Mixed Reality</span><strong
+                                class="testi-card__name">KiwiRail HoloLens 2</strong>
+                            <p class="testi-card__quote">A comprehensive spatial industrial training module engineered
+                                specifically for HoloLens 2 hardware, transforming complex workflows.</p>
+                        </div>
+                    </div>
+                    <div class="testi-card scroll-reveal"
+                        style="--card-bg: linear-gradient(200deg, #00D4FF 0%, #0077B6 60%, #0A0F1A 100%)">
+                        <a href="https://youtu.be/CEmShMY31d4?si=II7od-1hXOzZlOoH" target="_blank"
+                            rel="noopener noreferrer" class="testi-card__link">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 17L17 7M17 7H7M17 7V17" />
+                            </svg>
+                        </a>
+                        <div class="testi-card__overlay"><span class="testi-card__tag">IoT · Mobile
+                                Infrastructure</span><strong class="testi-card__name">Smart Stop</strong>
+                            <p class="testi-card__quote">An integrated IoT passenger mobile application designed to
+                                orchestrate seamless, real-time communication protocols between urban bus fleets and
+                                commuters.</p>
+                        </div>
+                    </div>
+                    <div class="testi-card testi-card--wide scroll-reveal"
+                        style="--card-bg: linear-gradient(90deg, #020617 0%, #1B3A5C 30%, #00A8E8 70%, #7DD3FC 100%)">
+                        <a href="https://youtu.be/OfG2aAhmLfo?si=V5wdXjJYXBlcV-xc" target="_blank"
+                            rel="noopener noreferrer" class="testi-card__link">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 17L17 7M17 7H7M17 7V17" />
+                            </svg>
+                        </a>
+                        <div class="testi-card__overlay"><span class="testi-card__tag">AI · Conversational</span><strong
+                                class="testi-card__name">Tiaki AI (Chatbot)</strong>
+                            <p class="testi-card__quote">An intelligent, LLM-powered natural language chatbot
+                                meticulously trained to deliver personalized, localized insights for the New Zealand
+                                tourism sector.</p>
+                        </div>
+                    </div>
+                    <div class="testi-card scroll-reveal"
+                        style="--card-bg: linear-gradient(145deg, #0077B6 0%, #020617 50%, #00D4FF 100%)">
+                        <div class="testi-card__overlay"><span class="testi-card__tag">Strategy ·
+                                Consulting</span><strong class="testi-card__name">Accenture Song</strong>
+                            <p class="testi-card__quote">Digital transformation and creative technology strategies
+                                developed alongside global enterprise clients as a Business Analyst intern.</p>
+                        </div>
+                    </div>
+                    <div class="testi-card testi-card--tall scroll-reveal"
+                        style="--card-bg: linear-gradient(170deg, #00A8E8 0%, #7DD3FC 30%, #0077B6 70%, #020617 100%)">
+                        <a href="https://youtu.be/nuVTepN5-bk?si=qDDvVw4_c9fqb6Lt" target="_blank"
+                            rel="noopener noreferrer" class="testi-card__link">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 17L17 7M17 7H7M17 7V17" />
+                            </svg>
+                        </a>
+                        <div class="testi-card__overlay"><span class="testi-card__tag">AR · Safety
+                                Protocols</span><strong class="testi-card__name">Site Safe Mobile AR</strong>
+                            <p class="testi-card__quote">An innovative proof-of-concept augmented reality toolkit,
+                                engineered to gamify and visualize critical hazard identification in the field.</p>
+                        </div>
+                    </div>
+                    <div class="testi-card scroll-reveal"
+                        style="--card-bg: linear-gradient(135deg, #1B3A5C 0%, #00D4FF 100%)">
+                        <div class="testi-card__overlay"><span class="testi-card__tag">Web · React UI</span><strong
+                                class="testi-card__name">Full-Stack Architectures</strong>
+                            <p class="testi-card__quote">A diverse portfolio of high-performance modern web
+                                architectures driven by robust React frontends and dynamic, scalable full-stack
+                                environments.</p>
+                        </div>
+                    </div>
+                    <div class="testi-card testi-card--wide scroll-reveal"
+                        style="--card-bg: linear-gradient(110deg, #0A0F1A 0%, #0077B6 40%, #00D4FF 80%, #7DD3FC 100%)">
+                        <a href="https://youtu.be/n2o9SX4FM3c" target="_blank" rel="noopener noreferrer"
+                            class="testi-card__link">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M7 17L17 7M17 7H7M17 7V17" />
+                            </svg>
+                        </a>
+                        <div class="testi-card__overlay"><span class="testi-card__tag">XR · Software Dev</span><strong
+                                class="testi-card__name">HoloLens 2 MRTK</strong>
+                            <p class="testi-card__quote">An intensive software development exploration of the Mixed
+                                Reality Toolkit (MRTK) SDK, prototyping advanced spatial interactions for HoloLens 2.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TESTIMONIALS SECTION ===== -->
+        <section class="testimonials" id="testimonials">
+            <!-- ===== SEPARATOR ASSET ===== -->
+            <div class="section-separator">
+                <video class="section-separator__video" autoplay loop muted playsinline>
+                    <source src="assets/videos/separator.mp4" type="video/mp4">
+                </video>
+            </div>
+
+            <div class="testimonials__sticky-wrapper">
+                <div class="testimonials__spline-bg" id="testimonials-spline-bg">
+                    <spline-viewer url="https://prod.spline.design/RT2Mz6w07HyIAY05/scene.splinecode"
+                        id="testimonials-spline-viewer"></spline-viewer>
+                </div>
+
+                <div class="testimonials__content">
+                    <p class="testimonials__label scroll-reveal">TRUSTED BY LEADING INNOVATORS WORLDWIDE</p>
+                    <h2 class="testimonials__heading scroll-reveal">Stories from our <br><span
+                            class="testimonials__heading--italic">community</span></h2>
+
+                    <div class="card-deck" id="card-deck">
+                        <div class="deck-card" data-index="0">
+                            <div class="deck-card__stars">★★★★★</div>
+                            <p class="deck-card__quote">Their innovative solutions and quick turnaround time made our
+                                collaboration incredibly successful. Highly recommended!</p>
+                            <div class="deck-card__author">
+                                <img class="deck-card__avatar"
+                                    src="https://media.licdn.com/dms/image/v2/D4E03AQEgq5a5gbYFIQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1664495146898?e=1778112000&v=beta&t=d1_3pk4hleWQmdkb09hFTHDEElZkIXtRwCx7GGDKLYM"
+                                    alt="">
+                                <div><strong class="deck-card__name">Jon M.</strong><span class="deck-card__role">Head
+                                        of Global Marketing, Citi New York</span></div>
+                            </div>
+
+                            <!-- Animated Scroll Hint (Only on Top Card) -->
+                            <div class="deck-scroll-hint">
+                                <div class="deck-scroll-hint__mouse">
+                                    <div class="deck-scroll-hint__wheel"></div>
+                                </div>
+                                <span>Scroll</span>
+                            </div>
+                        </div>
+                        <div class="deck-card" data-index="1">
+                            <div class="deck-card__stars">★★★★★</div>
+                            <p class="deck-card__quote">The level of detail and user experience in their work is
+                                exceptional. I'm thoroughly impressed with the final product.</p>
+                            <div class="deck-card__author">
+                                <img class="deck-card__avatar"
+                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYMUOxEy6LzZ7E78B60yCD3y-2am_J85mDAuVTMf2R7Vx4CM4M_T7fqv3fy1jnYIWlIofZ9k_62_oEkZ_L3nSyTClH6Q5E&s&ec=121635968"
+                                    alt="">
+                                <div><strong class="deck-card__name">Marco B.</strong><span class="deck-card__role">CEO,
+                                        3Ccodes New York</span></div>
+                            </div>
+
+                            <!-- Animated Scroll Hint -->
+                            <div class="deck-scroll-hint">
+                                <div class="deck-scroll-hint__mouse">
+                                    <div class="deck-scroll-hint__wheel"></div>
+                                </div>
+                                <span>Scroll</span>
+                            </div>
+                        </div>
+                        <div class="deck-card" data-index="2">
+                            <div class="deck-card__stars">★★★★★</div>
+                            <p class="deck-card__quote">Working with them was a game-changer for our project. Their
+                                expertise and professionalism exceeded our expectations.</p>
+                            <div class="deck-card__author">
+                                <img class="deck-card__avatar"
+                                    src="https://media.licdn.com/dms/image/v2/C5603AQFkjumkx-HAJg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659605431994?e=1778112000&v=beta&t=9CZTHlMgIoDEgn6VNdDvpLTNJTdHeldQt3LH_SG8FJA"
+                                    alt="">
+                                <div><strong class="deck-card__name">Donna P.</strong><span class="deck-card__role">CEO,
+                                        Chamber of Commerce, New Zealand</span></div>
+                            </div>
+
+                            <!-- Animated Scroll Hint -->
+                            <div class="deck-scroll-hint">
+                                <div class="deck-scroll-hint__mouse">
+                                    <div class="deck-scroll-hint__wheel"></div>
+                                </div>
+                                <span>Scroll</span>
+                            </div>
+                        </div>
+                        <div class="deck-card" data-index="3">
+                            <div class="deck-card__stars">★★★★★</div>
+                            <p class="deck-card__quote">The quality of work and communication throughout the project was
+                                outstanding. They delivered exactly what we needed.</p>
+                            <div class="deck-card__author">
+                                <img class="deck-card__avatar"
+                                    src="https://www.pwc.co.nz/people/2021/otene-hopa-500x500.jpg" alt="">
+                                <div><strong class="deck-card__name">Otene H.</strong><span
+                                        class="deck-card__role">National Cultural Lead, PwC New Zealand</span></div>
+                            </div>
+
+                            <!-- Animated Scroll Hint -->
+                            <div class="deck-scroll-hint">
+                                <div class="deck-scroll-hint__mouse">
+                                    <div class="deck-scroll-hint__wheel"></div>
+                                </div>
+                                <span>Scroll</span>
+                            </div>
+                        </div>
+                        <div class="deck-card" data-index="4">
+                            <div class="deck-card__stars">★★★★★</div>
+                            <p class="deck-card__quote">Absolutely brilliant execution. The creative direction and
+                                technical
+                                skill combined to produce something truly special.</p>
+                            <div class="deck-card__author">
+                                <img class="deck-card__avatar"
+                                    src="https://media.licdn.com/dms/image/v2/D4D03AQHBMEy_Q8PFtQ/profile-displayphoto-crop_800_800/B4DZulZlW9IAAI-/0/1768006506361?e=1778112000&v=beta&t=xSTOP0U8157oZmlh1SC783rr36DEhw-_Xgl0X-ndw6g"
+                                    alt="">
+                                <div><strong class="deck-card__name">Auon K.</strong><span
+                                        class="deck-card__role">Director, AWS New York</span></div>
+                            </div>
+
+                            <!-- Animated Scroll Hint -->
+                            <div class="deck-scroll-hint">
+                                <div class="deck-scroll-hint__mouse">
+                                    <div class="deck-scroll-hint__wheel"></div>
+                                </div>
+                                <span>Scroll</span>
+                            </div>
+
+                            <!-- Seamless Exit Hint (Hidden until finished) -->
+                            <div class="deck-final-hint">
+                                <svg class="hero__scroll-arrows" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 7l6 6 6-6M6 13l6 6 6-6" stroke="var(--color-accent-azure)"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ===== CONTACT SECTION ===== -->
+        <section class="contact" id="contact">
+            <div class="contact__spline-bg" id="contact-spline-bg">
+                <spline-viewer url="https://prod.spline.design/J5pGJ-AIw6Z47fRw/scene.splinecode"
+                    id="contact-spline-viewer"></spline-viewer>
+            </div>
+
+            <div class="contact__content">
+                <p class="contact__label scroll-reveal">GET IN TOUCH</p>
+                <h2 class="contact__heading scroll-reveal">Let's build something <span
+                        class="contact__heading--italic">extraordinary</span></h2>
+
+                <div data-fs-success class="contact__success">Thanks! We'll be in touch soon.</div>
+                <div data-fs-error class="contact__error"></div>
+
+                <form id="contact-form" class="contact__form scroll-reveal">
+                    <div class="contact__field">
+                        <label for="contact-name">Name</label>
+                        <input type="text" id="contact-name" name="name" placeholder="Your name" required data-fs-field>
+                        <span data-fs-error="name" class="contact__field-error"></span>
+                    </div>
+                    <div class="contact__field">
+                        <label for="contact-email">Email</label>
+                        <input type="email" id="contact-email" name="email" placeholder="you@example.com" required
+                            data-fs-field>
+                        <span data-fs-error="email" class="contact__field-error"></span>
+                    </div>
+                    <div class="contact__field">
+                        <label for="contact-message">Message</label>
+                        <textarea id="contact-message" name="message" placeholder="Tell us about your project..."
+                            rows="5" required data-fs-field></textarea>
+                        <span data-fs-error="message" class="contact__field-error"></span>
+                    </div>
+                    <button type="submit" class="contact__submit" data-fs-submit-btn>Send Message</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/script.js"></script>
+    <script>
+        window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
+        formspree('initForm', { formElement: '#contact-form', formId: 'xeepwgpo' });
+    </script>
+    <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
+</body>
+
+</html>
