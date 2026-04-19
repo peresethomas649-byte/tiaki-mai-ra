@@ -2314,7 +2314,15 @@ button {
         height: 36px;
     }
 
-    /* --- Hero: tighter text for narrower viewport --- */
+    /* --- Hero: fix scroll indicator overlapping CTA button --- */
+    .hero {
+        padding-bottom: 60px; /* Make room at the bottom for the scroll indicator */
+    }
+
+    .hero__scroll-indicator {
+        bottom: 12px; /* Push it toward the very bottom of the section */
+    }
+
     .hero__title {
         font-size: 1.85rem;
     }
@@ -2322,73 +2330,105 @@ button {
     .hero__subtitle {
         font-size: 0.82rem;
         max-width: 300px;
+        margin-bottom: var(--space-lg); /* More space between subtitle and CTA */
     }
 
     .hero__cta {
         padding: 12px 24px;
         font-size: 0.7rem;
+        margin-bottom: var(--space-xl); /* Push CTA up, away from scroll indicator */
     }
 
-    /* --- Testimonials: prevent heading overflow --- */
+    /* --- Projects: center the grid properly --- */
+    .testi-grid {
+        grid-template-columns: 1fr;
+        padding: 0 var(--space-sm);
+        max-width: 100%;
+    }
+
+    .testi-card {
+        min-height: 180px;
+    }
+
+    .projects__content {
+        padding: 0 var(--space-xs);
+    }
+
+    /* --- Video separator: ensure iOS autoplay works --- */
+    .section-separator__video {
+        min-height: 200px;
+    }
+
+    /* --- Testimonials: fix sticky section showing cards before visible --- */
+    .testimonials {
+        height: 350vh; /* Shorter scroll track for mobile */
+    }
+
+    .testimonials__content {
+        padding: calc(var(--nav-height) + var(--space-xs)) var(--space-xs) var(--space-xs);
+        gap: var(--space-sm);
+    }
+
     .testimonials__heading {
-        font-size: 1.6rem;
+        font-size: 1.5rem;
+        margin-bottom: var(--space-md);
     }
 
     .testimonials__label {
         font-size: 0.55rem;
+        margin-bottom: var(--space-xs);
     }
 
-    .testimonials__content {
-        padding: calc(var(--nav-height) + var(--space-sm)) var(--space-xs) var(--space-xs);
-        gap: var(--space-md);
-    }
-
-    /* --- Testimonial Cards: fix the scroll hint collision --- */
+    /* --- Testimonial Cards: fix cramped layout --- */
     .card-deck {
-        height: 320px;
-        max-width: 340px;
+        height: 290px;
+        max-width: 320px;
     }
 
     .deck-card {
-        padding: 28px 24px 36px;
+        padding: 20px 20px 32px;
     }
 
     .deck-card__stars {
-        font-size: 1rem;
-        letter-spacing: 3px;
-        margin-bottom: 14px;
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
     }
 
     .deck-card__quote {
-        font-size: 0.8rem;
-        line-height: 1.45;
-        margin-bottom: 16px;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        margin-bottom: 12px;
+    }
+
+    .deck-card__author {
+        gap: 8px;
     }
 
     .deck-card__avatar {
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
     }
 
     .deck-card__name {
-        font-size: 0.82rem;
+        font-size: 0.78rem;
     }
 
     .deck-card__role {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
     }
 
     .deck-scroll-hint {
-        bottom: 10px;
+        bottom: 6px;
     }
 
     .deck-scroll-hint__mouse {
-        width: 12px;
-        height: 20px;
+        width: 10px;
+        height: 16px;
     }
 
     .deck-scroll-hint span {
-        font-size: 0.55rem;
+        font-size: 0.5rem;
     }
 
     /* --- Projects: ensure cards don't overflow --- */
@@ -2417,11 +2457,16 @@ button {
 /* Extra small screens (iPhone SE, older 375px and below) */
 @media (max-width: 380px) {
     .nav__logo {
-        height: 32px;
+        height: 30px;
     }
 
     .hero__title {
-        font-size: 1.6rem;
+        font-size: 1.55rem;
+    }
+
+    .hero__subtitle {
+        font-size: 0.78rem;
+        max-width: 280px;
     }
 
     .hero__orb {
@@ -2438,21 +2483,25 @@ button {
     }
 
     .card-deck {
-        height: 300px;
-        max-width: 300px;
+        height: 270px;
+        max-width: 280px;
     }
 
     .deck-card {
-        padding: 22px 20px 32px;
+        padding: 18px 16px 28px;
     }
 
     .deck-card__quote {
-        font-size: 0.75rem;
-        margin-bottom: 12px;
+        font-size: 0.7rem;
+        margin-bottom: 10px;
+    }
+
+    .deck-card__stars {
+        margin-bottom: 8px;
     }
 
     .testimonials__heading {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
     }
 
     .trusted__logos {

@@ -568,6 +568,31 @@ class App {
 
         this.ticking = false;
         window.addEventListener('scroll', () => this.handleGlobalScroll(), { passive: true });
+
+        // iOS video autoplay fallback
+        this.initVideoAutoplay();
+    }
+
+    initVideoAutoplay() {
+        const video = document.querySelector('.section-separator__video');
+        if (!video) return;
+
+        // Force play when scrolled into view (iOS often blocks autoplay until visible)
+        const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    video.play().catch(() => {});
+                }
+            });
+        }, { threshold: 0.1 });
+        videoObserver.observe(video);
+
+        // Also force play on first user touch (iOS requirement)
+        const forcePlay = () => {
+            video.play().catch(() => {});
+            document.removeEventListener('touchstart', forcePlay);
+        };
+        document.addEventListener('touchstart', forcePlay, { passive: true });
     }
 
     handleGlobalScroll() {
