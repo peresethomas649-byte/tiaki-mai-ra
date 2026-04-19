@@ -2307,10 +2307,121 @@ button {
     }
 }
 
-/* Extra small screens */
-@media (max-width: 380px) {
+/* === STANDARD-SIZE IPHONES (14 Pro, 13, 12, SE3 — 375px to 430px) === */
+@media (max-width: 430px) {
+    /* --- Nav Logo: scale down for smaller phones --- */
+    .nav__logo {
+        height: 36px;
+    }
+
+    /* --- Hero: tighter text for narrower viewport --- */
     .hero__title {
-        font-size: 1.7rem;
+        font-size: 1.85rem;
+    }
+
+    .hero__subtitle {
+        font-size: 0.82rem;
+        max-width: 300px;
+    }
+
+    .hero__cta {
+        padding: 12px 24px;
+        font-size: 0.7rem;
+    }
+
+    /* --- Testimonials: prevent heading overflow --- */
+    .testimonials__heading {
+        font-size: 1.6rem;
+    }
+
+    .testimonials__label {
+        font-size: 0.55rem;
+    }
+
+    .testimonials__content {
+        padding: calc(var(--nav-height) + var(--space-sm)) var(--space-xs) var(--space-xs);
+        gap: var(--space-md);
+    }
+
+    /* --- Testimonial Cards: fix the scroll hint collision --- */
+    .card-deck {
+        height: 320px;
+        max-width: 340px;
+    }
+
+    .deck-card {
+        padding: 28px 24px 36px;
+    }
+
+    .deck-card__stars {
+        font-size: 1rem;
+        letter-spacing: 3px;
+        margin-bottom: 14px;
+    }
+
+    .deck-card__quote {
+        font-size: 0.8rem;
+        line-height: 1.45;
+        margin-bottom: 16px;
+    }
+
+    .deck-card__avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .deck-card__name {
+        font-size: 0.82rem;
+    }
+
+    .deck-card__role {
+        font-size: 0.7rem;
+    }
+
+    .deck-scroll-hint {
+        bottom: 10px;
+    }
+
+    .deck-scroll-hint__mouse {
+        width: 12px;
+        height: 20px;
+    }
+
+    .deck-scroll-hint span {
+        font-size: 0.55rem;
+    }
+
+    /* --- Projects: ensure cards don't overflow --- */
+    .testi-card__name {
+        font-size: 1rem;
+    }
+
+    .testi-card__quote {
+        font-size: 0.75rem;
+    }
+
+    .testi-card__tag {
+        font-size: 0.6rem;
+    }
+
+    /* --- Contact: tighter form --- */
+    .contact__heading {
+        font-size: 1.6rem;
+    }
+
+    .contact__form {
+        padding: var(--space-md) var(--space-sm);
+    }
+}
+
+/* Extra small screens (iPhone SE, older 375px and below) */
+@media (max-width: 380px) {
+    .nav__logo {
+        height: 32px;
+    }
+
+    .hero__title {
+        font-size: 1.6rem;
     }
 
     .hero__orb {
@@ -2324,6 +2435,24 @@ button {
 
     .hero__orb--right {
         right: -90px;
+    }
+
+    .card-deck {
+        height: 300px;
+        max-width: 300px;
+    }
+
+    .deck-card {
+        padding: 22px 20px 32px;
+    }
+
+    .deck-card__quote {
+        font-size: 0.75rem;
+        margin-bottom: 12px;
+    }
+
+    .testimonials__heading {
+        font-size: 1.4rem;
     }
 
     .trusted__logos {
