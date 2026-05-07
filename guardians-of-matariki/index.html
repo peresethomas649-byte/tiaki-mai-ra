@@ -30,14 +30,19 @@
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--bg-0); color: var(--ink); }
+  /* Horizontal-overflow guard MUST live on <html>, NOT <body>. Putting it on
+     <body> creates a new scroll container that breaks `position: sticky`
+     in iOS Safari (sections only stick scrolling up, not down). */
+  html { overflow-x: clip; }
   body {
     font-family: 'Inter', system-ui, sans-serif;
     font-weight: 400;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
     cursor: default;
   }
+  /* iOS hint to ensure sticky elements get their own composited layer */
+  .headset-sticky, .stars-sticky { will-change: transform; }
   ::selection { background: rgba(124,201,255,.3); color: #fff; }
 
   /* persistent atmospheric backdrop */
@@ -84,11 +89,30 @@
     font-size: 12.5px; letter-spacing: .04em;
     box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 12px 40px rgba(0,0,0,.5);
   }
-  .nav .brand { font-family: 'Fraunces', serif; font-weight: 400; font-size: 13.5px; letter-spacing: .02em; color: #fff; }
-  .nav .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .nav .brand { font-family: 'Fraunces', serif; font-weight: 400; font-size: 13.5px; letter-spacing: .02em; color: #fff; white-space: nowrap; }
+  .nav .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); flex-shrink: 0; }
   .nav a { color: var(--ink-soft); text-decoration: none; transition: color .25s; }
   .nav a:hover { color: #fff; }
-  @media (max-width: 720px) { .nav .links { display: none; } }
+  .nav .links { display: flex; gap: 22px; }
+  @media (max-width: 560px) {
+    /* Mobile pill: re-uses base left:50%/translateX(-50%) so the nav is
+       always centred. width:max-content shrink-fits the pill to the
+       links row, and max-width caps it to the viewport (minus 16px).
+       Two rows: brand on top, links centred below. */
+    .nav {
+      width: max-content;
+      max-width: calc(100vw - 16px);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 5px;
+      padding: 8px 16px;
+      border-radius: 18px;
+    }
+    .nav .dot { display: none; }
+    .nav .brand { font-size: 11.5px; text-align: center; }
+    .nav .links { gap: 11px; justify-content: center; }
+    .nav .links a { font-size: 10.5px; letter-spacing: 0; white-space: nowrap; }
+  }
 
   /* Layout primitives */
   main { position: relative; z-index: 1; }
@@ -160,7 +184,12 @@
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .hero h1 em { font-style: italic; font-weight: 300; color: var(--accent); -webkit-text-fill-color: var(--accent); }
-  .hero .subtitle { max-width: 680px; margin: 28px auto 0; font-size: 17px; color: var(--ink-soft); }
+  .hero .subtitle { max-width: 680px; margin: 28px auto 0; font-size: 17px; color: var(--ink-soft); padding: 0 20px; }
+  @media (max-width: 600px) {
+    .hero { padding-left: 20px; padding-right: 20px; }
+    .hero .subtitle { font-size: 15px; }
+    .hero .byline { font-size: 9px; }
+  }
   .hero .byline {
     margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
     letter-spacing: .15em; color: var(--ink-mute); text-transform: uppercase;
@@ -379,9 +408,9 @@
 
   .headset-eyebrow {
     position: absolute; top: 110px; left: 50%; transform: translateX(-50%);
-    text-align: center;
+    text-align: center; width: 90%;
   }
-  .headset-eyebrow h2 { font-size: clamp(28px, 3.4vw, 42px); margin-top: 14px; }
+  .headset-eyebrow h2 { font-size: clamp(22px, 3.4vw, 42px); margin-top: 14px; }
 
   /* Callout labels that float around the exploded headset */
   .callout {
@@ -408,6 +437,26 @@
   .callout .line {
     position: absolute; height: 1px; background: linear-gradient(90deg, var(--accent), transparent);
     pointer-events: none;
+  }
+
+  @media (max-width: 600px) {
+    .headset-section { height: 180vh; }
+    /* Anchor eyebrow from edges instead of 50%/translate so text can't overflow */
+    .headset-eyebrow {
+      top: 76px; left: 20px; right: 20px;
+      transform: none; width: auto;
+    }
+    .headset-eyebrow h2 { font-size: 22px; }
+    /* Allow callouts to wrap and cap their width so they stay on-screen */
+    .callout {
+      font-size: 10px; padding: 6px 9px 7px; border-radius: 9px;
+      white-space: normal; max-width: 110px; line-height: 1.3;
+    }
+    .callout .num { font-size: 8.5px; }
+    /* Hide the middle-row callouts (03 & 04) — the 4 corner ones don't overlap */
+    .callout-mid { display: none; }
+    .scrub-progress { gap: 6px; font-size: 9px; bottom: 24px; }
+    .scrub-progress .bar { width: 100px; }
   }
 
   /* MATARIKI star cluster */
@@ -469,11 +518,13 @@
   .star-tooltip .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; }
   .star-tooltip .desc { font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; }
 
+  /* Detail card is pinned to the bottom of .stars-sticky (sibling of canvas)
+     so it sits underneath the star cluster, not on top of it. */
   .star-detail {
-    position: absolute; left: 50%; bottom: 60px; transform: translateX(-50%);
+    position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%);
     width: min(760px, 88vw);
     padding: 22px 26px;
-    pointer-events: auto;
+    pointer-events: auto; z-index: 5;
     opacity: 0; transition: opacity .4s;
   }
   .star-detail.on { opacity: 1; }
@@ -485,7 +536,13 @@
   .star-detail .desc { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
   .star-detail .close { position: absolute; top: 10px; right: 14px; background: transparent; border: 0; color: var(--ink-mute); font-size: 16px; cursor: pointer; }
   .star-detail .close:hover { color: #fff; }
-  @media (max-width: 700px) { .star-detail .row { flex-direction: column; } .star-detail .col-1 { flex: none; } }
+  @media (max-width: 700px) { .star-detail .row { flex-direction: column; gap: 12px; } .star-detail .col-1 { flex: none; } }
+  @media (max-width: 600px) {
+    /* On mobile: tighter padding, smaller name, sit closer to bottom */
+    .star-detail { bottom: 20px; padding: 16px 18px; width: calc(100vw - 24px); }
+    .star-detail .name { font-size: 22px; }
+    .star-detail .desc { font-size: 12.5px; line-height: 1.5; }
+  }
 
   .stars-eyebrow {
     position: absolute; top: 90px; left: 50%; transform: translateX(-50%);
@@ -493,6 +550,13 @@
   }
   .stars-eyebrow h2 { margin-top: 14px; }
   .stars-eyebrow p { margin-top: 14px; font-size: 14px; color: var(--ink-mute); }
+  /* Mobile: anchor from edges so eyebrow text can't overflow — must come AFTER base .stars-eyebrow */
+  @media (max-width: 600px) {
+    .stars-section { height: 200vh; }
+    .stars-eyebrow { left: 20px; right: 20px; transform: none; width: auto; }
+    .stars-eyebrow h2 { font-size: 22px; }
+    .stars-canvas { width: 92vw; height: 56vh; }
+  }
 
   /* EXPERIENCE cards */
   .experience { padding: 200px 32px 160px; }
@@ -632,15 +696,22 @@
     text-align: left;
     display: grid; grid-template-columns: 110px 1fr; gap: 28px;
   }
-  @media (max-width: 600px) { .creator-card { grid-template-columns: 1fr; text-align: center; } }
+  @media (max-width: 600px) {
+    .creator-card { grid-template-columns: 1fr; text-align: center; }
+    /* Centre the avatar in its grid cell when card stacks on mobile */
+    .creator-card .avatar { justify-self: center; }
+  }
   .creator-card .avatar {
-    width: 110px; height: 110px; border-radius: 50%;
+    width: 110px; height: 110px; border-radius: 50%; overflow: hidden;
     background:
       radial-gradient(circle at 30% 30%, rgba(180,220,255,.6), transparent 55%),
       linear-gradient(150deg, #1a2240, #0a0e1c);
     border: 1px solid var(--hair-strong);
     display: flex; align-items: center; justify-content: center;
     font-family: 'Fraunces', serif; font-size: 34px; color: #fff; font-weight: 300;
+  }
+  .creator-card .avatar img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
   }
   .creator-card .role {
     font: 10px 'JetBrains Mono', monospace; letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
@@ -676,7 +747,7 @@
 <nav class="nav" aria-label="Primary">
   <span class="brand">Guardians of Matariki</span>
   <span class="dot"></span>
-  <div class="links" style="display:flex; gap:22px;">
+  <div class="links">
     <a href="#headset">Experience</a>
     <a href="#stars">Star Cluster</a>
     <a href="#culture">Kaupapa</a>
@@ -1250,7 +1321,7 @@ function Hero({ tweak }) {
 // ─────────────────────────────────────────────────────────────
 // HEADSET SECTION
 // ─────────────────────────────────────────────────────────────
-const HEADSET_VIDEO = "assets/vision-pro.mp4";
+const HEADSET_VIDEO = "https://res.cloudinary.com/dsqhj32yo/video/upload/q_auto/Apple_Vision_Pro_Animation_Black_bmfojk.mp4";
 
 function HeadsetSection({ tweak }) {
   const ref = useRef(null);
@@ -1258,12 +1329,16 @@ function HeadsetSection({ tweak }) {
   const p = useSectionProgress(ref);
   const explode = tweak.explodeDistance;
 
-  // Keep the video permanently paused so we can drive currentTime manually
+  // Keep the video permanently paused so we can drive currentTime manually.
+  // Also call v.load() explicitly — iOS Safari ignores preload="auto" on
+  // metered connections until user interaction, so without this v.duration
+  // stays NaN and the RAF loop never seeks.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     const keepPaused = () => v.pause();
     v.addEventListener('play', keepPaused);
+    v.load();   // force iOS to start buffering immediately
     v.pause();
     return () => v.removeEventListener('play', keepPaused);
   }, []);
@@ -1340,13 +1415,15 @@ function HeadsetSection({ tweak }) {
             const localOn = p > (0.32 + i * 0.02) && p < 0.78;
             const dx = c.x * (0.6 + ex * 0.8) * explode;
             const dy = c.y * (0.6 + ex * 0.8) * explode;
+            // Scale offsets down on smaller viewports so callouts stay on-screen
+            const vScale = Math.min(1, window.innerWidth / 960);
             return (
               <div
                 key={i}
-                className={"callout " + (localOn ? "on" : "")}
+                className={"callout " + (localOn ? "on" : "") + (i === 2 || i === 3 ? " callout-mid" : "")}
                 style={{
-                  left: `calc(50% + ${dx * 4}px)`,
-                  top:  `calc(50% + ${dy * 4}px)`,
+                  left: `calc(50% + ${dx * 4 * vScale}px)`,
+                  top:  `calc(50% + ${dy * 4 * vScale}px)`,
                   transform: `translate(-50%, -50%) ${localOn ? '' : 'translateY(6px)'}`,
                 }}
               >
@@ -1469,33 +1546,35 @@ function StarsSection({ tweak }) {
               })()}
             </div>
           )}
+        </div>
 
-          {active && (
-            <div className={"star-detail glass glass-strong " + (active ? "on" : "")}>
-              <button className="close" onClick={() => setActive(null)} aria-label="Close">×</button>
-              {(() => {
-                const s = CONFIG.stars.find(x => x.id === active);
-                return (
-                  <div className="row">
-                    <div className="col-1">
-                      <div className="name">{s.name}</div>
-                      <div className="domain">{s.domain}</div>
-                    </div>
-                    <div className="col-2">
-                      <div className="desc">{s.desc}</div>
-                      <div style={{
-                        marginTop: 14, fontFamily: 'JetBrains Mono, monospace',
-                        fontSize: 10, letterSpacing: '.15em', color: 'var(--ink-mute)', textTransform: 'uppercase',
-                      }}>
-                        Cultural meaning · review with advisors before publication
-                      </div>
+        {/* Detail card lives OUTSIDE the canvas so it sits at the bottom of
+            the sticky viewport instead of overlapping the stars. */}
+        {active && (
+          <div className={"star-detail glass glass-strong " + (active ? "on" : "")}>
+            <button className="close" onClick={() => setActive(null)} aria-label="Close">×</button>
+            {(() => {
+              const s = CONFIG.stars.find(x => x.id === active);
+              return (
+                <div className="row">
+                  <div className="col-1">
+                    <div className="name">{s.name}</div>
+                    <div className="domain">{s.domain}</div>
+                  </div>
+                  <div className="col-2">
+                    <div className="desc">{s.desc}</div>
+                    <div style={{
+                      marginTop: 14, fontFamily: 'JetBrains Mono, monospace',
+                      fontSize: 10, letterSpacing: '.15em', color: 'var(--ink-mute)', textTransform: 'uppercase',
+                    }}>
+                      Cultural meaning · review with advisors before publication
                     </div>
                   </div>
-                );
-              })()}
-            </div>
-          )}
-        </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
 
       </div>
     </section>
@@ -1589,7 +1668,9 @@ function Final() {
         </div>
 
         <div className="creator-card glass">
-          <div className="avatar">{CONFIG.creator.initials}</div>
+          <div className="avatar">
+            <img src="assets/creator-photo.jpg" alt={CONFIG.creator.name} />
+          </div>
           <div>
             <div className="role">{CONFIG.creator.role}</div>
             <div className="name">{CONFIG.creator.name}</div>
