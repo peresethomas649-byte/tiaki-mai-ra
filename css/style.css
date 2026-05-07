@@ -1125,29 +1125,41 @@ button {
     transition-delay: 0.24s;
 }
 
-/* === SECTION SEPARATOR === */
+/* === CLOUDINARY VIDEO SECTION SEPARATOR ===
+   Bridge spans the full viewport width edge-to-edge. Anchor with
+   left:50% + translateX(-50%) so width:100vw escapes the parent
+   `.testimonials` container's content padding. body has overflow-x:hidden
+   so 100vw never produces a horizontal scrollbar. */
 .section-separator {
     position: absolute;
     top: 0;
-    left: 0;
-    width: 100%;
-    transform: translateY(-95%);
+    left: 50%;
+    width: 100vw;
+    max-width: none;
+    transform: translate(-50%, -95%);
     z-index: 1;
     pointer-events: none;
     display: flex;
     justify-content: center;
     mix-blend-mode: screen;
+    overflow: hidden;
 }
 
 .section-separator__video {
+    display: block;
     width: 100%;
-    /* Remove min-width: 800px constraint that breaks mobile layout */
-    height: auto;
-    min-height: 400px; /* guarantees video doesn't get too short on mobile */
+    height: clamp(180px, 32vw, 420px);
     object-fit: cover;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
-    opacity: 0.95;
+    object-position: center;
+    opacity: 0.96;
+    pointer-events: none;
+    filter: saturate(125%) contrast(106%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+}
+
+.section-separator__video::-webkit-media-controls {
+    display: none !important;
 }
 
 /* === TESTIMONIALS SECTION === */
@@ -2273,7 +2285,7 @@ button {
     }
 
     .section-separator__video {
-        min-height: 250px;
+        height: 250px;
     }
 
     .card-deck {
@@ -2354,9 +2366,9 @@ button {
         padding: 0 var(--space-xs);
     }
 
-    /* --- Video separator: ensure iOS autoplay works --- */
+    /* --- Cloudinary video separator: responsive height --- */
     .section-separator__video {
-        min-height: 200px;
+        height: 200px;
     }
 
     /* --- Testimonials: fix sticky section showing cards before visible --- */
@@ -2527,5 +2539,26 @@ body {
 @keyframes pageLoad {
     to {
         opacity: 1;
+    }
+}
+
+/* === Production Performance Helpers === */
+.spline-lazy { width: 100%; height: 100%; min-height: 320px; }
+.spline-lazy.is-loading::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.12), transparent 60%); pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+    }
+
+    .binary-particle, .hero__scroll-indicator {
+        display: none !important;
+    }
+
+    .section-separator__video {
+        opacity: 0.35;
     }
 }

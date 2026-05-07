@@ -1,3 +1,28 @@
+# macOS / system files
 .DS_Store
-**/.DS_Store
+__MACOSX/
+
+# local development
 .claude/
+.vscode/
+.env
+.env.*
+node_modules/
+dist/
+.cache/
+
+# heavy media should live in Cloudinary/R2, not GitHub/Netlify
+*.mp4
+*.mov
+*.avi
+*.webm
+*.mkv
+*.glb
+*.gltf
+*.bin
+*.hdr
+*.zip
+
+# optional upload scratch folders
+uploads/
+**/uploads/
