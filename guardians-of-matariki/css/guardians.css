@@ -1,15 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Guardians of Matariki — Spatial Storytelling Showcase</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
-
-<style>
   :root {
     --bg-0: #03060f;
     --bg-1: #060a1a;
@@ -30,14 +18,19 @@
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--bg-0); color: var(--ink); }
+  /* Horizontal-overflow guard MUST live on <html>, NOT <body>. Putting it on
+     <body> creates a new scroll container that breaks `position: sticky`
+     in iOS Safari (sections only stick scrolling up, not down). */
+  html { overflow-x: clip; }
   body {
     font-family: 'Inter', system-ui, sans-serif;
     font-weight: 400;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
     cursor: default;
   }
+  /* iOS hint to ensure sticky elements get their own composited layer */
+  .headset-sticky, .stars-sticky { will-change: transform; }
   ::selection { background: rgba(124,201,255,.3); color: #fff; }
 
   /* persistent atmospheric backdrop */
@@ -84,11 +77,30 @@
     font-size: 12.5px; letter-spacing: .04em;
     box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 12px 40px rgba(0,0,0,.5);
   }
-  .nav .brand { font-family: 'Fraunces', serif; font-weight: 400; font-size: 13.5px; letter-spacing: .02em; color: #fff; }
-  .nav .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .nav .brand { font-family: 'Fraunces', serif; font-weight: 400; font-size: 13.5px; letter-spacing: .02em; color: #fff; white-space: nowrap; }
+  .nav .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); flex-shrink: 0; }
   .nav a { color: var(--ink-soft); text-decoration: none; transition: color .25s; }
   .nav a:hover { color: #fff; }
-  @media (max-width: 720px) { .nav .links { display: none; } }
+  .nav .links { display: flex; gap: 22px; }
+  @media (max-width: 560px) {
+    /* Mobile pill: re-uses base left:50%/translateX(-50%) so the nav is
+       always centred. width:max-content shrink-fits the pill to the
+       links row, and max-width caps it to the viewport (minus 16px).
+       Two rows: brand on top, links centred below. */
+    .nav {
+      width: max-content;
+      max-width: calc(100vw - 16px);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 5px;
+      padding: 8px 16px;
+      border-radius: 18px;
+    }
+    .nav .dot { display: none; }
+    .nav .brand { font-size: 11.5px; text-align: center; }
+    .nav .links { gap: 11px; justify-content: center; }
+    .nav .links a { font-size: 10.5px; letter-spacing: 0; white-space: nowrap; }
+  }
 
   /* Layout primitives */
   main { position: relative; z-index: 1; }
@@ -160,7 +172,12 @@
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .hero h1 em { font-style: italic; font-weight: 300; color: var(--accent); -webkit-text-fill-color: var(--accent); }
-  .hero .subtitle { max-width: 680px; margin: 28px auto 0; font-size: 17px; color: var(--ink-soft); }
+  .hero .subtitle { max-width: 680px; margin: 28px auto 0; font-size: 17px; color: var(--ink-soft); padding: 0 20px; }
+  @media (max-width: 600px) {
+    .hero { padding-left: 20px; padding-right: 20px; }
+    .hero .subtitle { font-size: 15px; }
+    .hero .byline { font-size: 9px; }
+  }
   .hero .byline {
     margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
     letter-spacing: .15em; color: var(--ink-mute); text-transform: uppercase;
@@ -262,6 +279,27 @@
     font: 10px 'JetBrains Mono', monospace; letter-spacing: .25em; text-transform: uppercase;
     color: rgba(255,255,255,.85);
   }
+
+  /* Scroll-scrubbed video (headset section) */
+  .scroll-video {
+    width: min(1100px, 92vw);
+    border-radius: 18px; overflow: hidden;
+    border: 1px solid var(--hair-strong);
+    background: rgba(8,12,28,.55);
+    box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 40px 120px rgba(0,0,0,.6), 0 0 80px rgba(124,201,255,.12);
+  }
+  .scroll-video-frame {
+    position: relative;
+    aspect-ratio: 16/9;
+    background: #000;
+    overflow: hidden;
+  }
+  .scroll-video-glow {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: .6;
+  }
   .hero-device {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
@@ -358,9 +396,9 @@
 
   .headset-eyebrow {
     position: absolute; top: 110px; left: 50%; transform: translateX(-50%);
-    text-align: center;
+    text-align: center; width: 90%;
   }
-  .headset-eyebrow h2 { font-size: clamp(28px, 3.4vw, 42px); margin-top: 14px; }
+  .headset-eyebrow h2 { font-size: clamp(22px, 3.4vw, 42px); margin-top: 14px; }
 
   /* Callout labels that float around the exploded headset */
   .callout {
@@ -387,6 +425,26 @@
   .callout .line {
     position: absolute; height: 1px; background: linear-gradient(90deg, var(--accent), transparent);
     pointer-events: none;
+  }
+
+  @media (max-width: 600px) {
+    .headset-section { height: 180vh; }
+    /* Anchor eyebrow from edges instead of 50%/translate so text can't overflow */
+    .headset-eyebrow {
+      top: 76px; left: 20px; right: 20px;
+      transform: none; width: auto;
+    }
+    .headset-eyebrow h2 { font-size: 22px; }
+    /* Allow callouts to wrap and cap their width so they stay on-screen */
+    .callout {
+      font-size: 10px; padding: 6px 9px 7px; border-radius: 9px;
+      white-space: normal; max-width: 110px; line-height: 1.3;
+    }
+    .callout .num { font-size: 8.5px; }
+    /* Hide the middle-row callouts (03 & 04) — the 4 corner ones don't overlap */
+    .callout-mid { display: none; }
+    .scrub-progress { gap: 6px; font-size: 9px; bottom: 24px; }
+    .scrub-progress .bar { width: 100px; }
   }
 
   /* MATARIKI star cluster */
@@ -448,11 +506,13 @@
   .star-tooltip .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; }
   .star-tooltip .desc { font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; }
 
+  /* Detail card is pinned to the bottom of .stars-sticky (sibling of canvas)
+     so it sits underneath the star cluster, not on top of it. */
   .star-detail {
-    position: absolute; left: 50%; bottom: 60px; transform: translateX(-50%);
+    position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%);
     width: min(760px, 88vw);
     padding: 22px 26px;
-    pointer-events: auto;
+    pointer-events: auto; z-index: 5;
     opacity: 0; transition: opacity .4s;
   }
   .star-detail.on { opacity: 1; }
@@ -464,7 +524,13 @@
   .star-detail .desc { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
   .star-detail .close { position: absolute; top: 10px; right: 14px; background: transparent; border: 0; color: var(--ink-mute); font-size: 16px; cursor: pointer; }
   .star-detail .close:hover { color: #fff; }
-  @media (max-width: 700px) { .star-detail .row { flex-direction: column; } .star-detail .col-1 { flex: none; } }
+  @media (max-width: 700px) { .star-detail .row { flex-direction: column; gap: 12px; } .star-detail .col-1 { flex: none; } }
+  @media (max-width: 600px) {
+    /* On mobile: tighter padding, smaller name, sit closer to bottom */
+    .star-detail { bottom: 20px; padding: 16px 18px; width: calc(100vw - 24px); }
+    .star-detail .name { font-size: 22px; }
+    .star-detail .desc { font-size: 12.5px; line-height: 1.5; }
+  }
 
   .stars-eyebrow {
     position: absolute; top: 90px; left: 50%; transform: translateX(-50%);
@@ -472,6 +538,15 @@
   }
   .stars-eyebrow h2 { margin-top: 14px; }
   .stars-eyebrow p { margin-top: 14px; font-size: 14px; color: var(--ink-mute); }
+  /* Mobile: anchor from edges so eyebrow text can't overflow — must come AFTER base .stars-eyebrow */
+  @media (max-width: 600px) {
+    .stars-section { height: 200vh; }
+    .stars-eyebrow { left: 20px; right: 20px; transform: none; width: auto; }
+    .stars-eyebrow h2 { font-size: 22px; }
+    .stars-canvas { width: 92vw; height: 56vh; margin-top: 90px; }
+    /* Hover-follow tooltip is desktop-only; tap shows the detail card instead. */
+    .star-tooltip { display: none; }
+  }
 
   /* EXPERIENCE cards */
   .experience { padding: 200px 32px 160px; }
@@ -551,14 +626,48 @@
     display: flex; flex-direction: column; gap: 0;
   }
   .value-row {
-    display: grid; grid-template-columns: 200px 1fr; gap: 28px;
+    display: grid; grid-template-columns: 1fr 1.2fr; gap: 28px;
     padding: 26px 0;
     border-top: 1px solid var(--hair);
+    align-items: center;
+    cursor: default;
+    outline: none;
   }
   .value-row:last-child { border-bottom: 1px solid var(--hair); }
-  .value-row .key { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 400; color: #fff; font-style: italic; }
-  .value-row .key small { display: block; font: 10px 'JetBrains Mono', monospace; letter-spacing: .15em; color: var(--accent); margin-top: 6px; font-style: normal; text-transform: uppercase; }
-  .value-row .desc { font-size: 13.5px; color: var(--ink-soft); }
+  .value-row .key {
+    font-family: 'Fraunces', serif; font-size: 26px; font-weight: 400; color: #fff;
+    font-style: italic;
+    display: flex; align-items: baseline; gap: 14px;
+    flex-wrap: wrap;
+    transition: color .3s;
+  }
+  .value-row .key small {
+    font: 10px 'JetBrains Mono', monospace; letter-spacing: .15em; color: var(--accent);
+    font-style: normal; text-transform: uppercase;
+  }
+  .value-row .key .hint {
+    font: 10px 'JetBrains Mono', monospace; letter-spacing: .15em; color: var(--ink-mute);
+    font-style: normal; text-transform: uppercase;
+    opacity: .55; transition: opacity .3s;
+    margin-left: auto;
+  }
+  .value-row:hover .key .hint, .value-row:focus .key .hint { opacity: 0; }
+  .value-row .desc-wrap {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height .5s cubic-bezier(.2,.8,.2,1), opacity .35s ease;
+  }
+  .value-row:hover .desc-wrap, .value-row:focus .desc-wrap, .value-row:focus-within .desc-wrap {
+    max-height: 240px;
+    opacity: 1;
+  }
+  .value-row .desc { font-size: 13.5px; color: var(--ink-soft); padding-right: 8px; }
+  @media (max-width: 700px) {
+    .value-row { grid-template-columns: 1fr; gap: 14px; }
+    .value-row .desc-wrap { max-height: 240px; opacity: 1; }
+    .value-row .key .hint { display: none; }
+  }
 
   /* CTA / FOOTER */
   .final {
@@ -577,15 +686,22 @@
     text-align: left;
     display: grid; grid-template-columns: 110px 1fr; gap: 28px;
   }
-  @media (max-width: 600px) { .creator-card { grid-template-columns: 1fr; text-align: center; } }
+  @media (max-width: 600px) {
+    .creator-card { grid-template-columns: 1fr; text-align: center; }
+    /* Centre the avatar in its grid cell when card stacks on mobile */
+    .creator-card .avatar { justify-self: center; }
+  }
   .creator-card .avatar {
-    width: 110px; height: 110px; border-radius: 50%;
+    width: 110px; height: 110px; border-radius: 50%; overflow: hidden;
     background:
       radial-gradient(circle at 30% 30%, rgba(180,220,255,.6), transparent 55%),
       linear-gradient(150deg, #1a2240, #0a0e1c);
     border: 1px solid var(--hair-strong);
     display: flex; align-items: center; justify-content: center;
     font-family: 'Fraunces', serif; font-size: 34px; color: #fff; font-weight: 300;
+  }
+  .creator-card .avatar img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
   }
   .creator-card .role {
     font: 10px 'JetBrains Mono', monospace; letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
@@ -612,39 +728,12 @@
     .atmosphere::after { animation: none; }
     .reveal { opacity: 1; transform: none; transition: none; }
   }
-</style>
-</head>
-<body>
 
-<div class="atmosphere"></div>
-
-<nav class="nav" aria-label="Primary">
-  <span class="brand">Guardians of Matariki</span>
-  <span class="dot"></span>
-  <div class="links" style="display:flex; gap:22px;">
-    <a href="#headset">Experience</a>
-    <a href="#stars">Star Cluster</a>
-    <a href="#culture">Kaupapa</a>
-    <a href="#contact">Creator</a>
-  </div>
-</nav>
-
-<main id="app"></main>
-
-<!-- React + Babel -->
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-
-<!-- Tweaks panel scaffolding -->
-<script type="text/babel" src="tweaks-panel.jsx"></script>
-<!-- App config -->
-<script type="text/babel" src="config.jsx"></script>
-<!-- App (split for clarity) -->
-<script type="text/babel" src="app-hero.jsx"></script>
-<script type="text/babel" src="app-headset.jsx"></script>
-<script type="text/babel" src="app-stars.jsx"></script>
-<script type="text/babel" src="app-rest.jsx"></script>
-
-</body>
-</html>
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

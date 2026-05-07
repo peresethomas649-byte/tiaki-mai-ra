@@ -29,14 +29,19 @@ class NavigationSystem {
     }
 
     toggleMenu() {
-        this.hamburger.classList.toggle('active');
-        this.mobileMenu.classList.toggle('active');
-        document.body.style.overflow = this.mobileMenu.classList.contains('active') ? 'hidden' : '';
+        const isOpen = !this.mobileMenu.classList.contains('active');
+        this.hamburger.classList.toggle('active', isOpen);
+        this.mobileMenu.classList.toggle('active', isOpen);
+        this.hamburger.setAttribute('aria-expanded', String(isOpen));
+        this.mobileMenu.setAttribute('aria-hidden', String(!isOpen));
+        document.body.style.overflow = isOpen ? 'hidden' : '';
     }
 
     closeMenu() {
         this.hamburger.classList.remove('active');
         this.mobileMenu.classList.remove('active');
+        this.hamburger.setAttribute('aria-expanded', 'false');
+        this.mobileMenu.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
     }
 
@@ -515,41 +520,84 @@ class LiquidGlassCards {
 // --- 8. Spline Performance Manager ---
 class SplinePerformanceManager {
     constructor() {
-        this.sections = [
-            { section: document.getElementById('home'), viewer: document.getElementById('spline-robot-viewer') },
-            { section: document.getElementById('projects'), viewer: document.getElementById('projects-spline-viewer') },
-            { section: document.getElementById('testimonials'), viewer: document.getElementById('testimonials-spline-viewer') },
-            { section: document.getElementById('contact'), viewer: document.getElementById('contact-spline-viewer') }
-        ];
-        this.initObserver();
+        this.scriptPromise = null;
+        this.heroViewer = document.getElementById('spline-robot-viewer');
+        this.lazyContainers = Array.from(document.querySelectorAll('.spline-lazy[data-spline-url]'));
+        this.initHeroObserver();
+        this.initLazyObserver();
     }
 
-    initObserver() {
+    loadSplineScript() {
+        if (window.customElements && customElements.get('spline-viewer')) return Promise.resolve();
+        if (this.scriptPromise) return this.scriptPromise;
+
+        this.scriptPromise = new Promise((resolve, reject) => {
+            const existing = document.querySelector('script[data-spline-viewer-loader]');
+            if (existing) {
+                existing.addEventListener('load', resolve, { once: true });
+                existing.addEventListener('error', reject, { once: true });
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = 'https://unpkg.com/@splinetool/viewer@1/build/spline-viewer.js';
+            script.dataset.splineViewerLoader = 'true';
+            script.addEventListener('load', resolve, { once: true });
+            script.addEventListener('error', reject, { once: true });
+            document.head.appendChild(script);
+        });
+
+        return this.scriptPromise;
+    }
+
+    initHeroObserver() {
+        const heroSection = document.getElementById('home');
+        if (!heroSection || !this.heroViewer) return;
+
+        this.loadSplineScript().catch(() => {});
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                const viewer = entry.target._splineViewer;
-                if (!viewer) return;
-
-                if (entry.isIntersecting) {
-                    // Start rendering again when moving into view
-                    viewer.style.display = 'block';
-                } else {
-                    // Setting display: none natively pauses requestAnimationFrame for off-screen WebGL elements
-                    viewer.style.display = 'none';
-                }
+                this.heroViewer.style.display = entry.isIntersecting ? 'block' : 'none';
             });
-        }, {
-            // Buffer to load the scene slightly before the user scrolls to it
-            rootMargin: '300px 0px 300px 0px'
-        });
+        }, { rootMargin: '300px 0px 300px 0px' });
 
-        this.sections.forEach(item => {
-            if (item.section && item.viewer) {
-                // Attach reference to the viewer
-                item.section._splineViewer = item.viewer;
-                observer.observe(item.section);
-            }
-        });
+        observer.observe(heroSection);
+    }
+
+    initLazyObserver() {
+        if (!this.lazyContainers.length) return;
+
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                const container = entry.target;
+                if (!entry.isIntersecting) {
+                    const viewer = container.querySelector('spline-viewer');
+                    if (viewer) viewer.style.display = 'none';
+                    return;
+                }
+
+                const existing = container.querySelector('spline-viewer');
+                if (existing) {
+                    existing.style.display = 'block';
+                    return;
+                }
+
+                container.classList.add('is-loading');
+                this.loadSplineScript()
+                    .then(() => {
+                        const viewer = document.createElement('spline-viewer');
+                        viewer.id = container.dataset.splineId || '';
+                        viewer.setAttribute('url', container.dataset.splineUrl);
+                        viewer.addEventListener('load', () => container.classList.remove('is-loading'), { once: true });
+                        container.appendChild(viewer);
+                    })
+                    .catch(() => container.classList.remove('is-loading'));
+            });
+        }, { rootMargin: '500px 0px 500px 0px' });
+
+        this.lazyContainers.forEach(container => observer.observe(container));
     }
 }
 
@@ -569,30 +617,6 @@ class App {
         this.ticking = false;
         window.addEventListener('scroll', () => this.handleGlobalScroll(), { passive: true });
 
-        // iOS video autoplay fallback
-        this.initVideoAutoplay();
-    }
-
-    initVideoAutoplay() {
-        const video = document.querySelector('.section-separator__video');
-        if (!video) return;
-
-        // Force play when scrolled into view (iOS often blocks autoplay until visible)
-        const videoObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    video.play().catch(() => {});
-                }
-            });
-        }, { threshold: 0.1 });
-        videoObserver.observe(video);
-
-        // Also force play on first user touch (iOS requirement)
-        const forcePlay = () => {
-            video.play().catch(() => {});
-            document.removeEventListener('touchstart', forcePlay);
-        };
-        document.addEventListener('touchstart', forcePlay, { passive: true });
     }
 
     handleGlobalScroll() {
