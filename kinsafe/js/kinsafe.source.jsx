@@ -225,13 +225,29 @@ function Icon({ name, className = "w-5 h-5", stroke = 1.6 }) {
 function NavBar({ links }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const headerRef = useRef(null);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  // Close the mobile dropdown when the user taps outside the nav.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onDocClick = (e) => {
+      if (headerRef.current && !headerRef.current.contains(e.target)) {
+        setMobileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("touchstart", onDocClick);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("touchstart", onDocClick);
+    };
+  }, [mobileOpen]);
   return (
-    <header className="fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-24px)] max-w-6xl">
+    <header ref={headerRef} className="fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-24px)] max-w-6xl">
       <nav
         className={`ss-nav glass-thin px-4 sm:px-5 py-3 flex items-center justify-between transition-all duration-500 ${scrolled ? "shadow-lg" : ""}`}
         style={{ borderRadius: "999px" }}
@@ -388,12 +404,12 @@ function HeroPhone({ activeHazard, onHover }) {
             ))}
 
             {/* AR top HUD */}
-            <div className="absolute top-3 left-3 right-3 flex items-center justify-between text-[10px] font-mono">
-              <div className="glass-thin px-2 py-1 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="absolute top-2 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 flex items-center justify-between text-[8px] sm:text-[10px] font-mono gap-2">
+              <div className="glass-thin px-1.5 sm:px-2 py-0.5 sm:py-1 flex items-center gap-1 sm:gap-1.5 whitespace-nowrap">
+                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 AR · TRACKING
               </div>
-              <div className="glass-thin px-2 py-1">3/5 HAZARDS</div>
+              <div className="glass-thin px-1.5 sm:px-2 py-0.5 sm:py-1 whitespace-nowrap">3/5 HAZARDS</div>
             </div>
 
             {/* Hazard detail card — pinned to a FIXED top-right slot inside
@@ -403,13 +419,11 @@ function HeroPhone({ activeHazard, onHover }) {
                 feel abrupt). Content is keyed off `displayHazard` which
                 lingers for the transition duration after `activeHazard`
                 clears, so the text stays visible during the fade-out. */}
-            <div className="glass-thin absolute z-20"
+            <div className="glass-thin hero-hazard-card absolute z-20"
               style={{
                 top: "10%",
                 right: "4%",
-                width: "56%",
-                padding: "10px 12px",
-                borderRadius: 14,
+                width: "60%",
                 pointerEvents: "none",
                 opacity: activeHazard ? 1 : 0,
                 transform: activeHazard ? "translateY(0)" : "translateY(-6px)",
@@ -420,16 +434,16 @@ function HeroPhone({ activeHazard, onHover }) {
                 if (!h) return null;
                 return (
                   <>
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--ss-yellow)]" />
-                      <span className="text-[9px] font-mono uppercase tracking-widest text-[color:var(--ss-muted)]">
+                    <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5">
+                      <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[color:var(--ss-yellow)]" />
+                      <span className="text-[7px] sm:text-[9px] font-mono uppercase tracking-widest text-[color:var(--ss-muted)]">
                         Hazard detected
                       </span>
                     </div>
-                    <div className="font-semibold text-[12px] leading-tight text-[color:var(--ss-fg)]">
+                    <div className="font-semibold text-[10px] sm:text-[12px] leading-tight text-[color:var(--ss-fg)]">
                       {h.label}
                     </div>
-                    <div className="text-[10px] leading-snug text-[color:var(--ss-muted)] mt-1">
+                    <div className="text-[8px] sm:text-[10px] leading-snug text-[color:var(--ss-muted)] mt-0.5 sm:mt-1">
                       {h.body}
                     </div>
                   </>
@@ -438,18 +452,18 @@ function HeroPhone({ activeHazard, onHover }) {
             </div>
 
             {/* bottom HUD */}
-            <div className="absolute bottom-3 left-3 right-3">
-              <div className="glass-thin p-3 flex items-center gap-3" style={{ borderRadius: 18 }}>
-                <div className="w-9 h-9 rounded-full bg-[var(--ss-yellow)] flex items-center justify-center text-[var(--ss-navy)]">
-                  <Icon name="alert" className="w-5 h-5" />
+            <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3">
+              <div className="glass-thin p-2 sm:p-3 flex items-center gap-2 sm:gap-3" style={{ borderRadius: 18 }}>
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[var(--ss-yellow)] flex items-center justify-center text-[var(--ss-navy)] flex-shrink-0">
+                  <Icon name="alert" className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[10px] font-mono text-[color:var(--ss-muted)]">CURRENT TASK</div>
-                  <div className="text-xs font-semibold text-[color:var(--ss-navy)] truncate">
-                    Identify 5 hazards within 60s
+                  <div className="text-[8px] sm:text-[10px] font-mono text-[color:var(--ss-muted)]">CURRENT TASK</div>
+                  <div className="text-[10px] sm:text-xs font-semibold text-[color:var(--ss-navy)] leading-tight">
+                    Identify 5 hazards · 60s
                   </div>
                 </div>
-                <div className="font-mono text-xs text-[color:var(--ss-navy)]">00:42</div>
+                <div className="font-mono text-[10px] sm:text-xs text-[color:var(--ss-navy)] flex-shrink-0">00:42</div>
               </div>
             </div>
           </div>
@@ -1311,40 +1325,42 @@ function AppFlow() {
         </Reveal>
         <Reveal delay={120}>
           <div className="mt-12 glass p-6 sm:p-10">
+            {/* Each pill is followed by its own w-full accordion card. The
+                w-full element forces the flex-wrap row to break at that
+                point, so the detail card "drops down" directly under the
+                pill that was tapped — instead of always appearing below
+                the entire pill row. Cards stay mounted (just collapsed)
+                so the close transition plays smoothly. */}
             <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-4">
-              {D.appFlow.map((step, i) => (
-                <React.Fragment key={step}>
-                  <button
-                    onClick={() => setActive(active === i ? -1 : i)}
-                    onMouseEnter={() => { if (window.matchMedia("(hover: hover)").matches) setActive(i); }}
-                    className={`relative px-4 py-3 rounded-full text-sm font-semibold transition-all duration-300 ease-in-out ${active === i ? "bg-[color:var(--ss-navy)] text-white -translate-y-0.5 shadow-lg" : "bg-white/60 text-[color:var(--ss-navy)]"}`}
-                  >
-                    <span className="font-mono text-[10px] mr-2 opacity-60">{String(i + 1).padStart(2, "0")}</span>
-                    {step}
-                  </button>
-                  {i < D.appFlow.length - 1 ? (
-                    <Icon name="arrow" className="w-4 h-4 text-[color:var(--ss-muted)] hidden sm:block" />
-                  ) : null}
-                </React.Fragment>
-              ))}
-            </div>
-
-            {/* Detail strip — accordion below the pill row. max-height +
-                opacity transition gives smooth slide-in on open and
-                slide-out on close, in both directions. No more absolute
-                popup overlapping neighbouring pills. */}
-            <div className={`overflow-hidden transition-all ease-in-out ${active >= 0 ? "max-h-[200px] opacity-100 mt-6" : "max-h-0 opacity-0 mt-0"}`}
-              style={{ transitionDuration: "420ms" }}>
-              <div className="glass-thin p-4 max-w-xl mx-auto text-center text-sm text-[color:var(--ss-navy)]">
-                {active >= 0 ? (
-                  <>
-                    <div className="font-mono text-[10px] tracking-widest uppercase text-[color:var(--ss-muted)] mb-1">
-                      {String(active + 1).padStart(2, "0")} · {D.appFlow[active]}
+              {D.appFlow.map((step, i) => {
+                const isActive = active === i;
+                return (
+                  <React.Fragment key={step}>
+                    <button
+                      onClick={() => setActive(active === i ? -1 : i)}
+                      onMouseEnter={() => { if (window.matchMedia("(hover: hover)").matches) setActive(i); }}
+                      className={`relative px-4 py-3 rounded-full text-sm font-semibold transition-all duration-300 ease-in-out ${isActive ? "bg-[color:var(--ss-navy)] text-white -translate-y-0.5 shadow-lg" : "bg-white/60 text-[color:var(--ss-navy)]"}`}
+                    >
+                      <span className="font-mono text-[10px] mr-2 opacity-60">{String(i + 1).padStart(2, "0")}</span>
+                      {step}
+                    </button>
+                    {i < D.appFlow.length - 1 ? (
+                      <Icon name="arrow" className="w-4 h-4 text-[color:var(--ss-muted)] hidden sm:block" />
+                    ) : null}
+                    <div
+                      className={`w-full overflow-hidden transition-all ease-in-out ${isActive ? "max-h-[200px] opacity-100 mt-4" : "max-h-0 opacity-0 mt-0"}`}
+                      style={{ transitionDuration: "420ms" }}
+                    >
+                      <div className="glass-thin p-4 max-w-xl mx-auto text-center text-sm text-[color:var(--ss-navy)]">
+                        <div className="font-mono text-[10px] tracking-widest uppercase text-[color:var(--ss-muted)] mb-1">
+                          {String(i + 1).padStart(2, "0")} · {step}
+                        </div>
+                        <div>{stepBody(i)}</div>
+                      </div>
                     </div>
-                    <div>{stepBody(active)}</div>
-                  </>
-                ) : null}
-              </div>
+                  </React.Fragment>
+                );
+              })}
             </div>
           </div>
         </Reveal>
@@ -1583,7 +1599,10 @@ function Footer() {
     { label: "Contact", href: "#cta" },
   ];
   return (
-    <footer className="section-pad !pt-12 !pb-10">
+    // Override .section-pad's vertical padding: a 140px top/bottom is way too
+    // much on a footer (used to create excessive blank space below on mobile).
+    // Use horizontal padding from .section-pad but tight verticals.
+    <footer className="section-pad !py-6 sm:!pt-10 sm:!pb-8">
       <div className="max-w-7xl mx-auto glass-thin px-6 py-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
         <div className="flex items-center gap-3">
           <Logo size={28} />
@@ -1592,9 +1611,16 @@ function Footer() {
             <div className="text-xs text-[color:var(--ss-muted)]">AR construction safety training · iOS</div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[color:var(--ss-muted)]">
-          {links.map((l) => (
-            <a key={l.href} href={l.href} className="hover:text-[color:var(--ss-navy)] transition">{l.label}</a>
+        {/* Links: dot-separated inline row from sm+, single column on mobile
+            for a tidy stack instead of an awkward 2-col flex-wrap. */}
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-x-6 gap-y-2 text-sm text-[color:var(--ss-muted)] w-full sm:w-auto">
+          {links.map((l, i) => (
+            <React.Fragment key={l.href}>
+              <a href={l.href} className="hover:text-[color:var(--ss-navy)] transition">{l.label}</a>
+              {i < links.length - 1 ? (
+                <span className="hidden sm:inline opacity-30">·</span>
+              ) : null}
+            </React.Fragment>
           ))}
         </div>
         <div className="text-xs text-[color:var(--ss-muted)] font-mono">© 2026 · KINSafe</div>
