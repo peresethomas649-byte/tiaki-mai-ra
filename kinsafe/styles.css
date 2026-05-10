@@ -154,6 +154,35 @@ body {
   .section-pad { padding-left: 16px; padding-right: 16px; }
 }
 
+/* Footer: defeat .section-pad's 140px vertical padding entirely.
+   On phones the giant top/bottom whitespace was leaving a half-screen
+   blank below the © line on iPhone 17 Pro Max etc. We use !important
+   here because the Tailwind `!py-6` utility from the JSX wasn't
+   reliably winning over the .section-pad shorthand. Also pad with
+   safe-area-inset on the bottom so the footer sits flush above the
+   home indicator without hiding behind it. */
+footer.section-pad {
+  padding-top: 16px !important;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+}
+@media (min-width: 640px) {
+  footer.section-pad {
+    padding-top: 40px !important;
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 28px) !important;
+  }
+}
+
+/* Make the body fill at least the viewport so we don't get phantom blank
+   space below short content on iOS Safari (rubber-band scroll exposes
+   the page-bg, which can read as "empty space below footer"). Long pages
+   are unaffected — flex-1 main only pushes footer down when content is
+   shorter than the viewport. */
+html, body { min-height: 100%; }
+body { display: flex; flex-direction: column; min-height: 100dvh; }
+#root { display: flex; flex-direction: column; flex: 1 0 auto; }
+#root > main { flex: 1 0 auto; }
+#root > footer { flex-shrink: 0; }
+
 .eyebrow {
   font-family: "JetBrains Mono", monospace;
   font-size: 11px; letter-spacing: 0.18em;
