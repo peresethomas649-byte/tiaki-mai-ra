@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>KINSafe — AR Construction Safety Training</title>
+
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%230a1628'/><circle cx='16' cy='16' r='9' fill='%23fbcf2c'/><circle cx='16' cy='16' r='3' fill='%230a1628'/></svg>" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Manrope", "ui-sans-serif", "system-ui", "sans-serif"],
+            mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- React production builds (minified, ~2-3x smaller than dev, no warnings). -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-[var(--ss-bg)] text-[var(--ss-fg)] font-sans antialiased">
+  <div id="root"></div>
+
+  <!-- Compiled bundle (components + sections + app concatenated and JSX→JS).
+       Edit `js/kinsafe.source.jsx` (or the original `*.jsx` files), then run
+       `npm run build` to regenerate this file. No Babel-in-browser. -->
+  <script src="data.js"></script>
+  <script src="js/kinsafe.js" defer></script>
+</body>
+</html>
