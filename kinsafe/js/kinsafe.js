@@ -254,12 +254,29 @@ function NavBar({
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const headerRef = useRef(null);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  // Close the mobile dropdown when the user taps outside the nav.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onDocClick = e => {
+      if (headerRef.current && !headerRef.current.contains(e.target)) {
+        setMobileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("touchstart", onDocClick);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("touchstart", onDocClick);
+    };
+  }, [mobileOpen]);
   return /*#__PURE__*/React.createElement("header", {
+    ref: headerRef,
     className: "fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-24px)] max-w-6xl"
   }, /*#__PURE__*/React.createElement("nav", {
     className: `ss-nav glass-thin px-4 sm:px-5 py-3 flex items-center justify-between transition-all duration-500 ${scrolled ? "shadow-lg" : ""}`,
@@ -548,21 +565,19 @@ function HeroPhone({
     onMouseLeave: () => onHover(null),
     onTouchStart: () => onHover(h.id)
   })), /*#__PURE__*/React.createElement("div", {
-    className: "absolute top-3 left-3 right-3 flex items-center justify-between text-[10px] font-mono"
+    className: "absolute top-2 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 flex items-center justify-between text-[8px] sm:text-[10px] font-mono gap-2"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "glass-thin px-2 py-1 flex items-center gap-1.5"
+    className: "glass-thin px-1.5 sm:px-2 py-0.5 sm:py-1 flex items-center gap-1 sm:gap-1.5 whitespace-nowrap"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
+    className: "w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-emerald-500 animate-pulse"
   }), "AR \xB7 TRACKING"), /*#__PURE__*/React.createElement("div", {
-    className: "glass-thin px-2 py-1"
+    className: "glass-thin px-1.5 sm:px-2 py-0.5 sm:py-1 whitespace-nowrap"
   }, "3/5 HAZARDS")), /*#__PURE__*/React.createElement("div", {
-    className: "glass-thin absolute z-20",
+    className: "glass-thin hero-hazard-card absolute z-20",
     style: {
       top: "10%",
       right: "4%",
-      width: "56%",
-      padding: "10px 12px",
-      borderRadius: 14,
+      width: "60%",
       pointerEvents: "none",
       opacity: activeHazard ? 1 : 0,
       transform: activeHazard ? "translateY(0)" : "translateY(-6px)",
@@ -572,36 +587,36 @@ function HeroPhone({
     const h = displayHazard ? D.hazards.find(x => x.id === displayHazard) : null;
     if (!h) return null;
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-      className: "flex items-center gap-1.5 mb-0.5"
+      className: "flex items-center gap-1 sm:gap-1.5 mb-0.5"
     }, /*#__PURE__*/React.createElement("span", {
-      className: "w-1.5 h-1.5 rounded-full bg-[color:var(--ss-yellow)]"
+      className: "w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[color:var(--ss-yellow)]"
     }), /*#__PURE__*/React.createElement("span", {
-      className: "text-[9px] font-mono uppercase tracking-widest text-[color:var(--ss-muted)]"
+      className: "text-[7px] sm:text-[9px] font-mono uppercase tracking-widest text-[color:var(--ss-muted)]"
     }, "Hazard detected")), /*#__PURE__*/React.createElement("div", {
-      className: "font-semibold text-[12px] leading-tight text-[color:var(--ss-fg)]"
+      className: "font-semibold text-[10px] sm:text-[12px] leading-tight text-[color:var(--ss-fg)]"
     }, h.label), /*#__PURE__*/React.createElement("div", {
-      className: "text-[10px] leading-snug text-[color:var(--ss-muted)] mt-1"
+      className: "text-[8px] sm:text-[10px] leading-snug text-[color:var(--ss-muted)] mt-0.5 sm:mt-1"
     }, h.body));
   })()), /*#__PURE__*/React.createElement("div", {
-    className: "absolute bottom-3 left-3 right-3"
+    className: "absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "glass-thin p-3 flex items-center gap-3",
+    className: "glass-thin p-2 sm:p-3 flex items-center gap-2 sm:gap-3",
     style: {
       borderRadius: 18
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "w-9 h-9 rounded-full bg-[var(--ss-yellow)] flex items-center justify-center text-[var(--ss-navy)]"
+    className: "w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[var(--ss-yellow)] flex items-center justify-center text-[var(--ss-navy)] flex-shrink-0"
   }, /*#__PURE__*/React.createElement(Icon, {
     name: "alert",
-    className: "w-5 h-5"
+    className: "w-4 h-4 sm:w-5 sm:h-5"
   })), /*#__PURE__*/React.createElement("div", {
     className: "flex-1 min-w-0"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "text-[10px] font-mono text-[color:var(--ss-muted)]"
+    className: "text-[8px] sm:text-[10px] font-mono text-[color:var(--ss-muted)]"
   }, "CURRENT TASK"), /*#__PURE__*/React.createElement("div", {
-    className: "text-xs font-semibold text-[color:var(--ss-navy)] truncate"
-  }, "Identify 5 hazards within 60s")), /*#__PURE__*/React.createElement("div", {
-    className: "font-mono text-xs text-[color:var(--ss-navy)]"
+    className: "text-[10px] sm:text-xs font-semibold text-[color:var(--ss-navy)] leading-tight"
+  }, "Identify 5 hazards \xB7 60s")), /*#__PURE__*/React.createElement("div", {
+    className: "font-mono text-[10px] sm:text-xs text-[color:var(--ss-navy)] flex-shrink-0"
   }, "00:42")))), /*#__PURE__*/React.createElement("div", {
     className: "absolute inset-0 pointer-events-none",
     style: {
@@ -1641,29 +1656,32 @@ function AppFlow() {
     className: "mt-12 glass p-6 sm:p-10"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex flex-wrap items-center justify-center gap-x-2 gap-y-4"
-  }, D.appFlow.map((step, i) => /*#__PURE__*/React.createElement(React.Fragment, {
-    key: step
-  }, /*#__PURE__*/React.createElement("button", {
-    onClick: () => setActive(active === i ? -1 : i),
-    onMouseEnter: () => {
-      if (window.matchMedia("(hover: hover)").matches) setActive(i);
-    },
-    className: `relative px-4 py-3 rounded-full text-sm font-semibold transition-all duration-300 ease-in-out ${active === i ? "bg-[color:var(--ss-navy)] text-white -translate-y-0.5 shadow-lg" : "bg-white/60 text-[color:var(--ss-navy)]"}`
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "font-mono text-[10px] mr-2 opacity-60"
-  }, String(i + 1).padStart(2, "0")), step), i < D.appFlow.length - 1 ? /*#__PURE__*/React.createElement(Icon, {
-    name: "arrow",
-    className: "w-4 h-4 text-[color:var(--ss-muted)] hidden sm:block"
-  }) : null))), /*#__PURE__*/React.createElement("div", {
-    className: `overflow-hidden transition-all ease-in-out ${active >= 0 ? "max-h-[200px] opacity-100 mt-6" : "max-h-0 opacity-0 mt-0"}`,
-    style: {
-      transitionDuration: "420ms"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "glass-thin p-4 max-w-xl mx-auto text-center text-sm text-[color:var(--ss-navy)]"
-  }, active >= 0 ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: "font-mono text-[10px] tracking-widest uppercase text-[color:var(--ss-muted)] mb-1"
-  }, String(active + 1).padStart(2, "0"), " \xB7 ", D.appFlow[active]), /*#__PURE__*/React.createElement("div", null, stepBody(active))) : null))))));
+  }, D.appFlow.map((step, i) => {
+    const isActive = active === i;
+    return /*#__PURE__*/React.createElement(React.Fragment, {
+      key: step
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => setActive(active === i ? -1 : i),
+      onMouseEnter: () => {
+        if (window.matchMedia("(hover: hover)").matches) setActive(i);
+      },
+      className: `relative px-4 py-3 rounded-full text-sm font-semibold transition-all duration-300 ease-in-out ${isActive ? "bg-[color:var(--ss-navy)] text-white -translate-y-0.5 shadow-lg" : "bg-white/60 text-[color:var(--ss-navy)]"}`
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "font-mono text-[10px] mr-2 opacity-60"
+    }, String(i + 1).padStart(2, "0")), step), i < D.appFlow.length - 1 ? /*#__PURE__*/React.createElement(Icon, {
+      name: "arrow",
+      className: "w-4 h-4 text-[color:var(--ss-muted)] hidden sm:block"
+    }) : null, /*#__PURE__*/React.createElement("div", {
+      className: `w-full overflow-hidden transition-all ease-in-out ${isActive ? "max-h-[200px] opacity-100 mt-4" : "max-h-0 opacity-0 mt-0"}`,
+      style: {
+        transitionDuration: "420ms"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "glass-thin p-4 max-w-xl mx-auto text-center text-sm text-[color:var(--ss-navy)]"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "font-mono text-[10px] tracking-widest uppercase text-[color:var(--ss-muted)] mb-1"
+    }, String(i + 1).padStart(2, "0"), " \xB7 ", step), /*#__PURE__*/React.createElement("div", null, stepBody(i)))));
+  }))))));
 }
 
 // ───────────────────────────────────────────────────────────────
@@ -1943,27 +1961,36 @@ function Footer() {
     label: "Contact",
     href: "#cta"
   }];
-  return /*#__PURE__*/React.createElement("footer", {
-    className: "section-pad !pt-12 !pb-10"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "max-w-7xl mx-auto glass-thin px-6 py-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center gap-3"
-  }, /*#__PURE__*/React.createElement(Logo, {
-    size: 28
-  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    className: "font-semibold"
-  }, "KINSafe"), /*#__PURE__*/React.createElement("div", {
-    className: "text-xs text-[color:var(--ss-muted)]"
-  }, "AR construction safety training \xB7 iOS"))), /*#__PURE__*/React.createElement("div", {
-    className: "flex flex-wrap gap-x-6 gap-y-2 text-sm text-[color:var(--ss-muted)]"
-  }, links.map(l => /*#__PURE__*/React.createElement("a", {
-    key: l.href,
-    href: l.href,
-    className: "hover:text-[color:var(--ss-navy)] transition"
-  }, l.label))), /*#__PURE__*/React.createElement("div", {
-    className: "text-xs text-[color:var(--ss-muted)] font-mono"
-  }, "\xA9 2026 \xB7 KINSafe")));
+  return (
+    /*#__PURE__*/
+    // Override .section-pad's vertical padding: a 140px top/bottom is way too
+    // much on a footer (used to create excessive blank space below on mobile).
+    // Use horizontal padding from .section-pad but tight verticals.
+    React.createElement("footer", {
+      className: "section-pad !py-6 sm:!pt-10 sm:!pb-8"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "max-w-7xl mx-auto glass-thin px-6 py-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-3"
+    }, /*#__PURE__*/React.createElement(Logo, {
+      size: 28
+    }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "font-semibold"
+    }, "KINSafe"), /*#__PURE__*/React.createElement("div", {
+      className: "text-xs text-[color:var(--ss-muted)]"
+    }, "AR construction safety training \xB7 iOS"))), /*#__PURE__*/React.createElement("div", {
+      className: "flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-x-6 gap-y-2 text-sm text-[color:var(--ss-muted)] w-full sm:w-auto"
+    }, links.map((l, i) => /*#__PURE__*/React.createElement(React.Fragment, {
+      key: l.href
+    }, /*#__PURE__*/React.createElement("a", {
+      href: l.href,
+      className: "hover:text-[color:var(--ss-navy)] transition"
+    }, l.label), i < links.length - 1 ? /*#__PURE__*/React.createElement("span", {
+      className: "hidden sm:inline opacity-30"
+    }, "\xB7") : null))), /*#__PURE__*/React.createElement("div", {
+      className: "text-xs text-[color:var(--ss-muted)] font-mono"
+    }, "\xA9 2026 \xB7 KINSafe")))
+  );
 }
 Object.assign(window, {
   Hero,
