@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>My Story — A Life in Eleven Islands</title>
+<meta name="description" content="A scroll-driven cinematic memoir told as eleven drifting islands — a personal journey through the places, people, and craft that have shaped a life." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ---------- Reset / tokens ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #04070d; color: #eef3ff; font-family: "Inter", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: auto; }
+body { overflow-x: hidden; }
+
+:root {
+  /* Glass palette — baked from the final tweak settings.
+     Previously these were driven at runtime by a dev tweaks panel;
+     the panel has been removed for production and the final values
+     are hard-coded here so first paint matches the intended look. */
+  --tint-hue: 340;            /* rosé tint hue */
+  --tint-sat: 70%;
+  --glass-alpha: 0.10;        /* base glass transparency */
+  --glass-blur: 6px;          /* backdrop-filter blur */
+  --border-alpha: 0.90;       /* thin border luminosity */
+  --vignette-strength: 0.45;  /* edge vignette darkness */
+  --display-font: "Fraunces", serif;
+  --display-italic-style: italic;
+  --type-scale: 1;
+
+  --glass-bg-1: hsla(var(--tint-hue), 60%, 70%, calc(var(--glass-alpha) * 0.6));
+  --glass-bg-2: hsla(calc(var(--tint-hue) + 10), 55%, 55%, calc(var(--glass-alpha) * 1.0));
+  --glass-bg-3: hsla(calc(var(--tint-hue) - 5), var(--tint-sat), 88%, calc(var(--glass-alpha) * 1.4));
+  --glass-border: hsla(var(--tint-hue), 90%, 92%, var(--border-alpha));
+  --glass-border-strong: hsla(calc(var(--tint-hue) - 5), 95%, 95%, calc(var(--border-alpha) + 0.27));
+  --glass-shadow: 0 8px 40px -8px hsla(calc(var(--tint-hue) + 15), 80%, 30%, 0.45),
+                  inset 0 1px 0 hsla(0, 0%, 100%, 0.22),
+                  inset 0 -1px 0 hsla(var(--tint-hue), 80%, 80%, 0.10);
+  --glow: 0 0 0 1px hsla(var(--tint-hue), 100%, 90%, 0.18), 0 8px 36px hsla(var(--tint-hue), 100%, 70%, 0.25);
+
+  --ink: hsla(var(--tint-hue), 30%, 98%, 0.96);
+  --ink-dim: hsla(var(--tint-hue), 30%, 92%, 0.72);
+  --ink-faint: hsla(var(--tint-hue), 30%, 90%, 0.48);
+
+  --pad: clamp(16px, 2.4vw, 36px);
+  --safe-top: max(env(safe-area-inset-top), 0px);
+  --safe-bottom: max(env(safe-area-inset-bottom), 0px);
+}
+
+/* ---------- Virtual scroll height ---------- */
+/* 11 chapters × 110vh of scroll per chapter, plus head + tail breathing room */
+#scroll-track {
+  height: calc(1320vh + 100vh);
+  width: 1px;
+  pointer-events: none;
+}
+
+/* ---------- Fixed cinematic stage ---------- */
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(120% 80% at 50% 30%, #0a1426 0%, #04070d 70%);
+  z-index: 1;
+}
+
+.video-wrap {
+  position: absolute; inset: 0;
+  z-index: 0;
+}
+.video-wrap video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+/* Subtle vignette + readability gradients */
+.vignette {
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background:
+    radial-gradient(140% 90% at 50% 50%, transparent 55%, hsla(220, 60%, 5%, calc(var(--vignette-strength) * 1)) 100%),
+    linear-gradient(180deg, hsla(220, 50%, 5%, calc(var(--vignette-strength) * 0.78)) 0%, transparent 18%, transparent 78%, hsla(220, 50%, 5%, var(--vignette-strength)) 100%);
+}
+
+/* Soft, drifting color light to give 'spatial' depth even when nothing else is on screen */
+.atmos {
+  position: absolute; inset: -10%; pointer-events: none; z-index: 1;
+  background:
+    radial-gradient(40% 30% at 18% 22%, hsla(205, 90%, 75%, 0.12), transparent 60%),
+    radial-gradient(50% 35% at 85% 80%, hsla(280, 70%, 70%, 0.10), transparent 65%);
+  mix-blend-mode: screen;
+  animation: drift 32s ease-in-out infinite alternate;
+}
+@keyframes drift {
+  0%   { transform: translate3d(-1.5%, -1%, 0); }
+  100% { transform: translate3d(1.5%, 1.5%, 0); }
+}
+
+/* ---------- Liquid glass utility ---------- */
+.glass {
+  position: relative;
+  background:
+    linear-gradient(135deg, var(--glass-bg-3) 0%, var(--glass-bg-1) 45%, var(--glass-bg-2) 100%);
+  border: 1px solid var(--glass-border);
+  border-radius: 22px;
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  box-shadow: var(--glass-shadow);
+  color: var(--ink);
+  isolation: isolate;
+}
+.glass::before {
+  /* specular highlight along top edge */
+  content: ""; position: absolute; inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, hsla(0,0%,100%,0.18) 0%, hsla(0,0%,100%,0) 22%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.glass::after {
+  /* faint inner reflection on bottom */
+  content: ""; position: absolute; inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(0deg, hsla(205,100%,85%,0.10) 0%, transparent 28%);
+  pointer-events: none;
+}
+
+/* ---------- Top navigation ---------- */
+.nav {
+  position: fixed;
+  top: calc(var(--safe-top) + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 999px;
+  max-width: calc(100vw - 32px);
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px 8px 12px;
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-style: var(--display-italic-style);
+  letter-spacing: 0.01em;
+  font-size: 14px;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.nav-brand .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #d6e9ff, #6aa6ff 60%, #2c5dd1 100%);
+  box-shadow: 0 0 14px hsla(205, 100%, 75%, 0.8);
+}
+.nav-scroll {
+  display: flex; gap: 4px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  max-width: min(70vw, 980px);
+  padding: 2px;
+  mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+}
+.nav-scroll::-webkit-scrollbar { display: none; }
+
+.nav-item {
+  flex-shrink: 0;
+  appearance: none;
+  border: 1px solid hsla(0,0%,100%,0.10);
+  background: hsla(210, 60%, 60%, 0.06);
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 9px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), background .35s, color .35s, border-color .35s, box-shadow .35s;
+  white-space: nowrap;
+  min-height: 36px;
+}
+.nav-item .idx {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+}
+.nav-item:hover {
+  transform: translateY(-2px);
+  color: var(--ink);
+  background: hsla(205, 80%, 70%, 0.14);
+  border-color: var(--glass-border-strong);
+  box-shadow: 0 8px 24px -8px hsla(205, 100%, 60%, 0.45);
+}
+.nav-item.active {
+  color: #f6fbff;
+  background: linear-gradient(135deg, hsla(205, 100%, 78%, 0.28), hsla(225, 90%, 55%, 0.22));
+  border-color: hsla(205, 100%, 92%, 0.65);
+  box-shadow: 0 0 0 1px hsla(205, 100%, 92%, 0.35) inset,
+              0 10px 32px -6px hsla(205, 100%, 60%, 0.55);
+}
+.nav-item.active .idx { color: hsla(205, 100%, 92%, 0.9); }
+
+/* ---------- Mouse glow ---------- */
+.cursor-glow {
+  position: fixed;
+  width: 360px; height: 360px;
+  pointer-events: none;
+  z-index: 30;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsla(205, 100%, 80%, 0.18), hsla(220, 100%, 60%, 0.06) 40%, transparent 70%);
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+
+/* ---------- Chapter cards / overlays ---------- */
+.overlay-layer {
+  position: absolute; inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+.chapter-frame {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  padding: clamp(72px, 9vh, 120px) clamp(20px, 4vw, 64px) clamp(60px, 8vh, 100px);
+  gap: 18px;
+  opacity: 0;
+  transition: opacity .9s ease;
+  pointer-events: none;
+}
+.chapter-frame.visible { opacity: 1; }
+.chapter-frame.visible .floats > * { animation: floatIn .9s cubic-bezier(.2,.7,.2,1) both; }
+.chapter-frame.visible .floats > *:nth-child(1) { animation-delay: .05s; }
+.chapter-frame.visible .floats > *:nth-child(2) { animation-delay: .22s; }
+.chapter-frame.visible .floats > *:nth-child(3) { animation-delay: .38s; }
+.chapter-frame.visible .floats > *:nth-child(4) { animation-delay: .52s; }
+
+@keyframes floatIn {
+  0%   { opacity: 0; transform: translateY(18px) scale(.985); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0)    scale(1);     filter: blur(0); }
+}
+
+.floats { pointer-events: auto; display: contents; }
+
+/* Primary card */
+.card-primary {
+  grid-column: 1 / span 1;
+  grid-row: 2 / span 1;
+  align-self: end;
+  justify-self: start;
+  max-width: min(460px, 42vw);
+  padding: 22px 24px 22px;
+  border-radius: 26px;
+}
+.card-primary .num {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: hsla(205, 100%, 88%, 0.78);
+  display: flex; align-items: center; gap: 10px;
+}
+.card-primary .num::after {
+  content: ""; height: 1px; flex: 1;
+  background: linear-gradient(90deg, hsla(205,100%,90%,0.45), transparent);
+}
+.card-primary .kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 14px;
+}
+.card-primary h2 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  font-size: clamp(28px, 3.4vw, 44px);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  margin: 6px 0 8px;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.card-primary h2 em {
+  font-style: italic;
+  color: hsla(205, 100%, 92%, 0.95);
+  font-weight: 300;
+}
+.card-primary .sub {
+  font-family: var(--display-font);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(13px, 1.3vw, 15.5px);
+  color: var(--ink-dim);
+  margin: 0 0 14px;
+  text-wrap: balance;
+}
+.card-primary p.body {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+  margin: 0 0 16px;
+  text-wrap: pretty;
+}
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: hsla(210, 80%, 80%, 0.10);
+  border: 1px solid hsla(205, 90%, 90%, 0.20);
+  color: var(--ink);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.actions { margin-top: 18px; display: flex; gap: 10px; }
+.btn-glass {
+  appearance: none; border: 1px solid hsla(205, 100%, 92%, 0.40);
+  background: hsla(205, 100%, 80%, 0.10);
+  color: var(--ink);
+  font: inherit; font-size: 12.5px; font-weight: 500;
+  padding: 9px 14px; border-radius: 999px;
+  cursor: pointer; min-height: 38px;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: transform .3s, background .3s, box-shadow .3s;
+}
+.btn-glass:hover { transform: translateY(-2px); background: hsla(205, 100%, 80%, 0.20); box-shadow: 0 10px 28px -8px hsla(205, 100%, 70%, 0.5); }
+.btn-glass .arrow { width: 14px; height: 14px; display: inline-block; }
+
+/* Secondary panel — small floating chip card */
+.panel-secondary {
+  grid-column: 2 / span 1;
+  grid-row: 1 / span 1;
+  justify-self: end;
+  align-self: start;
+  max-width: 260px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  font-size: 12px;
+}
+.panel-secondary .label {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: 6px;
+}
+.panel-secondary .quote {
+  font-family: var(--display-font);
+  font-style: italic; font-weight: 300;
+  color: var(--ink); line-height: 1.4;
+  font-size: 13.5px;
+  text-wrap: balance;
+}
+
+/* Coordinate panel — bottom right */
+.panel-coord {
+  grid-column: 2 / span 1;
+  grid-row: 3 / span 1;
+  justify-self: end;
+  align-self: end;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  display: flex; flex-direction: column; gap: 4px;
+  max-width: 260px;
+}
+.panel-coord .row { display: flex; justify-content: space-between; gap: 16px; }
+.panel-coord .row span:last-child { color: var(--ink); }
+
+/* ---------- Persistent UI: progress + scroll hint ---------- */
+.bottom-bar {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(var(--safe-bottom) + 20px);
+  z-index: 40;
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.dots {
+  display: flex; gap: 6px;
+}
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: hsla(205, 100%, 92%, 0.25);
+  transition: background .4s, transform .4s, box-shadow .4s;
+}
+.dot.passed { background: hsla(205, 100%, 92%, 0.6); }
+.dot.active {
+  background: hsla(205, 100%, 95%, 1);
+  box-shadow: 0 0 10px hsla(205, 100%, 80%, 0.9);
+  transform: scale(1.5);
+}
+.hint {
+  position: fixed; right: 24px; bottom: calc(var(--safe-bottom) + 24px);
+  z-index: 40;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+  opacity: 1;
+  transition: opacity .8s ease;
+}
+.hint.fade { opacity: 0; }
+.hint .scroll-icon {
+  width: 18px; height: 28px;
+  border: 1px solid var(--ink-faint);
+  border-radius: 12px;
+  position: relative;
+}
+.hint .scroll-icon::after {
+  content: ""; position: absolute; top: 6px; left: 50%;
+  width: 2px; height: 6px; background: var(--ink-faint);
+  border-radius: 1px; transform: translateX(-50%);
+  animation: scrollDrop 1.8s ease-in-out infinite;
+}
+@keyframes scrollDrop {
+  0%, 100% { transform: translate(-50%, 0); opacity: 0.4; }
+  50%      { transform: translate(-50%, 8px); opacity: 1; }
+}
+
+/* Chapter index in top-left corner */
+.chapter-index {
+  position: fixed;
+  top: calc(var(--safe-top) + 18px);
+  left: 24px;
+  z-index: 40;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.chapter-index .big {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 22px;
+  letter-spacing: 0;
+  color: var(--ink);
+  text-transform: none;
+}
+
+/* Intro screen */
+.intro-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  display: grid; place-items: center;
+  background: radial-gradient(80% 60% at 50% 50%, rgba(8,14,28,0.4), rgba(2,4,8,0.85));
+  transition: opacity 1.2s ease;
+}
+.intro-overlay.hidden { opacity: 0; pointer-events: none; }
+.intro-inner { text-align: center; padding: 24px; max-width: 560px; }
+.intro-inner .eyebrow {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: 22px;
+}
+.intro-inner h1 {
+  font-family: var(--display-font);
+  font-weight: 300;
+  font-size: clamp(34px, 5vw, 58px);
+  margin: 0 0 14px;
+  letter-spacing: -0.01em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+.intro-inner h1 em { font-style: italic; color: hsla(205, 100%, 92%, 0.95); }
+.intro-inner p {
+  font-family: var(--display-font);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 16px;
+  color: var(--ink-dim);
+  margin: 0 0 28px;
+  text-wrap: balance;
+  line-height: 1.5;
+}
+.intro-cta {
+  padding: 14px 26px;
+  border-radius: 999px;
+  font: inherit; font-size: 12.5px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink);
+  cursor: pointer;
+  border: 1px solid var(--glass-border-strong);
+  background: hsla(205, 100%, 80%, 0.10);
+  transition: all .3s ease;
+}
+.intro-cta:hover { background: hsla(205, 100%, 80%, 0.22); transform: translateY(-2px); }
+
+.intro-loading {
+  margin-top: 18px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px; letter-spacing: 0.22em; color: var(--ink-faint);
+  text-transform: uppercase;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .nav-brand { display: none; }
+}
+@media (max-width: 900px) {
+  .chapter-frame {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto auto;
+    padding: clamp(78px, 12vh, 110px) 16px clamp(110px, 16vh, 150px);
+    gap: 12px;
+  }
+  .card-primary {
+    grid-column: 1; grid-row: 3;
+    max-width: 100%;
+    align-self: end;
+    padding: 18px 20px;
+    border-radius: 22px;
+  }
+  .card-primary h2 { font-size: clamp(24px, 5.5vw, 32px); }
+  .card-primary p.body { font-size: 13px; }
+  .panel-secondary {
+    grid-column: 1; grid-row: 1;
+    justify-self: start;
+    max-width: 70vw;
+  }
+  .panel-coord { display: none; }
+  .nav-scroll { max-width: 65vw; }
+  .hint { display: none; }
+  .chapter-index { left: 14px; }
+}
+@media (max-width: 560px) {
+  .nav { top: calc(var(--safe-top) + 10px); padding: 6px; gap: 4px; }
+  .nav-scroll { max-width: calc(100vw - 24px); }
+  .nav-item { padding: 8px 11px; font-size: 12px; }
+  .chapter-frame { padding-bottom: 130px; }
+  .card-primary {
+    padding: 16px 18px;
+  }
+  .card-primary .kicker { display: none; }
+  .panel-secondary { max-width: calc(100vw - 28px); padding: 11px 14px; }
+  .panel-secondary .quote { font-size: 12.5px; }
+  .bottom-bar { font-size: 9.5px; padding: 7px 12px; gap: 8px; }
+  .chapter-index { top: calc(var(--safe-top) + 6px); left: 12px; }
+  .chapter-index .big { font-size: 18px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  .chapter-frame.visible .floats > * { animation: none; opacity: 1; }
+  .atmos { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Virtual scroll track -->
+<div id="scroll-track" aria-hidden="true"></div>
+
+<!-- Cinematic stage -->
+<div class="stage" role="region" aria-label="Floating Islands — A Life Journey">
+
+  <div class="video-wrap">
+    <video id="bg-video" muted playsinline preload="auto" disablepictureinpicture x-webkit-airplay="deny" tabindex="-1">
+      <source src="https://res.cloudinary.com/dsqhj32yo/video/upload/q_auto/f_auto/v1778533061/Life_Story_ywmeph.mov" />
+    </video>
+  </div>
+  <div class="atmos" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- Cursor glow -->
+  <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
+
+  <!-- Chapter index, top-left -->
+  <div class="chapter-index" aria-hidden="true">
+    <span id="ci-label">Chapter</span>
+    <span class="big" id="ci-num">00 / 11</span>
+  </div>
+
+  <!-- Bottom bar — progress dots -->
+  <div class="glass bottom-bar" aria-hidden="true">
+    <span id="bb-label">Foundation</span>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="hint" id="hint"><div class="scroll-icon"></div><span>Scroll to journey</span></div>
+
+  <!-- Overlay layer: chapter frames injected here -->
+  <div class="overlay-layer" id="overlay-layer" aria-live="polite"></div>
+
+  <!-- Floating top nav -->
+  <nav class="glass nav" aria-label="Chapters">
+    <div class="nav-brand"><span class="dot"></span><span>A Life in Islands</span></div>
+    <div class="nav-scroll" id="nav-scroll" role="tablist"></div>
+  </nav>
+
+  <!-- Intro overlay -->
+  <div class="intro-overlay" id="intro">
+    <div class="glass" style="padding: 36px 40px; border-radius: 26px;">
+      <div class="intro-inner">
+        <div class="eyebrow">A scroll-driven journey · 11 chapters</div>
+        <h1>Eleven islands,<br/><em>one life unfolding.</em></h1>
+        <p>Scroll to drift between islands. Each one is a chapter — a place I learned, built, loved, and became.</p>
+        <button class="intro-cta" id="intro-start">Begin the journey</button>
+        <div class="intro-loading" id="intro-loading">Loading film · <span id="loading-pct">0%</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   Chapter data
+   ============================================================ */
+const CHAPTERS = [
+  {
+    short: "Origins",
+    title: "Cultural Foundations",
+    titleEm: "Māori Dawn",
+    sub: "Whakapapa, the first horizon.",
+    body: "Before craft, before code, before careers — there were stories at the table, language in the air, and the patient grammar of a culture that taught me to begin from belonging. This island is whakapapa: the long line of people who made me possible.",
+    quote: "Ko au tēnei, nō reira au.",
+    tags: ["Whakapapa", "Storytelling", "Te Ao Māori", "Identity"],
+    coord: { lat: "—36.84° S", lng: "174.76° E", weather: "Dawn mist · 12°C" },
+    label: "Foundation"
+  },
+  {
+    short: "Hearth",
+    title: "Food, Care &",
+    titleEm: "Everyday Craft",
+    sub: "Discipline measured in small, warm acts.",
+    body: "Working in food taught me that craft is care made repeatable. Mise en place. Timing. The dignity of a clean station. Long before I designed interfaces, I learned to serve people — to notice what they need before they do.",
+    quote: "Care is a craft you practice nightly.",
+    tags: ["Hospitality", "Discipline", "Service", "Attention"],
+    coord: { lat: "—36.86° S", lng: "174.74° E", weather: "Steam · 18°C" },
+    label: "Care"
+  },
+  {
+    short: "Site",
+    title: "Construction &",
+    titleEm: "SiteSafe AR",
+    sub: "Safety, taught spatially.",
+    body: "Working on construction safety training in AR — designing the moment someone learns to keep themselves alive on a worksite. I learned to map procedure to space, to test on real people, to design for hands that are already busy and minds that are already tired.",
+    quote: "Design where the stakes are real.",
+    tags: ["AR", "SiteSafe", "User Flows", "Spatial UX"],
+    coord: { lat: "—36.92° S", lng: "174.79° E", weather: "Overcast · 14°C" },
+    label: "Site"
+  },
+  {
+    short: "Field",
+    title: "Sport &",
+    titleEm: "Discipline",
+    sub: "What the team taught me about pressure.",
+    body: "Rugby was where I learned that confidence is built in repetitions nobody sees. Show up. Take the hit. Trust the player beside you. The lessons of the field still shape how I lead projects and absorb setbacks.",
+    quote: "Train the boring thing. Trust the team.",
+    tags: ["Teamwork", "Resilience", "Pressure", "Discipline"],
+    coord: { lat: "—36.90° S", lng: "174.81° E", weather: "Wind · 11°C" },
+    label: "Field"
+  },
+  {
+    short: "Belonging",
+    title: "Community &",
+    titleEm: "Pride",
+    sub: "The shape of being held.",
+    body: "Community gave me language for who I am — and permission to bring all of it to the work. Identity isn't a brand. It's a way of paying attention. The people who held space for me are why my designs try to hold space for others.",
+    quote: "Belonging is a verb.",
+    tags: ["Identity", "Inclusion", "Belonging", "Growth"],
+    coord: { lat: "—36.85° S", lng: "174.77° E", weather: "Warm light · 19°C" },
+    label: "Belonging"
+  },
+  {
+    short: "Studio",
+    title: "Design &",
+    titleEm: "Creative Process",
+    sub: "Double diamond, drawn by hand.",
+    body: "I learned to lead through process: divergent, convergent, divergent again. Sketch the cheap, painful version first. Talk to the user. Prototype the smallest thing that could be wrong. Iterate, iterate, iterate — then commit, beautifully.",
+    quote: "Make the rough thing first.",
+    tags: ["Double Diamond", "Agile", "Prototyping", "Direction"],
+    coord: { lat: "—36.84° S", lng: "174.76° E", weather: "Studio light · 21°C" },
+    label: "Studio"
+  },
+  {
+    short: "Maker",
+    title: "Electronics &",
+    titleEm: "Mechatronics",
+    sub: "Where ideas become solder.",
+    body: "Arduino, sensors, the smell of a freshly-cut PCB. I learned to build the thing — to debug at the level of voltages and pull-up resistors. Making with your hands changes how you design for them.",
+    quote: "Curiosity, but soldered.",
+    tags: ["Arduino", "Sensors", "PCB", "Prototyping"],
+    coord: { lat: "—36.85° S", lng: "174.76° E", weather: "Workshop · 22°C" },
+    label: "Maker"
+  },
+  {
+    short: "Rail",
+    title: "KiwiRail &",
+    titleEm: "HoloLens 2",
+    sub: "Mixed reality, at industrial scale.",
+    body: "Leading a HoloLens 2 mixed-reality training project for KiwiRail: digital twins of locomotives, immersive procedure, stakeholder workshops, and a small team chasing something no one had built here yet. I learned what it means to ship XR inside an enterprise.",
+    quote: "Spatial design for the working hand.",
+    tags: ["HoloLens 2", "Digital Twin", "XR Training", "Leadership"],
+    coord: { lat: "—41.29° S", lng: "174.78° E", weather: "Rail yard · 9°C" },
+    label: "Rail"
+  },
+  {
+    short: "Matariki",
+    title: "Matariki &",
+    titleEm: "Vision Pro",
+    sub: "Spatial storytelling, rooted in kaupapa.",
+    body: "Guardians of Matariki — my thesis-level work on the Apple Vision Pro: immersive Māori storytelling, kaupapa-led spatial design, and a deep dive into how culture lives inside new media. Spatial computing only matters if it can carry meaning.",
+    quote: "The stars were always interface.",
+    tags: ["Vision Pro", "Matariki", "Kaupapa", "Spatial Story"],
+    coord: { lat: "—36.85° S", lng: "174.76° E", weather: "Night sky · 8°C" },
+    label: "Matariki"
+  },
+  {
+    short: "Love",
+    title: "Wedding &",
+    titleEm: "Partnership",
+    sub: "The quiet anchor under the work.",
+    body: "Some milestones aren't on a portfolio — but they are the ground everything else stands on. Choosing a person, building a life, letting yourself be known. The most generative practice I have is at home.",
+    quote: "To be witnessed is to be free.",
+    tags: ["Love", "Partnership", "Home", "Anchor"],
+    coord: { lat: "—36.84° S", lng: "174.76° E", weather: "Golden hour · 20°C" },
+    label: "Love"
+  },
+  {
+    short: "Next",
+    title: "NYC &",
+    titleEm: "What's next",
+    sub: "Creative technology, on a bigger horizon.",
+    body: "New York is the next island. Creative technology, AI-native interfaces, immersive media, and the responsibility of carrying a Māori practice into rooms where it hasn't been before. The journey isn't a destination — it's the next horizon, already arriving.",
+    quote: "The next island is already in view.",
+    tags: ["NYC", "AI", "XR", "Creative Tech"],
+    coord: { lat: "40.71° N", lng: "—74.01° W", weather: "Skyline · 16°C" },
+    label: "Horizon"
+  }
+];
+
+/* ============================================================
+   Setup
+   ============================================================ */
+const CHAPTER_COUNT = CHAPTERS.length;
+const video = document.getElementById('bg-video');
+const overlayLayer = document.getElementById('overlay-layer');
+const navScroll = document.getElementById('nav-scroll');
+const dotsEl = document.getElementById('dots');
+const intro = document.getElementById('intro');
+const introStart = document.getElementById('intro-start');
+const loadingPct = document.getElementById('loading-pct');
+const hintEl = document.getElementById('hint');
+const ciNum = document.getElementById('ci-num');
+const ciLabel = document.getElementById('ci-label');
+const bbLabel = document.getElementById('bb-label');
+const cursorGlow = document.getElementById('cursor-glow');
+
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ----- Build nav buttons ----- */
+CHAPTERS.forEach((c, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'nav-item';
+  btn.dataset.idx = i;
+  btn.setAttribute('role', 'tab');
+  btn.innerHTML = `<span class="idx">${String(i + 1).padStart(2, '0')}</span><span>${c.short}</span>`;
+  btn.addEventListener('click', () => smoothScrollToChapter(i));
+  navScroll.appendChild(btn);
+});
+
+/* ----- Build dots ----- */
+CHAPTERS.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot';
+  d.dataset.idx = i;
+  dotsEl.appendChild(d);
+});
+
+/* ----- Build chapter frames ----- */
+const frames = [];
+CHAPTERS.forEach((c, i) => {
+  const frame = document.createElement('div');
+  frame.className = 'chapter-frame';
+  frame.dataset.idx = i;
+  const sideRight = (i % 2 === 1); // alternate primary card placement
+  frame.innerHTML = `
+    <div class="floats">
+      <div class="glass panel-secondary" style="${sideRight ? 'grid-column:1; justify-self:start;' : ''}">
+        <div class="label">Voice memo · 0:14</div>
+        <div class="quote">"${c.quote}"</div>
+      </div>
+      <div class="glass card-primary" style="${sideRight ? 'grid-column:2; justify-self:end;' : ''}">
+        <div class="num">Chapter ${String(i + 1).padStart(2, '0')}<span></span></div>
+        <h2>${c.title} <em>${c.titleEm}</em></h2>
+        <div class="sub">${c.sub}</div>
+        <p class="body">${c.body}</p>
+        <div class="tag-row">${c.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        <div class="actions">
+          <button class="btn-glass" type="button" tabindex="-1">
+            View artefacts
+            <svg class="arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="glass panel-coord">
+        <div class="row"><span>LAT</span><span>${c.coord.lat}</span></div>
+        <div class="row"><span>LNG</span><span>${c.coord.lng}</span></div>
+        <div class="row"><span>ATM</span><span>${c.coord.weather}</span></div>
+      </div>
+    </div>
+  `;
+  overlayLayer.appendChild(frame);
+  frames.push(frame);
+});
+
+/* ============================================================
+   Scroll → Video timeline
+   ============================================================ */
+let videoDuration = 0;
+let videoReady = false;
+let scrollMax = 1;
+let targetTime = 0;
+let currentTime = 0;
+let lastScrollY = 0;
+let userInteracted = false;
+let smoothScrollTween = null;
+
+function recomputeScrollMax() {
+  scrollMax = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+}
+window.addEventListener('resize', recomputeScrollMax);
+
+function onLoadedMetadata() {
+  videoDuration = video.duration || 0;
+  if (videoDuration && isFinite(videoDuration)) {
+    videoReady = true;
+    recomputeScrollMax();
+    update(true);
+  }
+}
+video.addEventListener('loadedmetadata', onLoadedMetadata);
+video.addEventListener('durationchange', onLoadedMetadata);
+
+// Load progress UI
+function pollLoading() {
+  if (!video.buffered || video.buffered.length === 0) {
+    if (!videoReady) requestAnimationFrame(pollLoading);
+    return;
+  }
+  const end = video.buffered.end(video.buffered.length - 1);
+  const dur = video.duration || 1;
+  const pct = Math.min(100, Math.round((end / dur) * 100));
+  loadingPct.textContent = pct + '%';
+  if (pct < 100) requestAnimationFrame(pollLoading);
+}
+video.addEventListener('progress', pollLoading);
+video.addEventListener('canplay', pollLoading);
+
+// Kick off loading
+video.load();
+
+/* ----- Scroll handler ----- */
+function onScroll() {
+  if (smoothScrollTween) return; // ignore native scroll during tween
+  if (!videoReady) return;
+  const y = window.scrollY;
+  const p = Math.max(0, Math.min(1, y / scrollMax));
+  targetTime = p * videoDuration;
+  if (!userInteracted && y > 8) {
+    userInteracted = true;
+    hintEl.classList.add('fade');
+  }
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+
+/* ----- rAF loop: smooth scrub + UI update ----- */
+// Easing factor for `currentTime → targetTime`. Higher = snappier scrub.
+// Baked from the final dev-tweak value (0.28).
+const SCROLL_SMOOTHING = 0.28;
+// Duration (ms) of programmatic scrubs when a nav chip is clicked.
+const NAV_SCRUB_DURATION_MS = 3000;
+
+function update(force = false) {
+  // Smooth video time approach (avoids stutter from many rapid setCurrentTime calls)
+  const diff = targetTime - currentTime;
+  const smooth = SCROLL_SMOOTHING;
+  if (Math.abs(diff) > 0.01 || force) {
+    currentTime += diff * smooth; // ease
+    if (videoReady) {
+      try { video.currentTime = currentTime; } catch (e) {}
+    }
+  }
+
+  // Derive active chapter from progress
+  const p = videoDuration ? currentTime / videoDuration : 0;
+  const idxFloat = p * CHAPTER_COUNT;
+  const activeIdx = Math.min(CHAPTER_COUNT - 1, Math.max(0, Math.floor(idxFloat)));
+
+  // Position within chapter (0..1)
+  const local = idxFloat - activeIdx;
+
+  // Visibility envelope: fade in early in the chapter, fade out near end
+  // local 0.0–0.15 fading in, 0.15–0.75 fully visible, 0.75–1.0 fading out
+  frames.forEach((f, i) => {
+    let vis = 0;
+    if (i === activeIdx) {
+      if (local < 0.12) vis = local / 0.12;
+      else if (local > 0.82) vis = Math.max(0, (1 - local) / 0.18);
+      else vis = 1;
+    }
+    f.style.opacity = vis.toFixed(3);
+    if (vis > 0.05) f.classList.add('visible'); else f.classList.remove('visible');
+  });
+
+  // Nav active state
+  [...navScroll.children].forEach((btn, i) => {
+    btn.classList.toggle('active', i === activeIdx);
+  });
+
+  // Dots
+  [...dotsEl.children].forEach((d, i) => {
+    d.classList.toggle('active', i === activeIdx);
+    d.classList.toggle('passed', i < activeIdx);
+  });
+
+  // Chapter index display
+  const ch = CHAPTERS[activeIdx];
+  ciNum.textContent = `${String(activeIdx + 1).padStart(2, '0')} / ${String(CHAPTER_COUNT).padStart(2, '0')}`;
+  ciLabel.textContent = ch.short;
+  bbLabel.textContent = ch.label;
+
+  requestAnimationFrame(() => update(false));
+}
+requestAnimationFrame(() => update(false));
+
+/* ============================================================
+   Smooth scroll to chapter (nav click)
+   ============================================================ */
+function smoothScrollToChapter(idx) {
+  if (!videoReady) return;
+  // Target the *middle* of the chapter's scroll window
+  const t = ((idx + 0.4) / CHAPTER_COUNT) * scrollMax;
+  smoothScrollTo(t, reducedMotion ? 0 : NAV_SCRUB_DURATION_MS);
+}
+
+function smoothScrollTo(toY, duration) {
+  if (smoothScrollTween) cancelAnimationFrame(smoothScrollTween.raf);
+  if (duration <= 0) {
+    window.scrollTo(0, toY);
+    targetTime = (toY / scrollMax) * videoDuration;
+    smoothScrollTween = null;
+    return;
+  }
+  const startY = window.scrollY;
+  const delta = toY - startY;
+  const t0 = performance.now();
+  const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // easeInOutCubic
+  const step = () => {
+    const t = Math.min(1, (performance.now() - t0) / duration);
+    const y = startY + delta * ease(t);
+    window.scrollTo(0, y);
+    targetTime = (y / scrollMax) * videoDuration;
+    if (t < 1) {
+      smoothScrollTween.raf = requestAnimationFrame(step);
+    } else {
+      smoothScrollTween = null;
+    }
+  };
+  smoothScrollTween = { raf: requestAnimationFrame(step) };
+  userInteracted = true;
+  hintEl.classList.add('fade');
+}
+
+/* ============================================================
+   Intro
+   ============================================================ */
+function startJourney() {
+  intro.classList.add('hidden');
+  // Try playing through quickly to warm decoder, then pause for scrub
+  const warm = video.play();
+  if (warm && warm.then) warm.then(() => { video.pause(); }).catch(() => { /* will scrub on first scroll */ });
+}
+introStart.addEventListener('click', startJourney);
+
+// Auto-dismiss intro if user starts scrolling without clicking
+let introDismissed = false;
+window.addEventListener('scroll', () => {
+  if (!introDismissed && window.scrollY > 30) {
+    introDismissed = true;
+    intro.classList.add('hidden');
+  }
+}, { passive: true });
+
+/* ============================================================
+   Cursor glow + card tilt
+   ============================================================ */
+let pointerFine = matchMedia('(pointer: fine)').matches;
+if (pointerFine && !reducedMotion) {
+  document.addEventListener('mousemove', (e) => {
+    cursorGlow.style.left = e.clientX + 'px';
+    cursorGlow.style.top = e.clientY + 'px';
+    cursorGlow.style.opacity = '1';
+  });
+  document.addEventListener('mouseleave', () => { cursorGlow.style.opacity = '0'; });
+
+  // Subtle tilt for glass cards in active frame
+  overlayLayer.addEventListener('mousemove', (e) => {
+    const cards = overlayLayer.querySelectorAll('.chapter-frame.visible .glass');
+    cards.forEach((card) => {
+      const r = card.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = (e.clientX - cx) / r.width;
+      const dy = (e.clientY - cy) / r.height;
+      const max = 4;
+      card.style.transform = `perspective(1000px) rotateY(${(-dx * max).toFixed(2)}deg) rotateX(${(dy * max).toFixed(2)}deg) translateZ(0)`;
+    });
+  });
+  overlayLayer.addEventListener('mouseleave', () => {
+    overlayLayer.querySelectorAll('.glass').forEach(c => c.style.transform = '');
+  });
+}
+
+/* ============================================================
+   Keyboard nav
+   ============================================================ */
+window.addEventListener('keydown', (e) => {
+  if (!videoReady) return;
+  const p = videoDuration ? currentTime / videoDuration : 0;
+  const idx = Math.min(CHAPTER_COUNT - 1, Math.max(0, Math.floor(p * CHAPTER_COUNT)));
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
+    e.preventDefault(); smoothScrollToChapter(Math.min(CHAPTER_COUNT - 1, idx + 1));
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+    e.preventDefault(); smoothScrollToChapter(Math.max(0, idx - 1));
+  } else if (e.key === 'Home') {
+    e.preventDefault(); smoothScrollTo(0, 1000);
+  } else if (e.key === 'End') {
+    e.preventDefault(); smoothScrollTo(scrollMax, 1400);
+  }
+});
+
+/* ============================================================
+   Touch wheel — prevent the intro from blocking first scroll on mobile
+   ============================================================ */
+recomputeScrollMax();
+</script>
+
+</body>
+</html>
