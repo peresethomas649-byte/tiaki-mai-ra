@@ -258,6 +258,22 @@ body { overflow-x: hidden; }
 
 .floats { pointer-events: auto; display: contents; }
 
+/* Side-alternation: odd chapters mirror the layout so the eye doesn't
+   parse one rhythm. Applied via class so the mobile single-column
+   media query can override without fighting inline styles. */
+.chapter-frame.side-right .panel-secondary {
+  grid-column: 1 / span 1;
+  grid-row: 1 / span 1;
+  justify-self: start;
+  align-self: start;
+}
+.chapter-frame.side-right .card-primary {
+  grid-column: 2 / span 1;
+  grid-row: 2 / span 1;
+  justify-self: end;
+  align-self: end;
+}
+
 /* Primary card */
 .card-primary {
   grid-column: 1 / span 1;
@@ -523,6 +539,15 @@ body { overflow-x: hidden; }
   text-transform: uppercase;
 }
 
+/* ---------- Card collapse/expand (mobile)  ----------
+   The `.card-extra` wraps the tags + optional "View artefacts" CTA.
+   On desktop it's always visible. On mobile it collapses behind a
+   max-height + opacity transition until the user taps the card.
+   The `.card-tap-hint` is mobile-only — a small chevron with
+   "Tap for more", which fades out once the card is expanded. */
+.card-extra { display: block; }
+.card-tap-hint { display: none; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {
   .nav-brand { display: none; }
@@ -534,39 +559,155 @@ body { overflow-x: hidden; }
     padding: clamp(78px, 12vh, 110px) 16px clamp(110px, 16vh, 150px);
     gap: 12px;
   }
+  /* Defeat the desktop side-alternation rules on mobile: every chapter
+     gets the same stacked column-1 layout (secondary on top, primary on
+     bottom) regardless of which side it lives on at desktop sizes. */
+  .chapter-frame.side-left .panel-secondary,
+  .chapter-frame.side-right .panel-secondary,
+  .panel-secondary {
+    grid-column: 1; grid-row: 1;
+    justify-self: start;
+    align-self: start;
+    max-width: calc(100vw - 32px);
+  }
+  .chapter-frame.side-left .card-primary,
+  .chapter-frame.side-right .card-primary,
   .card-primary {
     grid-column: 1; grid-row: 3;
-    max-width: 100%;
+    justify-self: start;
     align-self: end;
+    max-width: 100%;
     padding: 18px 20px;
     border-radius: 22px;
   }
   .card-primary h2 { font-size: clamp(24px, 5.5vw, 32px); }
   .card-primary p.body { font-size: 13px; }
+
+  /* Voice-memo card: drop the "VOICE MEMO · 0:14" header and let the
+     italic quote be the entire card. We also bound width so it stays
+     horizontal-feeling instead of getting squashed by the grid. */
+  .panel-secondary .label { display: none; }
   .panel-secondary {
-    grid-column: 1; grid-row: 1;
-    justify-self: start;
-    max-width: 70vw;
+    padding: 11px 14px;
+    width: auto;
   }
+  .panel-secondary .quote {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
   .panel-coord { display: none; }
   .nav-scroll { max-width: 65vw; }
   .hint { display: none; }
   .chapter-index { left: 14px; }
+
+  /* ---------- Tap-to-expand chapter cards ---------- */
+  .card-primary {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .card-primary:active { transform: scale(0.995); }
+
+  .card-primary .card-extra {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-top: 0;
+    pointer-events: none;
+    transition: max-height 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
+                opacity 360ms ease,
+                margin-top 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .card-primary.expanded .card-extra {
+    max-height: 720px;
+    opacity: 1;
+    margin-top: 14px;
+    pointer-events: auto;
+  }
+
+  .card-tap-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    pointer-events: none;
+    transition: opacity 280ms ease,
+                max-height 360ms cubic-bezier(0.2, 0.7, 0.2, 1),
+                margin-top 360ms ease;
+    max-height: 30px;
+  }
+  .card-tap-hint svg { width: 12px; height: 12px; }
+  .card-primary.expanded .card-tap-hint {
+    opacity: 0;
+    max-height: 0;
+    margin-top: 0;
+  }
+
+  /* ---------- Smaller chapter-nav on mobile + flowing scroll ---------- */
+  .nav {
+    padding: 5px;
+    gap: 4px;
+  }
+  .nav-item {
+    padding: 6px 11px;
+    font-size: 11.5px;
+    min-height: 28px;
+    gap: 6px;
+  }
+  .nav-item .idx { font-size: 9.5px; }
+
+  /* ---------- Intro card: outer breathing room ---------- */
+  .intro-overlay { padding: 22px 18px; }
+  .intro-overlay > .glass {
+    padding: 24px 26px !important;
+    border-radius: 22px !important;
+    max-width: 100%;
+  }
 }
+
 @media (max-width: 560px) {
-  .nav { top: calc(var(--safe-top) + 10px); padding: 6px; gap: 4px; }
+  .nav { top: calc(var(--safe-top) + 10px); padding: 4px; gap: 4px; }
   .nav-scroll { max-width: calc(100vw - 24px); }
-  .nav-item { padding: 8px 11px; font-size: 12px; }
+  .nav-item {
+    padding: 5px 9px;
+    font-size: 11px;
+    min-height: 26px;
+  }
+  .nav-item .idx { font-size: 9px; }
   .chapter-frame { padding-bottom: 130px; }
   .card-primary {
     padding: 16px 18px;
   }
   .card-primary .kicker { display: none; }
-  .panel-secondary { max-width: calc(100vw - 28px); padding: 11px 14px; }
   .panel-secondary .quote { font-size: 12.5px; }
   .bottom-bar { font-size: 9.5px; padding: 7px 12px; gap: 8px; }
   .chapter-index { top: calc(var(--safe-top) + 6px); left: 12px; }
   .chapter-index .big { font-size: 18px; }
+
+  /* Intro card: even tighter margins so the loading line is never
+     clipped against the safe-area on small phones. */
+  .intro-overlay { padding: 18px 14px; }
+  .intro-overlay > .glass {
+    padding: 20px 20px !important;
+    border-radius: 20px !important;
+  }
+  .intro-inner .eyebrow { margin-bottom: 14px; }
+  .intro-inner h1 {
+    font-size: clamp(28px, 7vw, 40px);
+    margin-bottom: 10px;
+  }
+  .intro-inner p {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .intro-cta { padding: 12px 22px; }
+  .intro-loading { margin-top: 14px; }
 }
 
 /* Reduced motion */
@@ -639,6 +780,13 @@ body { overflow-x: hidden; }
 /* ============================================================
    Chapter data
    ============================================================ */
+// `delaySec` shifts the per-chapter card's visibility envelope so the
+// overlay text doesn't appear before the matching island is on screen.
+// Tuned by hand against the Cloudinary video; values are seconds.
+//
+// `showArtefacts` controls whether the "View artefacts" CTA is rendered
+// (only the chapters with a tangible XR project: 3 SiteSafe, 8 KiwiRail,
+// 9 Matariki Vision Pro). The personal/biographical chapters omit it.
 const CHAPTERS = [
   {
     short: "Origins",
@@ -649,7 +797,9 @@ const CHAPTERS = [
     quote: "Ko au tēnei, nō reira au.",
     tags: ["Whakapapa", "Storytelling", "Te Ao Māori", "Identity"],
     coord: { lat: "—36.84° S", lng: "174.76° E", weather: "Dawn mist · 12°C" },
-    label: "Foundation"
+    label: "Foundation",
+    delaySec: 0,
+    showArtefacts: false
   },
   {
     short: "Hearth",
@@ -660,7 +810,9 @@ const CHAPTERS = [
     quote: "Care is a craft you practice nightly.",
     tags: ["Hospitality", "Discipline", "Service", "Attention"],
     coord: { lat: "—36.86° S", lng: "174.74° E", weather: "Steam · 18°C" },
-    label: "Care"
+    label: "Care",
+    delaySec: 0,
+    showArtefacts: false
   },
   {
     short: "Site",
@@ -671,7 +823,9 @@ const CHAPTERS = [
     quote: "Design where the stakes are real.",
     tags: ["AR", "SiteSafe", "User Flows", "Spatial UX"],
     coord: { lat: "—36.92° S", lng: "174.79° E", weather: "Overcast · 14°C" },
-    label: "Site"
+    label: "Site",
+    delaySec: 0,
+    showArtefacts: true
   },
   {
     short: "Field",
@@ -682,7 +836,9 @@ const CHAPTERS = [
     quote: "Train the boring thing. Trust the team.",
     tags: ["Teamwork", "Resilience", "Pressure", "Discipline"],
     coord: { lat: "—36.90° S", lng: "174.81° E", weather: "Wind · 11°C" },
-    label: "Field"
+    label: "Field",
+    delaySec: 0,
+    showArtefacts: false
   },
   {
     short: "Belonging",
@@ -693,7 +849,9 @@ const CHAPTERS = [
     quote: "Belonging is a verb.",
     tags: ["Identity", "Inclusion", "Belonging", "Growth"],
     coord: { lat: "—36.85° S", lng: "174.77° E", weather: "Warm light · 19°C" },
-    label: "Belonging"
+    label: "Belonging",
+    delaySec: 1,
+    showArtefacts: false
   },
   {
     short: "Studio",
@@ -704,7 +862,9 @@ const CHAPTERS = [
     quote: "Make the rough thing first.",
     tags: ["Double Diamond", "Agile", "Prototyping", "Direction"],
     coord: { lat: "—36.84° S", lng: "174.76° E", weather: "Studio light · 21°C" },
-    label: "Studio"
+    label: "Studio",
+    delaySec: 2,
+    showArtefacts: false
   },
   {
     short: "Maker",
@@ -715,7 +875,9 @@ const CHAPTERS = [
     quote: "Curiosity, but soldered.",
     tags: ["Arduino", "Sensors", "PCB", "Prototyping"],
     coord: { lat: "—36.85° S", lng: "174.76° E", weather: "Workshop · 22°C" },
-    label: "Maker"
+    label: "Maker",
+    delaySec: 2,
+    showArtefacts: false
   },
   {
     short: "Rail",
@@ -726,7 +888,9 @@ const CHAPTERS = [
     quote: "Spatial design for the working hand.",
     tags: ["HoloLens 2", "Digital Twin", "XR Training", "Leadership"],
     coord: { lat: "—41.29° S", lng: "174.78° E", weather: "Rail yard · 9°C" },
-    label: "Rail"
+    label: "Rail",
+    delaySec: 2,
+    showArtefacts: true
   },
   {
     short: "Matariki",
@@ -737,7 +901,9 @@ const CHAPTERS = [
     quote: "The stars were always interface.",
     tags: ["Vision Pro", "Matariki", "Kaupapa", "Spatial Story"],
     coord: { lat: "—36.85° S", lng: "174.76° E", weather: "Night sky · 8°C" },
-    label: "Matariki"
+    label: "Matariki",
+    delaySec: 2,
+    showArtefacts: true
   },
   {
     short: "Love",
@@ -748,7 +914,9 @@ const CHAPTERS = [
     quote: "To be witnessed is to be free.",
     tags: ["Love", "Partnership", "Home", "Anchor"],
     coord: { lat: "—36.84° S", lng: "174.76° E", weather: "Golden hour · 20°C" },
-    label: "Love"
+    label: "Love",
+    delaySec: 2,
+    showArtefacts: false
   },
   {
     short: "Next",
@@ -759,7 +927,9 @@ const CHAPTERS = [
     quote: "The next island is already in view.",
     tags: ["NYC", "AI", "XR", "Creative Tech"],
     coord: { lat: "40.71° N", lng: "—74.01° W", weather: "Skyline · 16°C" },
-    label: "Horizon"
+    label: "Horizon",
+    delaySec: 2,
+    showArtefacts: false
   }
 ];
 
@@ -801,30 +971,44 @@ CHAPTERS.forEach((_, i) => {
   dotsEl.appendChild(d);
 });
 
-/* ----- Build chapter frames ----- */
+/* ----- Build chapter frames -----
+   Side-alternation is applied via a class (.side-left / .side-right)
+   instead of inline grid-column styles so the mobile single-column
+   media query can override it cleanly. Previously the inline styles
+   forced grid-column:2 even at <900px, expanding the implicit grid
+   and squashing the voice-memo card into a narrow vertical strip. */
 const frames = [];
 CHAPTERS.forEach((c, i) => {
   const frame = document.createElement('div');
-  frame.className = 'chapter-frame';
+  const sideRight = (i % 2 === 1);
+  frame.className = 'chapter-frame ' + (sideRight ? 'side-right' : 'side-left');
   frame.dataset.idx = i;
-  const sideRight = (i % 2 === 1); // alternate primary card placement
-  frame.innerHTML = `
-    <div class="floats">
-      <div class="glass panel-secondary" style="${sideRight ? 'grid-column:1; justify-self:start;' : ''}">
-        <div class="label">Voice memo · 0:14</div>
-        <div class="quote">"${c.quote}"</div>
-      </div>
-      <div class="glass card-primary" style="${sideRight ? 'grid-column:2; justify-self:end;' : ''}">
-        <div class="num">Chapter ${String(i + 1).padStart(2, '0')}<span></span></div>
-        <h2>${c.title} <em>${c.titleEm}</em></h2>
-        <div class="sub">${c.sub}</div>
-        <p class="body">${c.body}</p>
-        <div class="tag-row">${c.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+  // The "View artefacts" CTA only renders for chapters that have
+  // a tangible XR project to show (set via CHAPTERS[i].showArtefacts).
+  const artefactsHtml = c.showArtefacts ? `
         <div class="actions">
           <button class="btn-glass" type="button" tabindex="-1">
             View artefacts
             <svg class="arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
           </button>
+        </div>` : '';
+  frame.innerHTML = `
+    <div class="floats">
+      <div class="glass panel-secondary">
+        <div class="label">Voice memo · 0:14</div>
+        <div class="quote">"${c.quote}"</div>
+      </div>
+      <div class="glass card-primary">
+        <div class="num">Chapter ${String(i + 1).padStart(2, '0')}<span></span></div>
+        <h2>${c.title} <em>${c.titleEm}</em></h2>
+        <div class="sub">${c.sub}</div>
+        <p class="body">${c.body}</p>
+        <div class="card-extra">
+          <div class="tag-row">${c.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>${artefactsHtml}
+        </div>
+        <div class="card-tap-hint" aria-hidden="true">
+          <span>Tap for more</span>
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"/></svg>
         </div>
       </div>
       <div class="glass panel-coord">
@@ -837,6 +1021,69 @@ CHAPTERS.forEach((c, i) => {
   overlayLayer.appendChild(frame);
   frames.push(frame);
 });
+
+/* ============================================================
+   Mobile: tap-to-expand chapter cards + nav auto-scroll
+   ============================================================
+   On phones the primary chapter card is dense for the viewport, so we
+   collapse it by default to the title / titleEm / sub / first paragraph
+   and reveal the tags (+ optional View artefacts CTA) on tap. Desktop
+   shows everything expanded as before.
+
+   We also auto-scroll the chapter-nav strip so the active chip stays
+   centred as the user scrolls through the journey. The current chip's
+   `.active` class is already set in update(); this just keeps it in
+   view for the small navbar variant on mobile. */
+const mobileMQ = matchMedia('(max-width: 900px)');
+
+function syncCardA11y() {
+  const mobile = mobileMQ.matches;
+  frames.forEach((f) => {
+    const card = f.querySelector('.card-primary');
+    if (!card) return;
+    if (mobile) {
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'button');
+      if (!card.hasAttribute('aria-expanded')) {
+        card.setAttribute('aria-expanded', 'false');
+      }
+    } else {
+      card.removeAttribute('tabindex');
+      card.removeAttribute('role');
+      card.removeAttribute('aria-expanded');
+      card.classList.remove('expanded');
+    }
+  });
+}
+syncCardA11y();
+mobileMQ.addEventListener('change', syncCardA11y);
+
+frames.forEach((f) => {
+  const card = f.querySelector('.card-primary');
+  if (!card) return;
+  card.addEventListener('click', (e) => {
+    if (!mobileMQ.matches) return;
+    // Don't toggle when the user is tapping the View-artefacts button
+    // or selecting body text.
+    if (e.target.closest('.btn-glass')) return;
+    const expanded = card.classList.toggle('expanded');
+    card.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  });
+  card.addEventListener('keydown', (e) => {
+    if (!mobileMQ.matches) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      card.click();
+    }
+  });
+});
+
+function autoScrollNavToActive(idx) {
+  const btn = navScroll.children[idx];
+  if (!btn) return;
+  const target = btn.offsetLeft - (navScroll.clientWidth - btn.offsetWidth) / 2;
+  navScroll.scrollTo({ left: target, behavior: 'smooth' });
+}
 
 /* ============================================================
    Scroll → Video timeline
@@ -924,14 +1171,27 @@ function update(force = false) {
   // Position within chapter (0..1)
   const local = idxFloat - activeIdx;
 
-  // Visibility envelope: fade in early in the chapter, fade out near end
-  // local 0.0–0.15 fading in, 0.15–0.75 fully visible, 0.75–1.0 fading out
+  // Visibility envelope: fade in mid-chapter, fade out near the end.
+  // Each chapter has an optional `delaySec` (see CHAPTERS) which shifts
+  // the fade-in window later within its scroll slot, so the overlay
+  // text doesn't appear before its matching island reaches centre frame.
+  const chapterSlotSec = videoDuration && CHAPTER_COUNT
+    ? videoDuration / CHAPTER_COUNT
+    : 1;
   frames.forEach((f, i) => {
     let vis = 0;
     if (i === activeIdx) {
-      if (local < 0.12) vis = local / 0.12;
-      else if (local > 0.82) vis = Math.max(0, (1 - local) / 0.18);
-      else vis = 1;
+      const ch = CHAPTERS[i];
+      const delayLocal = Math.min(0.7, (ch.delaySec || 0) / chapterSlotSec);
+      if (local < delayLocal) {
+        vis = 0;
+      } else {
+        // Re-normalise position over the post-delay portion of the slot.
+        const eff = (local - delayLocal) / Math.max(0.001, 1 - delayLocal);
+        if (eff < 0.12) vis = eff / 0.12;
+        else if (eff > 0.82) vis = Math.max(0, (1 - eff) / 0.18);
+        else vis = 1;
+      }
     }
     f.style.opacity = vis.toFixed(3);
     if (vis > 0.05) f.classList.add('visible'); else f.classList.remove('visible');
@@ -954,8 +1214,24 @@ function update(force = false) {
   ciLabel.textContent = ch.short;
   bbLabel.textContent = ch.label;
 
+  // Handle activeIdx change: collapse the previously-active card so each
+  // chapter opens fresh, and pull the nav strip so the active chip stays
+  // in view on mobile.
+  if (activeIdx !== lastActiveIdx) {
+    if (lastActiveIdx >= 0) {
+      const prevCard = frames[lastActiveIdx] && frames[lastActiveIdx].querySelector('.card-primary');
+      if (prevCard && prevCard.classList.contains('expanded')) {
+        prevCard.classList.remove('expanded');
+        prevCard.setAttribute('aria-expanded', 'false');
+      }
+    }
+    autoScrollNavToActive(activeIdx);
+    lastActiveIdx = activeIdx;
+  }
+
   requestAnimationFrame(() => update(false));
 }
+let lastActiveIdx = -1;
 requestAnimationFrame(() => update(false));
 
 /* ============================================================
