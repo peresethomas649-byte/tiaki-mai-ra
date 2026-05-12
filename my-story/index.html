@@ -256,7 +256,14 @@ body { overflow-x: hidden; }
   100% { opacity: 1; transform: translateY(0)    scale(1);     filter: blur(0); }
 }
 
-.floats { pointer-events: auto; display: contents; }
+/* Floats wrapper has no box of its own (display: contents). Pointer
+   events are gated on the per-child elements so only the active
+   chapter (.visible) intercepts taps — without this, every chapter
+   frame is stacked at inset:0 and the topmost in DOM order (Ch 11)
+   silently swallows every click. */
+.floats { display: contents; }
+.chapter-frame .floats > * { pointer-events: none; }
+.chapter-frame.visible .floats > * { pointer-events: auto; }
 
 /* Side-alternation: odd chapters mirror the layout so the eye doesn't
    parse one rhythm. Applied via class so the mobile single-column
@@ -556,8 +563,12 @@ body { overflow-x: hidden; }
   .chapter-frame {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr auto auto;
-    padding: clamp(78px, 12vh, 110px) 16px clamp(110px, 16vh, 150px);
-    gap: 12px;
+    /* Tighter vertical chrome on mobile: the primary card sits in
+       grid-row 3 with align-self:end, so a smaller bottom padding
+       pulls it down to just above the bottom progress pill instead
+       of floating in the middle of the viewport. */
+    padding: clamp(60px, 9vh, 90px) 16px 78px;
+    gap: 10px;
   }
   /* Defeat the desktop side-alternation rules on mobile: every chapter
      gets the same stacked column-1 layout (secondary on top, primary on
@@ -615,6 +626,9 @@ body { overflow-x: hidden; }
     overflow: hidden;
     margin-top: 0;
     pointer-events: none;
+    /* Closing animation (this declaration is what's "current" when
+       .expanded gets removed, so its transition plays on close). Same
+       quicker curve as before — feedback was that the collapse is fine. */
     transition: max-height 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
                 opacity 360ms ease,
                 margin-top 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -627,6 +641,11 @@ body { overflow-x: hidden; }
     opacity: 1;
     margin-top: 14px;
     pointer-events: auto;
+    /* Opening animation: softer, slightly longer ease-out so the
+       reveal feels gentle on first tap instead of snapping in. */
+    transition: max-height 720ms cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 520ms cubic-bezier(0.4, 0, 0.2, 1),
+                margin-top 720ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .card-tap-hint {
@@ -683,7 +702,9 @@ body { overflow-x: hidden; }
     min-height: 26px;
   }
   .nav-item .idx { font-size: 9px; }
-  .chapter-frame { padding-bottom: 130px; }
+  /* Even tighter bottom padding on small phones so the card sits
+     ~16px above the bottom progress pill. */
+  .chapter-frame { padding-bottom: 72px; }
   .card-primary {
     padding: 16px 18px;
   }
@@ -927,7 +948,7 @@ const CHAPTERS = [
     titleEm: "What's next",
     sub: "Creative technology, on a bigger horizon.",
     body: "New York is the next island. Creative technology, AI-native interfaces, immersive media, and the responsibility of carrying a Māori practice into rooms where it hasn't been before. The journey isn't a destination — it's the next horizon, already arriving.",
-    quote: "The next island is already in view.",
+    quote: "The most certain constant is change.",
     tags: ["NYC", "AI", "XR", "Creative Tech"],
     coord: { lat: "40.71° N", lng: "—74.01° W", weather: "Skyline · 16°C" },
     label: "Horizon",
