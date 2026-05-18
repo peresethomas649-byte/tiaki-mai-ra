@@ -867,7 +867,18 @@ button {
 /* === PROJECTS SECTION === */
 .projects {
     position: relative;
-    min-height: 250vh;
+    /* Section height shrunk from 250vh now that the .testi-grid has
+       been replaced with a single-stage 3D carousel. The grid needed
+       the extra height for its responsive 12-card stack; the carousel
+       only takes one stage (~540px) so 175vh is plenty.
+
+       Why not less: the next section's .section-separator video is
+       absolutely-positioned at top:0 of .testimonials with
+       transform: translate(-50%, -95%) — i.e. pulled UP by ~95% of
+       its own height (~400px) so it bridges the seam. We need this
+       section tall enough that the separator lands below the carousel
+       HUD instead of overlapping the stage. */
+    min-height: 225vh;
     background: var(--color-bg-deep);
     overflow: hidden;
 }
@@ -914,7 +925,9 @@ button {
     z-index: 2;
     /* Pulls text and cards up so they graphically overlap the 3D liquid scene */
     margin-top: -45vh;
-    padding: 0 var(--space-lg) 12.5vw;
+    /* Bottom padding trimmed (was 12.5vw / ~160px at desktop) so the
+       carousel HUD sits closer to the animated bridge separator below. */
+    padding: 0 var(--space-lg) 32px;
     max-width: var(--max-width);
     margin-left: auto;
     margin-right: auto;
@@ -2848,6 +2861,14 @@ body {
         width: 280px;
         height: 360px;
     }
+    /* Shorten the projects section on mobile. The bridge separator
+       video below is smaller on phones (~200px vs ~410px desktop), so
+       its `transform: translate(-50%, -95%)` only pulls it up ~190px
+       — much less than on desktop. Without this we'd land the
+       separator hundreds of pixels below the carousel HUD. */
+    .projects {
+        min-height: 195vh;
+    }
 }
 
 @media (max-width: 480px) {
@@ -2858,6 +2879,9 @@ body {
         width: 84vw;
         max-width: 320px;
         height: 320px;
+    }
+    .projects {
+        min-height: 185vh;
     }
 }
 

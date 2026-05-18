@@ -814,8 +814,14 @@ class ProjectsCarousel {
         this.dragLastT = this.dragStart.t;
         this.dragLastDelta = 0;
         this.dragMovedPx = 0;
+        this.pointerDownAt = this.dragStart.t;
         this.stage.classList.add('is-grabbing');
-        try { this.stage.setPointerCapture(e.pointerId); } catch (_) {}
+        // Note: we intentionally DO NOT call setPointerCapture here.
+        // Capturing the pointer redirects subsequent click events to the
+        // capturing element (the stage) and can suppress the click on
+        // the original card target, which would prevent the tap-to-open
+        // detail modal from firing. The drag logic still works without
+        // capture because pointermove/up are bound to window above.
     }
 
     onPointerMove(e) {
@@ -873,9 +879,16 @@ class ProjectsCarousel {
     }
 
     onCardClick(e, card, i) {
-        // Suppress click if the user actually dragged (Pointer events
-        // still fire click on the element they started on).
-        if (this.dragMovedPx > 6) { this.dragMovedPx = 0; return; }
+        // Distinguish a genuine click from the tail of a drag gesture.
+        // Real mouse clicks can wobble up to ~10-15px; we treat anything
+        // under 14px OR completed in under 220ms as a click. Beyond that
+        // it's a drag and we suppress the click so the carousel doesn't
+        // also open the detail at the end of a swipe.
+        const movedPx = this.dragMovedPx || 0;
+        const heldMs = this.pointerDownAt ? performance.now() - this.pointerDownAt : 0;
+        const isClick = movedPx < 14 || heldMs < 220;
+        this.dragMovedPx = 0;
+        if (!isClick) return;
         const activeIdx = Math.round(this.pos);
         if (i !== activeIdx) {
             this.snapTo(i);
