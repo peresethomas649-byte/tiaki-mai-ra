@@ -601,6 +601,352 @@ class SplinePerformanceManager {
     }
 }
 
+// --- 8b. Projects Carousel (3D perspective stack) ---
+// Replaces the old .testi-grid. Builds a depth-stacked carousel of
+// .proj-card elements driven by a fractional `pos` (0..n-1). Each card's
+// position/scale/opacity/blur is computed per-frame as an offset from
+// `pos` and applied via CSS custom properties (--cx, --cy, --cz, --rx,
+// --ry, --cs, --co, --cb, --cblur). The carousel is horizontal on
+// desktop and vertical on mobile; tapping a back card brings it to the
+// front, tapping the front card opens a detail overlay with a CTA link
+// to the project page.
+class ProjectsCarousel {
+    constructor() {
+        this.root = document.getElementById('projects-carousel');
+        if (!this.root) return;
+        this.stage = this.root.querySelector('.proj-carousel__stage');
+        this.track = this.root.querySelector('.proj-carousel__track');
+        this.cards = Array.from(this.track.querySelectorAll('.proj-card'));
+        this.prevBtn = document.getElementById('proj-prev');
+        this.nextBtn = document.getElementById('proj-next');
+        this.counterCur = document.getElementById('proj-counter-cur');
+        this.counterTot = document.getElementById('proj-counter-tot');
+        this.detail = document.getElementById('proj-detail');
+        this.detailTag = document.getElementById('proj-detail-tag');
+        this.detailName = document.getElementById('proj-detail-name');
+        this.detailQuote = document.getElementById('proj-detail-quote');
+        this.detailCta = document.getElementById('proj-detail-cta');
+        this.detailClose = document.getElementById('proj-detail-close');
+
+        this.n = this.cards.length;
+        this.pos = 0; // fractional active position, 0..n-1
+        this.velocity = 0; // pos-units per frame
+        this.dragging = false;
+        this.dragStart = null;
+        this.dragLastT = 0;
+        this.dragLastDelta = 0;
+        this.modalOpen = false;
+        this.modalReturnIdx = -1;
+
+        // Wheel accumulation for trackpad/scroll → discrete steps
+        this.wheelAccum = 0;
+        this.wheelLastTs = 0;
+
+        if (this.counterTot) this.counterTot.textContent = String(this.n).padStart(2, '0');
+
+        this.bindEvents();
+        this.layout();
+        this.loop();
+    }
+
+    isVertical() {
+        return window.matchMedia('(max-width: 768px)').matches;
+    }
+
+    // Compute the per-card transform values for a given offset (i - pos).
+    // The exponential-ish lateral curve keeps adjacent cards visually close
+    // and bunches the far-back cards into the dark.
+    geometryForOffset(offset) {
+        const vertical = this.isVertical();
+        const abs = Math.abs(offset);
+        const sign = offset >= 0 ? 1 : -1;
+        const lateralPx = vertical ? 240 : 320;
+        const lateral = sign * (1 - Math.exp(-abs * 0.55)) * lateralPx;
+        const depth = -Math.min(abs, 6) * 110;
+        const rotate = -sign * Math.min(abs, 4) * (vertical ? 9 : 14);
+        const scale = Math.max(0.42, 1 - abs * 0.10);
+        const opacity = Math.max(0, 1 - abs * 0.18);
+        const brightness = Math.max(0.22, 1 - abs * 0.17);
+        const blur = Math.min(4, abs * 0.7);
+        return {
+            cx: vertical ? 0 : lateral,
+            cy: vertical ? lateral : 0,
+            cz: depth,
+            rx: vertical ? rotate : 0,
+            ry: vertical ? 0 : rotate,
+            cs: scale,
+            co: opacity,
+            cb: brightness,
+            cblur: blur
+        };
+    }
+
+    layout() {
+        const activeIdx = Math.round(this.pos);
+        for (let i = 0; i < this.n; i++) {
+            const card = this.cards[i];
+            const offset = i - this.pos;
+            const g = this.geometryForOffset(offset);
+            const style = card.style;
+            style.setProperty('--cx', g.cx + 'px');
+            style.setProperty('--cy', g.cy + 'px');
+            style.setProperty('--cz', g.cz + 'px');
+            style.setProperty('--rx', g.rx + 'deg');
+            style.setProperty('--ry', g.ry + 'deg');
+            style.setProperty('--cs', g.cs.toFixed(3));
+            style.setProperty('--co', g.co.toFixed(3));
+            style.setProperty('--cb', g.cb.toFixed(3));
+            style.setProperty('--cblur', g.cblur.toFixed(2) + 'px');
+            // Only the front card reveals the body quote
+            const textOpacity = Math.max(0, 1 - Math.abs(offset) * 1.6);
+            style.setProperty('--co-text', textOpacity.toFixed(3));
+            // Stack front-most card on top
+            style.zIndex = String(1000 - Math.round(Math.abs(offset) * 10));
+            // Only let the front + adjacent cards swallow taps
+            const interactive = Math.abs(offset) <= 4;
+            style.pointerEvents = interactive ? 'auto' : 'none';
+            card.setAttribute('aria-hidden', interactive ? 'false' : 'true');
+            card.classList.toggle('is-active', i === activeIdx);
+        }
+        if (this.counterCur) {
+            this.counterCur.textContent = String(activeIdx + 1).padStart(2, '0');
+        }
+        if (this.prevBtn) this.prevBtn.disabled = activeIdx <= 0;
+        if (this.nextBtn) this.nextBtn.disabled = activeIdx >= this.n - 1;
+    }
+
+    // Used for free-tracking (drag / wheel during pan): no CSS transition.
+    setPosFree(pos) {
+        this.pos = Math.max(-0.35, Math.min(this.n - 1 + 0.35, pos));
+        this.track.classList.add('is-dragging');
+        this.layout();
+    }
+
+    // Snap to an integer index with the CSS transition playing.
+    snapTo(target) {
+        this.velocity = 0;
+        this.wheelAccum = 0;
+        const idx = Math.max(0, Math.min(this.n - 1, target));
+        this.track.classList.remove('is-dragging');
+        this.pos = idx;
+        this.layout();
+    }
+
+    step(delta) {
+        const target = Math.round(this.pos) + delta;
+        this.snapTo(target);
+    }
+
+    bindEvents() {
+        if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.step(-1));
+        if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.step(1));
+
+        this.stage.addEventListener('wheel', (e) => this.onWheel(e), { passive: false });
+
+        // Pointer drag — works for mouse + touch
+        this.stage.addEventListener('pointerdown', (e) => this.onPointerDown(e));
+        window.addEventListener('pointermove', (e) => this.onPointerMove(e));
+        window.addEventListener('pointerup', (e) => this.onPointerUp(e));
+        window.addEventListener('pointercancel', (e) => this.onPointerUp(e));
+
+        this.cards.forEach((card, i) => {
+            card.addEventListener('click', (e) => this.onCardClick(e, card, i));
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.onCardClick(e, card, i);
+                } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    this.step(1);
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.step(-1);
+                }
+            });
+        });
+
+        if (this.detailClose) this.detailClose.addEventListener('click', () => this.closeDetail());
+        if (this.detail) {
+            this.detail.addEventListener('click', (e) => {
+                if (e.target.matches('[data-detail-dismiss]')) this.closeDetail();
+            });
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.modalOpen) this.closeDetail();
+        });
+
+        // Orientation / viewport change → relayout
+        window.addEventListener('resize', () => this.layout(), { passive: true });
+    }
+
+    onWheel(e) {
+        // Only horizontal wheel/trackpad scrolls drive the carousel.
+        // Vertical wheel passes through so the user can scroll past the
+        // projects section normally — hijacking vertical wheel here
+        // would trap the page when scrolling over the carousel.
+        const primary = e.deltaX;
+        if (!primary || Math.abs(primary) < Math.abs(e.deltaY) * 0.6) return;
+        const now = performance.now();
+        if (now - this.wheelLastTs > 280) this.wheelAccum = 0;
+        this.wheelLastTs = now;
+        this.wheelAccum += primary;
+        const threshold = 70;
+        let stepped = false;
+        while (this.wheelAccum > threshold) {
+            this.step(1);
+            this.wheelAccum -= threshold;
+            stepped = true;
+        }
+        while (this.wheelAccum < -threshold) {
+            this.step(-1);
+            this.wheelAccum += threshold;
+            stepped = true;
+        }
+        if (stepped) e.preventDefault();
+    }
+
+    onPointerDown(e) {
+        if (this.modalOpen) return;
+        // Only primary button (left mouse / single touch)
+        if (e.button !== undefined && e.button !== 0) return;
+        this.dragging = true;
+        this.dragStart = { x: e.clientX, y: e.clientY, pos: this.pos, t: performance.now() };
+        this.dragLastT = this.dragStart.t;
+        this.dragLastDelta = 0;
+        this.dragMovedPx = 0;
+        this.stage.classList.add('is-grabbing');
+        try { this.stage.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+
+    onPointerMove(e) {
+        if (!this.dragging) return;
+        const vertical = this.isVertical();
+        const dx = e.clientX - this.dragStart.x;
+        const dy = e.clientY - this.dragStart.y;
+        const axis = vertical ? dy : dx;
+        this.dragMovedPx = Math.abs(axis);
+        const cardSpan = vertical
+            ? Math.min(360, window.innerHeight * 0.42)
+            : Math.min(480, window.innerWidth * 0.36);
+        const delta = -axis / cardSpan;
+        const next = this.dragStart.pos + delta;
+        const now = performance.now();
+        const dt = Math.max(1, now - this.dragLastT);
+        this.dragLastT = now;
+        // Velocity = recent pos-delta per ~frame (16ms)
+        this.dragLastDelta = ((next - this.pos) / dt) * 16;
+        this.setPosFree(next);
+    }
+
+    onPointerUp() {
+        if (!this.dragging) return;
+        this.dragging = false;
+        this.stage.classList.remove('is-grabbing');
+        // Inherit a snapshot of last drag velocity for momentum
+        this.velocity = Math.max(-0.6, Math.min(0.6, this.dragLastDelta));
+        // If it was effectively a tap (no movement), let the click handler
+        // run as normal — onCardClick will fire afterwards.
+        if (this.dragMovedPx < 6) this.velocity = 0;
+    }
+
+    // rAF loop: momentum decay + snap-back when motion settles.
+    loop() {
+        const tick = () => {
+            if (!this.dragging) {
+                if (Math.abs(this.velocity) > 0.0009) {
+                    this.pos += this.velocity;
+                    this.velocity *= 0.92;
+                    this.pos = Math.max(-0.3, Math.min(this.n - 1 + 0.3, this.pos));
+                    this.layout();
+                } else if (this.track.classList.contains('is-dragging')) {
+                    // Momentum settled — re-enable transitions and snap.
+                    this.velocity = 0;
+                    const target = Math.max(0, Math.min(this.n - 1, Math.round(this.pos)));
+                    this.track.classList.remove('is-dragging');
+                    this.pos = target;
+                    this.layout();
+                }
+            }
+            requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+    }
+
+    onCardClick(e, card, i) {
+        // Suppress click if the user actually dragged (Pointer events
+        // still fire click on the element they started on).
+        if (this.dragMovedPx > 6) { this.dragMovedPx = 0; return; }
+        const activeIdx = Math.round(this.pos);
+        if (i !== activeIdx) {
+            this.snapTo(i);
+        } else {
+            this.openDetail(i);
+        }
+    }
+
+    openDetail(idx) {
+        const card = this.cards[idx];
+        if (!card || !this.detail) return;
+        const tagEl = card.querySelector('.proj-card__tag');
+        const nameEl = card.querySelector('.proj-card__name');
+        const quoteEl = card.querySelector('.proj-card__quote');
+        const href = card.getAttribute('data-href');
+        const target = card.getAttribute('data-target') || '_self';
+
+        if (this.detailTag) this.detailTag.textContent = tagEl ? tagEl.textContent : '';
+        if (this.detailName) this.detailName.textContent = nameEl ? nameEl.textContent : '';
+        if (this.detailQuote) this.detailQuote.textContent = quoteEl ? quoteEl.textContent : '';
+
+        if (this.detailCta) {
+            const labelEl = this.detailCta.querySelector('.proj-detail__cta-label');
+            if (href) {
+                this.detailCta.classList.remove('is-disabled');
+                this.detailCta.setAttribute('href', href);
+                if (target === '_blank') {
+                    this.detailCta.setAttribute('target', '_blank');
+                } else {
+                    this.detailCta.removeAttribute('target');
+                }
+                if (labelEl) labelEl.textContent = 'Open project';
+                this.detailCta.removeAttribute('aria-disabled');
+                this.detailCta.removeAttribute('tabindex');
+            } else {
+                this.detailCta.classList.add('is-disabled');
+                this.detailCta.removeAttribute('href');
+                this.detailCta.removeAttribute('target');
+                if (labelEl) labelEl.textContent = 'No external link';
+                this.detailCta.setAttribute('aria-disabled', 'true');
+                this.detailCta.setAttribute('tabindex', '-1');
+            }
+        }
+
+        this.detail.removeAttribute('hidden');
+        this.detail.setAttribute('aria-hidden', 'false');
+        // Layout flush so the open transition fires from the hidden state.
+        void this.detail.offsetWidth;
+        this.detail.classList.add('is-open');
+        this.modalOpen = true;
+        this.modalReturnIdx = idx;
+        const panel = this.detail.querySelector('.proj-detail__panel');
+        if (panel) panel.focus({ preventScroll: true });
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeDetail() {
+        if (!this.detail) return;
+        this.detail.classList.remove('is-open');
+        this.detail.setAttribute('aria-hidden', 'true');
+        this.modalOpen = false;
+        document.body.style.overflow = '';
+        setTimeout(() => {
+            this.detail.setAttribute('hidden', '');
+            if (this.modalReturnIdx >= 0 && this.cards[this.modalReturnIdx]) {
+                this.cards[this.modalReturnIdx].focus({ preventScroll: true });
+            }
+        }, 420);
+    }
+}
+
 // --- 9. Master App Orchestrator ---
 class App {
     constructor() {
@@ -609,8 +955,14 @@ class App {
         this.marquee = new MarqueeEngine();
         this.hero = new HeroVisuals();
         this.testimonialDeck = new TestimonialDeck();
-        this.binaryTrail = new BinaryTrail();
+        // Binary "Matrix" cursor trail — desktop only. Touch-tap on phones
+        // was spawning the same character trail and the "Right Click Me"
+        // bait, which read as cluttered noise on mobile.
+        if (window.innerWidth > 968) {
+            this.binaryTrail = new BinaryTrail();
+        }
         this.liquidGlass = new LiquidGlassCards();
+        this.projectsCarousel = new ProjectsCarousel();
         this.splineManager = new SplinePerformanceManager();
         this.navElement = document.getElementById('main-nav');
 

@@ -2562,3 +2562,455 @@ body {
         opacity: 0.35;
     }
 }
+
+/* ==========================================================================
+   PROJECTS — 3D PERSPECTIVE CAROUSEL
+   --------------------------------------------------------------------------
+   Replaces the previous .testi-grid. The container provides perspective;
+   each .proj-card is absolutely positioned and given custom-property
+   transforms (--cx, --cy, --cz, --rx, --ry, --cs, --co, --cb, --cblur)
+   by the JS controller (ProjectsCarousel in js/script.js) based on its
+   offset from the currently-active card. Far-back cards fade into the
+   page background (brightness ↓, opacity ↓, blur ↑).
+   ========================================================================== */
+.proj-carousel {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    /* Hand the carousel its own stacking context so its 3D depth doesn't
+       collide with the Spline background behind the section. */
+    isolation: isolate;
+    pointer-events: auto;
+    --carousel-h: 540px;
+}
+
+.proj-carousel__stage {
+    position: relative;
+    width: 100%;
+    height: var(--carousel-h);
+    /* Strong perspective so the receding cards read as depth, not just
+       scale. Origin centred so cards angle in/out around the front card. */
+    perspective: 1600px;
+    perspective-origin: 50% 50%;
+    /* Touch handling lives in JS; let the carousel claim horizontal pans
+       on desktop and vertical pans on mobile. We override per-axis
+       below in the media query. */
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.proj-carousel__stage.is-grabbing { cursor: grabbing; }
+
+.proj-carousel__track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    transform-style: preserve-3d;
+}
+
+.proj-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 340px;
+    height: 440px;
+    margin: 0;
+    border-radius: 22px;
+    overflow: hidden;
+    background: rgba(10, 15, 26, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.55);
+    transform-origin: center center;
+    transform-style: preserve-3d;
+    will-change: transform, opacity, filter;
+    /* All position/depth comes from CSS custom props the JS sets. */
+    transform:
+        translate(-50%, -50%)
+        translate3d(var(--cx, 0px), var(--cy, 0px), var(--cz, 0px))
+        rotateX(var(--rx, 0deg))
+        rotateY(var(--ry, 0deg))
+        scale(var(--cs, 1));
+    opacity: var(--co, 1);
+    filter: brightness(var(--cb, 1)) blur(var(--cblur, 0px));
+    transition:
+        transform 620ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
+        filter 520ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 420ms ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Live drag — disable transitions so card position tracks pointer
+   1:1 instead of lagging behind. JS re-enables when drag releases. */
+.proj-carousel__track.is-dragging .proj-card {
+    transition: none;
+}
+
+/* When a card is being clicked/active by keyboard, give it a subtle
+   inset push so the tap feels responsive. */
+.proj-card:active { transform-origin: center center; }
+
+.proj-card:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 2px rgba(125, 211, 252, 0.95),
+        0 24px 60px -20px rgba(0, 0, 0, 0.55);
+}
+
+/* Card face = the visual surface (gradient tint + inner overlay).
+   Separated from .proj-card so we can morph .proj-card transforms
+   without disturbing the gradient/overlay layering. */
+.proj-card__face {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    isolation: isolate;
+}
+.proj-card__face::before {
+    /* Gradient tint set per-card via inline --card-bg. */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--card-bg);
+    opacity: 0.92;
+    z-index: 0;
+}
+.proj-card__face::after {
+    /* Bottom-anchored readability gradient over the chrome text. */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(2, 6, 23, 0.92) 0%,
+        rgba(2, 6, 23, 0.55) 38%,
+        rgba(2, 6, 23, 0.05) 72%,
+        transparent 100%
+    );
+    z-index: 1;
+}
+
+.proj-card__chrome {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 22px 22px 24px;
+    z-index: 2;
+    color: var(--color-white, #fff);
+    pointer-events: none; /* taps land on the card, not text */
+}
+.proj-card__tag {
+    display: block;
+    font-family: var(--font-body, system-ui, sans-serif);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-glow-cyan, #7DD3FC);
+    margin: 0 0 8px;
+}
+.proj-card__name {
+    display: block;
+    font-size: 1.25rem;
+    line-height: 1.18;
+    margin: 0 0 8px;
+    color: var(--color-white, #fff);
+    text-wrap: balance;
+}
+.proj-card__quote {
+    font-size: 0.83rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.78);
+    margin: 0;
+    /* Only the front card shows the full quote — others are gradient-only. */
+    opacity: var(--co-text, 0);
+    transition: opacity 380ms ease 80ms;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Featured cards — first four. Glow border + subtle outer halo. */
+.proj-card.is-featured {
+    border-color: rgba(125, 211, 252, 0.5);
+    box-shadow:
+        0 0 0 1px rgba(125, 211, 252, 0.4),
+        0 0 32px -4px rgba(0, 212, 255, 0.32),
+        0 24px 60px -20px rgba(0, 0, 0, 0.55);
+}
+
+/* Hero card — My Story. Brighter still, always-front by default
+   (JS picks idx=0 as the initial active card and this is idx=0). */
+.proj-card.is-hero {
+    border-color: rgba(186, 230, 253, 0.95);
+    box-shadow:
+        0 0 0 1.5px rgba(186, 230, 253, 0.9),
+        0 0 60px -2px rgba(0, 212, 255, 0.6),
+        0 0 110px -8px rgba(125, 211, 252, 0.45),
+        0 30px 80px -20px rgba(0, 0, 0, 0.7);
+}
+
+/* HUD: prev / counter / next under the stage. */
+.proj-carousel__hud {
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    pointer-events: auto;
+}
+.proj-nav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(10, 15, 26, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        background 280ms ease,
+        border-color 280ms ease,
+        transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 280ms ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.proj-nav-btn svg { width: 18px; height: 18px; }
+.proj-nav-btn:hover,
+.proj-nav-btn:focus-visible {
+    background: rgba(0, 168, 232, 0.18);
+    border-color: rgba(125, 211, 252, 0.55);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px -10px rgba(0, 212, 255, 0.45);
+    outline: none;
+}
+.proj-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+}
+.proj-carousel__counter {
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.7);
+    min-width: 64px;
+    text-align: center;
+    user-select: none;
+}
+.proj-carousel__counter-cur {
+    color: var(--color-glow-cyan, #7DD3FC);
+}
+.proj-carousel__counter-sep {
+    margin: 0 6px;
+    opacity: 0.5;
+}
+
+/* Reveal animation reuses the existing .scroll-reveal hook (the
+   carousel container carries `scroll-reveal` so the whole stage
+   fades up on first view, same rhythm as the rest of the page). */
+.proj-carousel.scroll-reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.proj-carousel.scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ----- Mobile: rotate the carousel onto a vertical axis -----
+   On phones / narrow tablets the stack runs top→bottom instead of
+   left→right. JS computes Y/X transforms based on this orientation. */
+@media (max-width: 768px) {
+    .proj-carousel {
+        --carousel-h: 600px;
+    }
+    .proj-carousel__stage {
+        /* Drag axis swaps: vertical now */
+        touch-action: pan-x;
+    }
+    .proj-card {
+        width: 280px;
+        height: 360px;
+    }
+}
+
+@media (max-width: 480px) {
+    .proj-carousel {
+        --carousel-h: 540px;
+    }
+    .proj-card {
+        width: 84vw;
+        max-width: 320px;
+        height: 320px;
+    }
+}
+
+/* ==========================================================================
+   PROJECTS — DETAIL OVERLAY (opened from tap on front card)
+   ========================================================================== */
+.proj-detail {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0s linear 420ms;
+}
+.proj-detail.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0s linear 0s;
+}
+.proj-detail[hidden] { display: none; }
+
+.proj-detail__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.72);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+.proj-detail__panel {
+    position: relative;
+    width: min(560px, 100%);
+    max-height: calc(100vh - 48px);
+    border-radius: 26px;
+    overflow: hidden;
+    background: linear-gradient(160deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.98));
+    border: 1px solid rgba(125, 211, 252, 0.45);
+    box-shadow:
+        0 0 0 1px rgba(125, 211, 252, 0.25),
+        0 30px 90px -20px rgba(0, 0, 0, 0.65),
+        0 0 80px -10px rgba(0, 212, 255, 0.35);
+    transform: translateY(20px) scale(0.96);
+    opacity: 0;
+    transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 380ms ease;
+}
+.proj-detail.is-open .proj-detail__panel {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.proj-detail__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 240ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 3;
+}
+.proj-detail__close svg { width: 16px; height: 16px; }
+.proj-detail__close:hover,
+.proj-detail__close:focus-visible {
+    background: rgba(255, 255, 255, 0.18);
+    transform: rotate(90deg);
+    outline: none;
+}
+
+.proj-detail__face {
+    padding: 38px 32px 32px;
+    color: var(--color-white, #fff);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.proj-detail__tag {
+    font-family: var(--font-body, system-ui, sans-serif);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-glow-cyan, #7DD3FC);
+}
+.proj-detail__name {
+    font-size: clamp(1.6rem, 4vw, 2.1rem);
+    line-height: 1.1;
+    margin: 0;
+    color: var(--color-white, #fff);
+    text-wrap: balance;
+}
+.proj-detail__quote {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.82);
+    margin: 4px 0 8px;
+}
+.proj-detail__cta {
+    align-self: flex-start;
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0077B6, #00A8E8);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+    box-shadow: 0 10px 30px -8px rgba(0, 168, 232, 0.55);
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 240ms ease,
+                filter 240ms ease;
+}
+.proj-detail__cta:hover,
+.proj-detail__cta:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 38px -8px rgba(0, 168, 232, 0.7);
+    filter: brightness(1.08);
+    outline: none;
+}
+.proj-detail__cta svg { width: 16px; height: 16px; }
+.proj-detail__cta.is-disabled {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+@media (max-width: 480px) {
+    .proj-detail__face { padding: 32px 22px 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .proj-card,
+    .proj-detail,
+    .proj-detail__panel {
+        transition-duration: 60ms !important;
+    }
+}

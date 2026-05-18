@@ -237,153 +237,174 @@
                 <h2 class="projects__heading scroll-reveal" id="projects-heading">Projects that push<br><span
                         class="projects__heading--italic">boundaries</span></h2>
 
-                <div class="testi-grid">
-                    <div class="testi-card testi-card--tall scroll-reveal"
-                        style="--card-bg: linear-gradient(135deg, #0077B6 0%, #00D4FF 60%, #7DD3FC 100%)">
-                        <a href="guardians-of-matariki/" target="_blank" rel="noopener noreferrer"
-                            class="testi-card__link">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" />
-                            </svg>
-                        </a>
-                        <div class="testi-card__overlay"><span class="testi-card__tag">XR · VisionOS</span><strong
-                                class="testi-card__name">Guardians of Matariki</strong>
-                            <p class="testi-card__quote">An immersive spatial storytelling experience for Apple
-                                VisionOS, bridging cutting-edge RealityKit environments with indigenous cultural
-                                narratives.</p>
-                        </div>
+                <!-- 3D perspective carousel.
+                     The first four cards are featured (glowing border).
+                     My Story additionally gets `is-hero` (brightest glow) and
+                     is the default-active card. Cards further back fade into
+                     the dark background; tap a back card to bring it forward,
+                     tap the front card to open the detail panel with a link
+                     to the project page. JS controller in js/script.js
+                     (class ProjectsCarousel). -->
+                <div class="proj-carousel scroll-reveal" id="projects-carousel"
+                     role="region" aria-roledescription="carousel" aria-label="Selected projects">
+                    <div class="proj-carousel__stage">
+                        <ol class="proj-carousel__track" id="proj-track">
+                            <li class="proj-card is-featured is-hero" data-idx="0"
+                                data-href="my-story/" data-target="_self"
+                                tabindex="0" role="button"
+                                aria-label="My Story project"
+                                style="--card-bg: linear-gradient(200deg, #7DD3FC 0%, #0077B6 45%, #020617 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">Personal · Scroll Cinema</span>
+                                        <strong class="proj-card__name">My Story</strong>
+                                        <p class="proj-card__quote">A scroll-driven cinematic memoir told as eleven drifting islands — a personal journey through the places, people, and craft that have shaped a life.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="proj-card is-featured" data-idx="1"
+                                data-href="guardians-of-matariki/" data-target="_self"
+                                tabindex="0" role="button"
+                                aria-label="Guardians of Matariki project"
+                                style="--card-bg: linear-gradient(135deg, #0077B6 0%, #00D4FF 60%, #7DD3FC 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">XR · VisionOS</span>
+                                        <strong class="proj-card__name">Guardians of Matariki</strong>
+                                        <p class="proj-card__quote">An immersive spatial storytelling experience for Apple VisionOS, bridging cutting-edge RealityKit environments with indigenous cultural narratives.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="proj-card is-featured" data-idx="2"
+                                data-href="kinsafe/" data-target="_self"
+                                tabindex="0" role="button"
+                                aria-label="KINSafe project"
+                                style="--card-bg: linear-gradient(170deg, #00A8E8 0%, #7DD3FC 30%, #0077B6 70%, #020617 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">AR · Safety Protocols</span>
+                                        <strong class="proj-card__name">KINSafe</strong>
+                                        <p class="proj-card__quote">An innovative proof-of-concept augmented reality toolkit, engineered to gamify and visualize critical hazard identification in the field.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="proj-card is-featured" data-idx="3"
+                                data-href="https://youtu.be/ezRUdjYpfCM?si=EBV8lt5MTKJsWo0j" data-target="_blank"
+                                tabindex="0" role="button"
+                                aria-label="Microsoft HoloLens project"
+                                style="--card-bg: linear-gradient(180deg, #7DD3FC 0%, #00A8E8 40%, #020617 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">Mixed Reality</span>
+                                        <strong class="proj-card__name">Microsoft HoloLens</strong>
+                                        <p class="proj-card__quote">A comprehensive spatial industrial training module engineered specifically for HoloLens 2 hardware, transforming complex workflows.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="proj-card" data-idx="4"
+                                data-href="https://youtu.be/n2o9SX4FM3c" data-target="_blank"
+                                tabindex="0" role="button"
+                                aria-label="HoloLens 2 MRTK project"
+                                style="--card-bg: linear-gradient(110deg, #0A0F1A 0%, #0077B6 40%, #00D4FF 80%, #7DD3FC 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">XR · Software Dev</span>
+                                        <strong class="proj-card__name">HoloLens 2 MRTK</strong>
+                                        <p class="proj-card__quote">An intensive software development exploration of the Mixed Reality Toolkit (MRTK) SDK, prototyping advanced spatial interactions for HoloLens 2.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="proj-card" data-idx="5"
+                                data-href="https://www.linkedin.com/posts/thomas-perese-140441190_mentalwellness-immersivetechnology-vrtraining-activity-6981319841764827136-eb1U?utm_source=share&utm_medium=member_desktop&rcm=ACoAACzqO4ABsgDZSxdOosHSbz38uYWFHW-3hwM"
+                                data-target="_blank"
+                                tabindex="0" role="button"
+                                aria-label="SkillsVR Training Modules project"
+                                style="--card-bg: linear-gradient(160deg, #020617 0%, #0A0F1A 40%, #0077B6 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">VR · Enterprise</span>
+                                        <strong class="proj-card__name">SkillsVR Training Modules</strong>
+                                        <p class="proj-card__quote">High-fidelity, interactive VR safety simulations architected in Unity to deliver scalable, hyper-realistic instructional design.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="proj-card" data-idx="6"
+                                data-href="https://youtu.be/cHgGJdDxML8?si=fxr7_j06RbcumndU" data-target="_blank"
+                                tabindex="0" role="button"
+                                aria-label="Indigenous AR Concepts project"
+                                style="--card-bg: linear-gradient(120deg, #1B3A5C 0%, #00A8E8 50%, #00D4FF 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">AR · Mobile Prototypes</span>
+                                        <strong class="proj-card__name">Indigenous AR Concepts</strong>
+                                        <p class="proj-card__quote">Bespoke iOS augmented reality prototypes leveraging ARKit to seamlessly weave traditional Māori and Polynesian narratives into the physical world.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="proj-card" data-idx="7"
+                                data-href="https://youtu.be/CEmShMY31d4?si=II7od-1hXOzZlOoH" data-target="_blank"
+                                tabindex="0" role="button"
+                                aria-label="Smart Stop project"
+                                style="--card-bg: linear-gradient(200deg, #00D4FF 0%, #0077B6 60%, #0A0F1A 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">IoT · Mobile Infrastructure</span>
+                                        <strong class="proj-card__name">Smart Stop</strong>
+                                        <p class="proj-card__quote">An integrated IoT passenger mobile application designed to orchestrate seamless, real-time communication protocols between urban bus fleets and commuters.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="proj-card" data-idx="8"
+                                data-href="https://youtu.be/OfG2aAhmLfo?si=V5wdXjJYXBlcV-xc" data-target="_blank"
+                                tabindex="0" role="button"
+                                aria-label="Tiaki AI Chatbot project"
+                                style="--card-bg: linear-gradient(90deg, #020617 0%, #1B3A5C 30%, #00A8E8 70%, #7DD3FC 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">AI · Conversational</span>
+                                        <strong class="proj-card__name">Tiaki AI (Chatbot)</strong>
+                                        <p class="proj-card__quote">An intelligent, LLM-powered natural language chatbot meticulously trained to deliver personalized, localized insights for the New Zealand tourism sector.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="proj-card" data-idx="9"
+                                tabindex="0" role="button"
+                                aria-label="Accenture Song project"
+                                style="--card-bg: linear-gradient(145deg, #0077B6 0%, #020617 50%, #00D4FF 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">Strategy · Consulting</span>
+                                        <strong class="proj-card__name">Accenture Song</strong>
+                                        <p class="proj-card__quote">Digital transformation and creative technology strategies developed alongside global enterprise clients as a Business Analyst intern.</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="proj-card" data-idx="10"
+                                tabindex="0" role="button"
+                                aria-label="Full-Stack Architectures project"
+                                style="--card-bg: linear-gradient(135deg, #1B3A5C 0%, #00D4FF 100%)">
+                                <div class="proj-card__face">
+                                    <div class="proj-card__chrome">
+                                        <span class="proj-card__tag">Web · React UI</span>
+                                        <strong class="proj-card__name">Full-Stack Architectures</strong>
+                                        <p class="proj-card__quote">A diverse portfolio of high-performance modern web architectures driven by robust React frontends and dynamic, scalable full-stack environments.</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ol>
                     </div>
-                    <div class="testi-card scroll-reveal"
-                        style="--card-bg: linear-gradient(160deg, #020617 0%, #0A0F1A 40%, #0077B6 100%)">
-                        <a href="https://www.linkedin.com/posts/thomas-perese-140441190_mentalwellness-immersivetechnology-vrtraining-activity-6981319841764827136-eb1U?utm_source=share&utm_medium=member_desktop&rcm=ACoAACzqO4ABsgDZSxdOosHSbz38uYWFHW-3hwM"
-                            target="_blank" rel="noopener noreferrer" class="testi-card__link">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" />
-                            </svg>
-                        </a>
-                        <div class="testi-card__overlay"><span class="testi-card__tag">VR · Enterprise</span><strong
-                                class="testi-card__name">SkillsVR Training Modules</strong>
-                            <p class="testi-card__quote">High-fidelity, interactive VR safety simulations architected in
-                                Unity to deliver scalable, hyper-realistic instructional design.</p>
+                    <div class="proj-carousel__hud" aria-hidden="true">
+                        <button type="button" class="proj-nav-btn proj-nav-btn--prev" id="proj-prev" aria-label="Previous project">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <div class="proj-carousel__counter">
+                            <span class="proj-carousel__counter-cur" id="proj-counter-cur">01</span>
+                            <span class="proj-carousel__counter-sep">/</span>
+                            <span class="proj-carousel__counter-tot" id="proj-counter-tot">11</span>
                         </div>
-                    </div>
-                    <div class="testi-card testi-card--wide scroll-reveal"
-                        style="--card-bg: linear-gradient(120deg, #1B3A5C 0%, #00A8E8 50%, #00D4FF 100%)">
-                        <a href="https://youtu.be/cHgGJdDxML8?si=fxr7_j06RbcumndU" target="_blank"
-                            rel="noopener noreferrer" class="testi-card__link">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" />
-                            </svg>
-                        </a>
-                        <div class="testi-card__overlay"><span class="testi-card__tag">AR · Mobile
-                                Prototypes</span><strong class="testi-card__name">Indigenous AR Concepts</strong>
-                            <p class="testi-card__quote">Bespoke iOS augmented reality prototypes leveraging ARKit to
-                                seamlessly weave traditional Māori and Polynesian narratives into the physical world.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="testi-card testi-card--tall scroll-reveal"
-                        style="--card-bg: linear-gradient(180deg, #7DD3FC 0%, #00A8E8 40%, #020617 100%)">
-                        <a href="https://youtu.be/ezRUdjYpfCM?si=EBV8lt5MTKJsWo0j" target="_blank"
-                            rel="noopener noreferrer" class="testi-card__link">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" />
-                            </svg>
-                        </a>
-                        <div class="testi-card__overlay"><span class="testi-card__tag">Mixed Reality</span><strong
-                                class="testi-card__name">KiwiRail HoloLens 2</strong>
-                            <p class="testi-card__quote">A comprehensive spatial industrial training module engineered
-                                specifically for HoloLens 2 hardware, transforming complex workflows.</p>
-                        </div>
-                    </div>
-                    <div class="testi-card scroll-reveal"
-                        style="--card-bg: linear-gradient(200deg, #00D4FF 0%, #0077B6 60%, #0A0F1A 100%)">
-                        <a href="https://youtu.be/CEmShMY31d4?si=II7od-1hXOzZlOoH" target="_blank"
-                            rel="noopener noreferrer" class="testi-card__link">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" />
-                            </svg>
-                        </a>
-                        <div class="testi-card__overlay"><span class="testi-card__tag">IoT · Mobile
-                                Infrastructure</span><strong class="testi-card__name">Smart Stop</strong>
-                            <p class="testi-card__quote">An integrated IoT passenger mobile application designed to
-                                orchestrate seamless, real-time communication protocols between urban bus fleets and
-                                commuters.</p>
-                        </div>
-                    </div>
-                    <div class="testi-card testi-card--wide scroll-reveal"
-                        style="--card-bg: linear-gradient(90deg, #020617 0%, #1B3A5C 30%, #00A8E8 70%, #7DD3FC 100%)">
-                        <a href="https://youtu.be/OfG2aAhmLfo?si=V5wdXjJYXBlcV-xc" target="_blank"
-                            rel="noopener noreferrer" class="testi-card__link">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" />
-                            </svg>
-                        </a>
-                        <div class="testi-card__overlay"><span class="testi-card__tag">AI · Conversational</span><strong
-                                class="testi-card__name">Tiaki AI (Chatbot)</strong>
-                            <p class="testi-card__quote">An intelligent, LLM-powered natural language chatbot
-                                meticulously trained to deliver personalized, localized insights for the New Zealand
-                                tourism sector.</p>
-                        </div>
-                    </div>
-                    <div class="testi-card scroll-reveal"
-                        style="--card-bg: linear-gradient(145deg, #0077B6 0%, #020617 50%, #00D4FF 100%)">
-                        <div class="testi-card__overlay"><span class="testi-card__tag">Strategy ·
-                                Consulting</span><strong class="testi-card__name">Accenture Song</strong>
-                            <p class="testi-card__quote">Digital transformation and creative technology strategies
-                                developed alongside global enterprise clients as a Business Analyst intern.</p>
-                        </div>
-                    </div>
-                    <div class="testi-card testi-card--tall scroll-reveal"
-                        style="--card-bg: linear-gradient(170deg, #00A8E8 0%, #7DD3FC 30%, #0077B6 70%, #020617 100%)">
-                        <a href="kinsafe/" class="testi-card__link">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" />
-                            </svg>
-                        </a>
-                        <div class="testi-card__overlay"><span class="testi-card__tag">AR · Safety
-                                Protocols</span><strong class="testi-card__name">KINSafe</strong>
-                            <p class="testi-card__quote">An innovative proof-of-concept augmented reality toolkit,
-                                engineered to gamify and visualize critical hazard identification in the field.</p>
-                        </div>
-                    </div>
-                    <div class="testi-card scroll-reveal"
-                        style="--card-bg: linear-gradient(200deg, #7DD3FC 0%, #0077B6 45%, #020617 100%)">
-                        <a href="my-story/" class="testi-card__link">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" />
-                            </svg>
-                        </a>
-                        <div class="testi-card__overlay"><span class="testi-card__tag">Personal · Scroll
-                                Cinema</span><strong class="testi-card__name">My Story</strong>
-                            <p class="testi-card__quote">A scroll-driven cinematic memoir told as eleven drifting
-                                islands — a personal journey through the places, people, and craft that have shaped a
-                                life.</p>
-                        </div>
-                    </div>
-                    <div class="testi-card scroll-reveal"
-                        style="--card-bg: linear-gradient(135deg, #1B3A5C 0%, #00D4FF 100%)">
-                        <div class="testi-card__overlay"><span class="testi-card__tag">Web · React UI</span><strong
-                                class="testi-card__name">Full-Stack Architectures</strong>
-                            <p class="testi-card__quote">A diverse portfolio of high-performance modern web
-                                architectures driven by robust React frontends and dynamic, scalable full-stack
-                                environments.</p>
-                        </div>
-                    </div>
-                    <div class="testi-card testi-card--wide scroll-reveal"
-                        style="--card-bg: linear-gradient(110deg, #0A0F1A 0%, #0077B6 40%, #00D4FF 80%, #7DD3FC 100%)">
-                        <a href="https://youtu.be/n2o9SX4FM3c" target="_blank" rel="noopener noreferrer"
-                            class="testi-card__link">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 17L17 7M17 7H7M17 7V17" />
-                            </svg>
-                        </a>
-                        <div class="testi-card__overlay"><span class="testi-card__tag">XR · Software Dev</span><strong
-                                class="testi-card__name">HoloLens 2 MRTK</strong>
-                            <p class="testi-card__quote">An intensive software development exploration of the Mixed
-                                Reality Toolkit (MRTK) SDK, prototyping advanced spatial interactions for HoloLens 2.
-                            </p>
-                        </div>
+                        <button type="button" class="proj-nav-btn proj-nav-btn--next" id="proj-next" aria-label="Next project">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -566,6 +587,26 @@
             </div>
         </section>
     </main>
+
+    <!-- Projects carousel detail overlay — populated by ProjectsCarousel
+         in js/script.js when the front card is tapped. -->
+    <div class="proj-detail" id="proj-detail" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="proj-detail-name">
+        <div class="proj-detail__backdrop" data-detail-dismiss></div>
+        <article class="proj-detail__panel" tabindex="-1">
+            <button type="button" class="proj-detail__close" id="proj-detail-close" aria-label="Close project details">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <div class="proj-detail__face">
+                <span class="proj-detail__tag" id="proj-detail-tag"></span>
+                <h3 class="proj-detail__name" id="proj-detail-name"></h3>
+                <p class="proj-detail__quote" id="proj-detail-quote"></p>
+                <a class="proj-detail__cta" id="proj-detail-cta" href="#" rel="noopener noreferrer">
+                    <span class="proj-detail__cta-label">Open project</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+                </a>
+            </div>
+        </article>
+    </div>
 
     <script src="js/script.js"></script>
     <script>
