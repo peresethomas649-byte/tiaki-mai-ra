@@ -867,18 +867,19 @@ button {
 /* === PROJECTS SECTION === */
 .projects {
     position: relative;
-    /* Section height shrunk from 250vh now that the .testi-grid has
-       been replaced with a single-stage 3D carousel. The grid needed
-       the extra height for its responsive 12-card stack; the carousel
-       only takes one stage (~540px) so 175vh is plenty.
+    /* Section height shrunk now that the .testi-grid has been replaced
+       with a single-stage 3D carousel. The grid needed the extra
+       height for its responsive 12-card stack; the carousel only
+       takes one stage (~420px after shrinking the cards) so 215vh
+       is plenty for the bridge separator to land just under the HUD.
 
        Why not less: the next section's .section-separator video is
        absolutely-positioned at top:0 of .testimonials with
        transform: translate(-50%, -95%) — i.e. pulled UP by ~95% of
        its own height (~400px) so it bridges the seam. We need this
-       section tall enough that the separator lands below the carousel
-       HUD instead of overlapping the stage. */
-    min-height: 225vh;
+       section tall enough that the separator lands ~15px below the
+       carousel HUD instead of overlapping the stage. */
+    min-height: 203vh;
     background: var(--color-bg-deep);
     overflow: hidden;
 }
@@ -2576,6 +2577,27 @@ body {
     }
 }
 
+/* Suppress the iOS Safari long-press callout (copy / share menu) on
+   touch devices. Pairs with the JS `contextmenu` preventer in App init
+   for full coverage across mobile browsers. Limited to coarse pointers
+   so desktop right-click / browser context menus still work normally. */
+@media (pointer: coarse) {
+    body,
+    .proj-carousel,
+    .proj-card,
+    .proj-card__face,
+    .proj-card__chrome {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    /* Keep the CTA link selectable/long-pressable so users can long-
+       press to "Open in new tab" if they want to. */
+    .proj-card__cta {
+        -webkit-touch-callout: default;
+    }
+}
+
 /* ==========================================================================
    PROJECTS — 3D PERSPECTIVE CAROUSEL
    --------------------------------------------------------------------------
@@ -2589,13 +2611,24 @@ body {
 .proj-carousel {
     position: relative;
     width: 100%;
-    max-width: 1200px;
+    /* No max-width — the cards spread across the full viewport width on
+       desktop so the carousel feels expansive instead of cramped into
+       a centre column. The .proj-carousel__hud below is constrained
+       separately. */
     margin: 0 auto;
+    /* Break out of the .projects__content max-width container so the
+       stage truly spans the viewport. */
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    width: 100vw;
+    max-width: 100vw;
     /* Hand the carousel its own stacking context so its 3D depth doesn't
        collide with the Spline background behind the section. */
     isolation: isolate;
     pointer-events: auto;
-    --carousel-h: 540px;
+    /* Stage height sized for the landscape cards (300px) plus some
+       breathing room for the edge-flip rotation. */
+    --carousel-h: 420px;
 }
 
 .proj-carousel__stage {
@@ -2616,6 +2649,48 @@ body {
 }
 .proj-carousel__stage.is-grabbing { cursor: grabbing; }
 
+/* Edge fade — cards reaching the left/right of the stage on desktop
+   (or top/bottom on mobile) blend into the page background. This sells
+   the "cards disappear into the dark" feeling instead of leaving them
+   as hard slabs clipped at the viewport edge. The gradient sits above
+   the cards (z-index 10) but ignores pointer events so the cards
+   underneath still receive taps. */
+.proj-carousel__stage::before,
+.proj-carousel__stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+.proj-carousel__stage::before {
+    background: linear-gradient(
+        to right,
+        var(--color-bg-deep, #0a0a0f) 0%,
+        rgba(10, 10, 15, 0.55) 3%,
+        transparent 10%,
+        transparent 90%,
+        rgba(10, 10, 15, 0.55) 97%,
+        var(--color-bg-deep, #0a0a0f) 100%
+    );
+}
+.proj-carousel__stage::after { display: none; }
+
+@media (max-width: 768px) {
+    /* Mobile vertical stack: fade top/bottom instead of left/right. */
+    .proj-carousel__stage::before {
+        background: linear-gradient(
+            to bottom,
+            var(--color-bg-deep, #0a0a0f) 0%,
+            rgba(10, 10, 15, 0.6) 8%,
+            transparent 22%,
+            transparent 78%,
+            rgba(10, 10, 15, 0.6) 92%,
+            var(--color-bg-deep, #0a0a0f) 100%
+        );
+    }
+}
+
 .proj-carousel__track {
     position: relative;
     width: 100%;
@@ -2630,8 +2705,11 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 340px;
-    height: 440px;
+    /* Landscape proportions — wider than tall — so the card has less
+       empty vertical area and reads as a "slab" when viewed edge-on
+       during the flip animation. */
+    width: 440px;
+    height: 300px;
     margin: 0;
     border-radius: 22px;
     overflow: hidden;
@@ -2650,11 +2728,13 @@ body {
         scale(var(--cs, 1));
     opacity: var(--co, 1);
     filter: brightness(var(--cb, 1)) blur(var(--cblur, 0px));
+    /* Smoother / longer transitions so reveal+collapse animation feels
+       buttery instead of snappy. Cubic ease-out keeps motion calm. */
     transition:
-        transform 620ms cubic-bezier(0.22, 1, 0.36, 1),
-        opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
-        filter 520ms cubic-bezier(0.22, 1, 0.36, 1),
-        box-shadow 420ms ease;
+        transform 780ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+        filter 620ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 480ms ease;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
@@ -2772,6 +2852,142 @@ body {
         0 30px 80px -20px rgba(0, 0, 0, 0.7);
 }
 
+/* Active centred card — pulses a soft glow as a "tap me" hint while
+   it stays edge-on. The protruding translateZ is set by the JS
+   geometry; the pulse is purely a shadow animation so it doesn't
+   fight the dynamic transform. */
+.proj-card.is-active:not(.is-revealed) {
+    animation: projCardHint 2.2s ease-in-out infinite;
+}
+@keyframes projCardHint {
+    0%, 100% {
+        box-shadow:
+            0 0 0 1px rgba(125, 211, 252, 0.45),
+            0 0 32px -4px rgba(0, 212, 255, 0.35),
+            0 24px 60px -20px rgba(0, 0, 0, 0.55);
+    }
+    50% {
+        box-shadow:
+            0 0 0 2px rgba(186, 230, 253, 0.85),
+            0 0 70px -2px rgba(0, 212, 255, 0.7),
+            0 0 110px -10px rgba(125, 211, 252, 0.45),
+            0 24px 60px -20px rgba(0, 0, 0, 0.55);
+    }
+}
+.proj-card.is-active.is-hero:not(.is-revealed) {
+    /* Hero card already has its own glow — boost the pulse a touch
+       so it still feels "alive" without changing color identity. */
+    animation: projCardHintHero 2.2s ease-in-out infinite;
+}
+@keyframes projCardHintHero {
+    0%, 100% {
+        box-shadow:
+            0 0 0 1.5px rgba(186, 230, 253, 0.85),
+            0 0 60px -2px rgba(0, 212, 255, 0.55),
+            0 0 110px -8px rgba(125, 211, 252, 0.4),
+            0 30px 80px -20px rgba(0, 0, 0, 0.7);
+    }
+    50% {
+        box-shadow:
+            0 0 0 2px rgba(224, 242, 254, 1),
+            0 0 90px -2px rgba(0, 212, 255, 0.85),
+            0 0 150px -10px rgba(125, 211, 252, 0.6),
+            0 30px 80px -20px rgba(0, 0, 0, 0.7);
+    }
+}
+
+/* Revealed state — the user has tapped the active card. It flips
+   face-on, scales up, pulls toward the viewer, and the inline
+   description + CTA become visible. */
+.proj-card.is-revealed {
+    /* Override the JS-set transform so the card sits face-on, centred
+       and pulled forward regardless of the geometry calc. The !important
+       defeats the inline `transform` written into .style by layout(). */
+    transform: translate(-50%, -50%) translateZ(120px) rotateX(0deg) rotateY(0deg) scale(1.08) !important;
+    /* Lift above all other cards */
+    z-index: 2000 !important;
+    /* Full clarity */
+    opacity: 1 !important;
+    filter: brightness(1.05) !important;
+    /* Slightly bigger to fit the description comfortably */
+    border-color: rgba(186, 230, 253, 1);
+    box-shadow:
+        0 0 0 1.5px rgba(186, 230, 253, 0.95),
+        0 0 80px -2px rgba(0, 212, 255, 0.65),
+        0 30px 100px -20px rgba(0, 0, 0, 0.8) !important;
+    animation: none !important;
+}
+
+/* Description and CTA inside the revealed card. Hidden by default
+   (no opacity on the quote / no display on the CTA) so the edge-on
+   card body reads as a clean slab. They smoothly fade in on reveal. */
+.proj-card__quote {
+    /* The old `--co-text` formula is no longer used since we don't
+       reveal partial text during scroll. Hide unless revealed. */
+    opacity: 0 !important;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 360ms ease, max-height 480ms ease;
+    margin: 0;
+}
+.proj-card.is-revealed .proj-card__quote {
+    opacity: 1 !important;
+    max-height: 200px;
+    margin-top: 8px;
+    transition: opacity 380ms ease 180ms, max-height 480ms ease 60ms;
+}
+
+.proj-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0077B6, #00A8E8);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    /* Hidden until reveal */
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity 320ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 240ms ease, filter 240ms ease;
+    width: max-content;
+    align-self: flex-start;
+    box-shadow: 0 10px 28px -8px rgba(0, 168, 232, 0.55);
+}
+.proj-card__cta svg { width: 14px; height: 14px; }
+.proj-card__cta.is-disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+.proj-card.is-revealed .proj-card__cta {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: 280ms;
+}
+.proj-card__cta:hover,
+.proj-card__cta:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 38px -8px rgba(0, 168, 232, 0.75);
+    filter: brightness(1.08);
+    outline: none;
+}
+
+/* When the chrome is the only thing showing on an edge-on card the
+   tag/name need to be tightly packed; allow them to grow when the
+   card is revealed so the description has breathing room. */
+.proj-card.is-revealed .proj-card__chrome {
+    pointer-events: auto;
+    padding: 26px 26px 24px;
+}
+
 /* HUD: prev / counter / next under the stage. */
 .proj-carousel__hud {
     margin-top: 28px;
@@ -2851,190 +3067,122 @@ body {
    left→right. JS computes Y/X transforms based on this orientation. */
 @media (max-width: 768px) {
     .proj-carousel {
-        --carousel-h: 600px;
+        --carousel-h: 520px;
     }
     .proj-carousel__stage {
-        /* Drag axis swaps: vertical now */
-        touch-action: pan-x;
+        /* Scroll is the primary input on mobile — see the scroll-pin
+           wrapper below. We let native vertical scroll happen so the
+           sticky stage advances naturally. */
+        touch-action: pan-y;
     }
     .proj-card {
-        width: 280px;
-        height: 360px;
+        width: 320px;
+        height: 220px;
     }
-    /* Shorten the projects section on mobile. The bridge separator
-       video below is smaller on phones (~200px vs ~410px desktop), so
-       its `transform: translate(-50%, -95%)` only pulls it up ~190px
-       — much less than on desktop. Without this we'd land the
-       separator hundreds of pixels below the carousel HUD. */
+    /* No prev/counter/next HUD on mobile — the scroll-pin drives
+       navigation instead, so the on-screen buttons are noise. */
+    .proj-carousel__hud { display: none; }
+
+    /* On mobile the active centred card auto-shows its description
+       + CTA link — no tap needed to read project info. The user just
+       scrolls to a card and sees it. Tap is reserved for the
+       "popped out" reveal state which spreads the other cards. */
+    .proj-card.is-active:not(.is-revealed) .proj-card__quote {
+        opacity: 1 !important;
+        max-height: 200px;
+        margin-top: 8px;
+        transition: opacity 380ms ease 100ms, max-height 480ms ease;
+    }
+    .proj-card.is-active:not(.is-revealed) .proj-card__cta {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        transition-delay: 220ms;
+    }
+
+    /* Scroll-pin: the carousel sticks to the viewport while the
+       user scrolls through all 11 cards. The .projects section is
+       made tall enough below that each viewport-height of scroll
+       advances the carousel by roughly one card; the JS controller
+       maps scroll progress through the section onto carousel.pos.
+       After the last card the section ends and normal page scroll
+       continues to the next section. */
+    .proj-carousel-pin {
+        position: sticky;
+        top: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        /* Sit cards a touch above viewport-center so they're not pushed
+           into the bottom half of the screen on phones. */
+        justify-content: flex-start;
+        padding-top: 12vh;
+        z-index: 4;
+    }
+    /* Mobile flow: the user scrolls into the section, sees the Spline
+       3D bubble scene FIRST (it takes its own ~95vh of scroll), then
+       the carousel pin engages and they scroll through the cards. The
+       bubble scene and the carousel are sequential, not overlapping. */
+    .projects__spline-bg {
+        /* Drop the sticky so the spline scene scrolls away naturally
+           before the carousel pin engages. */
+        position: relative;
+        height: 95vh;
+    }
+    /* No edge fade on mobile — the subtle dark gradient at the top
+       and bottom of the stage looked weird against the dark bg. */
+    .proj-carousel__stage::before { display: none; }
+    /* The .projects section is `overflow: hidden` to clip its Spline
+       background bubbles, but `overflow: hidden` breaks `position:
+       sticky` on descendants in Safari/older Blink. `overflow: clip`
+       does the same visual clipping without establishing a scroll
+       container, so sticky works as expected. */
     .projects {
-        min-height: 195vh;
+        overflow: clip;
+    }
+    /* Each non-active card adds roughly half a viewport of scroll
+       distance through the section. 10 transitions × ~55vh + the
+       initial pin viewport = ~650vh; the carousel pos is computed
+       from this scroll progress in js/script.js. */
+    .projects {
+        min-height: 700vh !important;
+    }
+    .projects__content {
+        /* No negative margin on mobile — the spline-bg now occupies
+           its own space above (relative, ~95vh), so content flows
+           naturally below it. */
+        margin-top: 0;
+        /* The sticky pin lives inside .projects__content. For sticky to
+           pin to the viewport for the full duration of the carousel
+           phase, the container needs that much height. The section
+           is 700vh total: ~95vh for the bubble preview + ~600vh for
+           the carousel pin's scroll range. */
+        min-height: 605vh;
     }
 }
 
 @media (max-width: 480px) {
+    .projects {
+        min-height: 650vh !important;
+    }
+    .projects__content {
+        min-height: 555vh;
+    }
     .proj-carousel {
-        --carousel-h: 540px;
+        --carousel-h: 460px;
     }
     .proj-card {
-        width: 84vw;
+        width: 86vw;
         max-width: 320px;
-        height: 320px;
-    }
-    .projects {
-        min-height: 185vh;
+        height: 200px;
     }
 }
 
-/* ==========================================================================
-   PROJECTS — DETAIL OVERLAY (opened from tap on front card)
-   ========================================================================== */
-.proj-detail {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
-                visibility 0s linear 420ms;
-}
-.proj-detail.is-open {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
-                visibility 0s linear 0s;
-}
-.proj-detail[hidden] { display: none; }
-
-.proj-detail__backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(2, 6, 23, 0.72);
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-}
-
-.proj-detail__panel {
-    position: relative;
-    width: min(560px, 100%);
-    max-height: calc(100vh - 48px);
-    border-radius: 26px;
-    overflow: hidden;
-    background: linear-gradient(160deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.98));
-    border: 1px solid rgba(125, 211, 252, 0.45);
-    box-shadow:
-        0 0 0 1px rgba(125, 211, 252, 0.25),
-        0 30px 90px -20px rgba(0, 0, 0, 0.65),
-        0 0 80px -10px rgba(0, 212, 255, 0.35);
-    transform: translateY(20px) scale(0.96);
-    opacity: 0;
-    transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
-                opacity 380ms ease;
-}
-.proj-detail.is-open .proj-detail__panel {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-}
-
-.proj-detail__close {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: rgba(255, 255, 255, 0.9);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 240ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
-    z-index: 3;
-}
-.proj-detail__close svg { width: 16px; height: 16px; }
-.proj-detail__close:hover,
-.proj-detail__close:focus-visible {
-    background: rgba(255, 255, 255, 0.18);
-    transform: rotate(90deg);
-    outline: none;
-}
-
-.proj-detail__face {
-    padding: 38px 32px 32px;
-    color: var(--color-white, #fff);
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-.proj-detail__tag {
-    font-family: var(--font-body, system-ui, sans-serif);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-glow-cyan, #7DD3FC);
-}
-.proj-detail__name {
-    font-size: clamp(1.6rem, 4vw, 2.1rem);
-    line-height: 1.1;
-    margin: 0;
-    color: var(--color-white, #fff);
-    text-wrap: balance;
-}
-.proj-detail__quote {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.82);
-    margin: 4px 0 8px;
-}
-.proj-detail__cta {
-    align-self: flex-start;
-    margin-top: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 22px;
-    border-radius: 999px;
-    background: linear-gradient(135deg, #0077B6, #00A8E8);
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.92rem;
-    letter-spacing: 0.02em;
-    box-shadow: 0 10px 30px -8px rgba(0, 168, 232, 0.55);
-    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
-                box-shadow 240ms ease,
-                filter 240ms ease;
-}
-.proj-detail__cta:hover,
-.proj-detail__cta:focus-visible {
-    transform: translateY(-2px);
-    box-shadow: 0 18px 38px -8px rgba(0, 168, 232, 0.7);
-    filter: brightness(1.08);
-    outline: none;
-}
-.proj-detail__cta svg { width: 16px; height: 16px; }
-.proj-detail__cta.is-disabled {
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: none;
-    color: rgba(255, 255, 255, 0.55);
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-@media (max-width: 480px) {
-    .proj-detail__face { padding: 32px 22px 24px; }
-}
 
 @media (prefers-reduced-motion: reduce) {
-    .proj-card,
-    .proj-detail,
-    .proj-detail__panel {
+    .proj-card {
+
+
         transition-duration: 60ms !important;
     }
 }

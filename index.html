@@ -244,7 +244,13 @@
                      the dark background; tap a back card to bring it forward,
                      tap the front card to open the detail panel with a link
                      to the project page. JS controller in js/script.js
-                     (class ProjectsCarousel). -->
+                     (class ProjectsCarousel).
+
+                     The .proj-carousel-pin wrapper goes sticky on mobile
+                     so the carousel pins to the viewport while the user
+                     scrolls through all 11 cards before continuing to
+                     the next section. -->
+                <div class="proj-carousel-pin" id="projects-carousel-pin">
                 <div class="proj-carousel scroll-reveal" id="projects-carousel"
                      role="region" aria-roledescription="carousel" aria-label="Selected projects">
                     <div class="proj-carousel__stage">
@@ -407,6 +413,7 @@
                         </button>
                     </div>
                 </div>
+                </div><!-- /.proj-carousel-pin -->
             </div>
         </section>
 
@@ -587,26 +594,6 @@
             </div>
         </section>
     </main>
-
-    <!-- Projects carousel detail overlay — populated by ProjectsCarousel
-         in js/script.js when the front card is tapped. -->
-    <div class="proj-detail" id="proj-detail" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="proj-detail-name">
-        <div class="proj-detail__backdrop" data-detail-dismiss></div>
-        <article class="proj-detail__panel" tabindex="-1">
-            <button type="button" class="proj-detail__close" id="proj-detail-close" aria-label="Close project details">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-            </button>
-            <div class="proj-detail__face">
-                <span class="proj-detail__tag" id="proj-detail-tag"></span>
-                <h3 class="proj-detail__name" id="proj-detail-name"></h3>
-                <p class="proj-detail__quote" id="proj-detail-quote"></p>
-                <a class="proj-detail__cta" id="proj-detail-cta" href="#" rel="noopener noreferrer">
-                    <span class="proj-detail__cta-label">Open project</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-                </a>
-            </div>
-        </article>
-    </div>
 
     <script src="js/script.js"></script>
     <script>
