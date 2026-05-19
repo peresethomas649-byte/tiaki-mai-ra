@@ -329,12 +329,16 @@ class BinaryTrail {
         const targetElement = parentSection || this.container;
 
         targetElement.addEventListener('mousemove', (e) => this.handleMouseMove(e), true);
-        
+
         // intercept Right Clicks (Context Menu) to activate/deactivate the secret mode!
         targetElement.addEventListener('contextmenu', (e) => {
+            // Hard-skip on touch / coarse pointers — long-press on mobile
+            // shouldn't spawn the Easter egg toggle; the OS context menu
+            // is suppressed by the global preventer in App init.
+            if (e.pointerType === 'touch' || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)) return;
             e.preventDefault(); // Stop normal browser popup
             this.easterEggMode = !this.easterEggMode; // Toggle mode
-            
+
             // When turning ON, rig the thematic bomb to drop in 3 to 5 seconds!
             if (this.easterEggMode) {
                 this.nextThemeTime = Date.now() + (Math.random() * 2000 + 3000);
@@ -343,6 +347,11 @@ class BinaryTrail {
     }
 
     handleMouseMove(e) {
+        // Belt-and-braces: even if BinaryTrail was accidentally
+        // instantiated on a touch device, suppress particle spawn for
+        // synthesized mouse events from touches.
+        if (e.pointerType === 'touch') return;
+        if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
         const now = Date.now();
         // Throttle heavily (e.g. max 1 spawn every 30ms) to ensure zero performance hit on large screens
         if (now - this.lastSpawnTime < 30) return;
@@ -621,12 +630,8 @@ class ProjectsCarousel {
         this.nextBtn = document.getElementById('proj-next');
         this.counterCur = document.getElementById('proj-counter-cur');
         this.counterTot = document.getElementById('proj-counter-tot');
-        this.detail = document.getElementById('proj-detail');
-        this.detailTag = document.getElementById('proj-detail-tag');
-        this.detailName = document.getElementById('proj-detail-name');
-        this.detailQuote = document.getElementById('proj-detail-quote');
-        this.detailCta = document.getElementById('proj-detail-cta');
-        this.detailClose = document.getElementById('proj-detail-close');
+        // The old .proj-detail popup is gone — description + project
+        // link now live on the card itself and are revealed inline.
 
         this.n = this.cards.length;
         this.pos = 0; // fractional active position, 0..n-1
@@ -635,45 +640,162 @@ class ProjectsCarousel {
         this.dragStart = null;
         this.dragLastT = 0;
         this.dragLastDelta = 0;
-        this.modalOpen = false;
-        this.modalReturnIdx = -1;
+        // Inline reveal pattern (replaces the old popup modal).
+        // -1 means no card revealed; otherwise the card index currently
+        // expanded face-on with its description + project link.
+        this.revealedIdx = -1;
 
         // Wheel accumulation for trackpad/scroll → discrete steps
         this.wheelAccum = 0;
         this.wheelLastTs = 0;
 
+        // Mobile scroll-pin: when the .projects section's sticky
+        // wrapper is pinned, we map scroll progress through the section
+        // onto carousel.pos (so the user must scroll through all 11
+        // cards before continuing past the section).
+        this.scrollPinSection = document.getElementById('projects');
+        this.scrollPinWrapper = document.getElementById('projects-carousel-pin');
+        this.scrollTickPending = false;
+
         if (this.counterTot) this.counterTot.textContent = String(this.n).padStart(2, '0');
 
+        this.injectInlineCtas();
         this.bindEvents();
         this.layout();
         this.loop();
+    }
+
+    // Add an inline "View project →" CTA to each card. The link is
+    // hidden until the card has .is-revealed (CSS). Honours the same
+    // data-href / data-target attributes the old detail modal used.
+    injectInlineCtas() {
+        this.cards.forEach((card) => {
+            // Avoid double-injection on hot-reload
+            if (card.querySelector('.proj-card__cta')) return;
+            const href = card.getAttribute('data-href');
+            const target = card.getAttribute('data-target') || '_self';
+            const chrome = card.querySelector('.proj-card__chrome');
+            if (!chrome) return;
+            const a = document.createElement(href ? 'a' : 'span');
+            a.className = 'proj-card__cta';
+            if (href) {
+                a.setAttribute('href', href);
+                if (target === '_blank') {
+                    a.setAttribute('target', '_blank');
+                    a.setAttribute('rel', 'noopener noreferrer');
+                }
+            } else {
+                a.classList.add('is-disabled');
+                a.setAttribute('aria-disabled', 'true');
+            }
+            a.innerHTML = `
+                <span class="proj-card__cta-label">${href ? 'View project' : 'No external link'}</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+            `;
+            chrome.appendChild(a);
+        });
     }
 
     isVertical() {
         return window.matchMedia('(max-width: 768px)').matches;
     }
 
+    // True only when mobile + the projects section is scroll-pinning
+    // the carousel. We use this to gate the scroll → pos mapping and
+    // to disable touch drag on mobile (since scroll is the input).
+    isScrollPinActive() {
+        return this.isVertical() && !!this.scrollPinSection;
+    }
+
     // Compute the per-card transform values for a given offset (i - pos).
-    // The exponential-ish lateral curve keeps adjacent cards visually close
-    // and bunches the far-back cards into the dark.
+    //
+    // Two different visual models:
+    //
+    // DESKTOP — cards always tilted to the same side (no sign-dependent
+    // rotation that would jump 160° when pos crosses an integer). The
+    // active centered card is slightly LESS tilted (bend-toward-viewer
+    // hint) and protrudes via translateZ. Click to reveal face-on.
+    //
+    // MOBILE — the active centered card auto-faces the viewer (rotateX
+    // 0°) showing its full chrome (description + CTA). Adjacent cards
+    // tilt away (rotateX ±80°) along the vertical stack.
+    //
+    // Spacing is tight — cards stacked like a deck. When any card is
+    // revealed, the other cards spread outward to make room.
     geometryForOffset(offset) {
         const vertical = this.isVertical();
         const abs = Math.abs(offset);
         const sign = offset >= 0 ? 1 : -1;
-        const lateralPx = vertical ? 240 : 320;
-        const lateral = sign * (1 - Math.exp(-abs * 0.55)) * lateralPx;
-        const depth = -Math.min(abs, 6) * 110;
-        const rotate = -sign * Math.min(abs, 4) * (vertical ? 9 : 14);
-        const scale = Math.max(0.42, 1 - abs * 0.10);
-        const opacity = Math.max(0, 1 - abs * 0.18);
-        const brightness = Math.max(0.22, 1 - abs * 0.17);
-        const blur = Math.min(4, abs * 0.7);
+        const anyRevealed = this.revealedIdx >= 0;
+
+        // Tight stacking — about 17% of viewport per step (desktop) /
+        // 15% (mobile). Reveal-spread blows them out to 1.8× so the
+        // popped-out card has clear breathing room.
+        const baseStep = vertical
+            ? Math.min(140, window.innerHeight * 0.15)
+            : Math.min(220, window.innerWidth * 0.17);
+        const lateralStep = anyRevealed ? baseStep * 1.8 : baseStep;
+        const lateral = sign * Math.min(abs, 6) * lateralStep;
+
+        // Orbit curve — cards arc back via 1 - cos so they appear to
+        // wrap around a sphere instead of sliding flat.
+        const orbitAngle = Math.min(abs, 5) * 0.16;
+        const orbitR = vertical ? 220 : 280;
+        const orbitDepth = -orbitR * (1 - Math.cos(orbitAngle));
+
+        // Curve-from-bottom (desktop only): cards arc downward as they
+        // move outward from the active centre. The active card sits at
+        // y=0; outer cards descend along a power curve so the whole
+        // stack reads as a fan / wreath radiating from a centre point
+        // (per the user's reference screenshot of "Reactive Carousels").
+        const arcCurve = vertical ? 0 : Math.pow(Math.min(abs, 5), 1.25) * 28;
+
+        // Rotation — see the docstring for the desktop vs mobile split.
+        let flipAngle;
+        if (vertical) {
+            // Mobile: active card faces user (0°), adjacent cards tilt
+            // off-axis. Continuous function so there are no jumps —
+            // rotateX scales smoothly with absolute offset.
+            //   offset 0   → 0°    (face-on, description visible)
+            //   offset 0.5 → 50°
+            //   offset 1+  → 80°   (clamp at edge)
+            // Sign of rotation matches sign of offset so cards above
+            // active (negative offset) tilt one way and cards below
+            // (positive offset) tilt the other — giving a 3D arc feel.
+            flipAngle = sign * Math.min(80, abs * 80);
+        } else {
+            // Desktop: ALL cards tilt the same direction (no sign-flip
+            // jump at offset=0). Active card bends toward viewer by
+            // reducing rotation magnitude — exponential bell centred
+            // on offset 0 so the transition is smooth.
+            const baseEdge = 68;
+            const bendOut = 28 * Math.exp(-offset * offset * 1.4);
+            flipAngle = baseEdge - bendOut;
+        }
+
+        // Slight orbit-tilt around the OTHER axis for 3D depth.
+        const tiltSecondary = vertical ? 0 : 4 * Math.sin(offset * 0.35);
+
+        // Active card slightly protrudes toward viewer.
+        const protrude = abs < 0.5 ? 30 * (1 - abs * 2) : 0;
+
+        // Opacity holds 1 across the active band, fades by ±3.
+        let opacity;
+        if (abs <= 0.5) opacity = 1;
+        else if (abs <= 2) opacity = 1 - (abs - 0.5) * 0.32;
+        else if (abs <= 3) opacity = 0.52 - (abs - 2) * 0.45;
+        else opacity = 0;
+
+        const scale = Math.max(0.78, 1 - abs * 0.05);
+        const brightness = Math.max(0.55, 1 - abs * 0.13);
+        const blur = Math.min(1.8, abs * 0.35);
+
         return {
             cx: vertical ? 0 : lateral,
-            cy: vertical ? lateral : 0,
-            cz: depth,
-            rx: vertical ? rotate : 0,
-            ry: vertical ? 0 : rotate,
+            cy: vertical ? lateral : arcCurve,
+            cz: orbitDepth + protrude,
+            rx: vertical ? flipAngle : tiltSecondary,
+            ry: vertical ? tiltSecondary : flipAngle,
             cs: scale,
             co: opacity,
             cb: brightness,
@@ -738,8 +860,14 @@ class ProjectsCarousel {
     }
 
     bindEvents() {
-        if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.step(-1));
-        if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.step(1));
+        if (this.prevBtn) this.prevBtn.addEventListener('click', () => {
+            if (this.revealedIdx >= 0) return; // locked while a card is revealed
+            this.step(-1);
+        });
+        if (this.nextBtn) this.nextBtn.addEventListener('click', () => {
+            if (this.revealedIdx >= 0) return;
+            this.step(1);
+        });
 
         this.stage.addEventListener('wheel', (e) => this.onWheel(e), { passive: false });
 
@@ -756,34 +884,107 @@ class ProjectsCarousel {
                     e.preventDefault();
                     this.onCardClick(e, card, i);
                 } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    if (this.revealedIdx >= 0) return;
                     e.preventDefault();
                     this.step(1);
                 } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    if (this.revealedIdx >= 0) return;
                     e.preventDefault();
                     this.step(-1);
                 }
             });
         });
 
-        if (this.detailClose) this.detailClose.addEventListener('click', () => this.closeDetail());
-        if (this.detail) {
-            this.detail.addEventListener('click', (e) => {
-                if (e.target.matches('[data-detail-dismiss]')) this.closeDetail();
-            });
-        }
+        // Esc collapses any revealed card.
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.modalOpen) this.closeDetail();
+            if (e.key === 'Escape' && this.revealedIdx >= 0) this.collapseReveal();
+        });
+        // Click anywhere outside an active CARD = collapse. We deliberately
+        // allow clicks on the carousel chrome (stage, hud, edges) to
+        // count as "outside" so the user can dismiss by tapping nearly
+        // anywhere — but onCardClick handles taps on the cards
+        // themselves (which toggle reveal / snap-to-front).
+        document.addEventListener('click', (e) => {
+            if (this.revealedIdx < 0) return;
+            // Clicks ON a card or on the CTA link inside one are handled
+            // by onCardClick; don't double-process them here.
+            if (e.target.closest('.proj-card')) return;
+            this.collapseReveal();
         });
 
         // Orientation / viewport change → relayout
         window.addEventListener('resize', () => this.layout(), { passive: true });
+
+        // Mobile scroll-pin: throttle a rAF tick on scroll and update
+        // carousel.pos from how far we've scrolled through the section.
+        window.addEventListener('scroll', () => this.onPageScroll(), { passive: true });
+    }
+
+    onPageScroll() {
+        if (this.scrollTickPending) return;
+        this.scrollTickPending = true;
+        requestAnimationFrame(() => {
+            this.scrollTickPending = false;
+            // Don't advance the carousel while a card is revealed —
+            // body scroll is locked too (in expandReveal) so this is
+            // a belt-and-braces check.
+            if (this.revealedIdx >= 0) return;
+            if (!this.isScrollPinActive()) return;
+            // Compute progress against the PIN'S PARENT (.projects__content)
+            // rather than the whole .projects section. The section's top
+            // starts before the spline-bg (which occupies ~95vh on mobile
+            // before the pin engages); using it as the base would put
+            // pos at ~1.5 by the time the user actually sees the
+            // carousel. The pin's parent begins AFTER the spline-bg, so
+            // parent.top reaching 0 lines up with pin engagement → pos 0
+            // (My Story).
+            const parent = this.scrollPinWrapper.parentElement;
+            if (!parent) return;
+            const parentRect = parent.getBoundingClientRect();
+            const viewH = window.innerHeight;
+            const scrollable = Math.max(1, parent.offsetHeight - viewH);
+            const past = Math.max(0, Math.min(scrollable, -parentRect.top));
+            const progress = past / scrollable;
+            const targetPos = progress * (this.n - 1);
+            // Direct-set (no transition) for tight scroll tracking, then
+            // snap on idle to clean up the partial state.
+            this.pos = Math.max(0, Math.min(this.n - 1, targetPos));
+            this.track.classList.add('is-dragging');
+            this.layout();
+            // Cancel any momentum from a stale drag.
+            this.velocity = 0;
+            // Defer a snap-out so when scrolling pauses the card lands
+            // on the nearest integer with a smooth ease. Longer timeout
+            // so iOS Safari's deferred scroll events don't cause the
+            // snap to re-fire mid-glide (which read as "jumping").
+            clearTimeout(this._snapOutT);
+            this._snapOutT = setTimeout(() => {
+                if (!this.isScrollPinActive() || this.dragging) return;
+                if (this.revealedIdx >= 0) return;
+                const target = Math.max(0, Math.min(this.n - 1, Math.round(this.pos)));
+                // Only snap if we're close to a card — avoid pulling
+                // pos to an integer while the user is still mid-scroll
+                // between cards, which causes visible jumps.
+                if (Math.abs(target - this.pos) > 0.001) {
+                    this.track.classList.remove('is-dragging');
+                    this.pos = target;
+                    this.layout();
+                }
+            }, 320);
+        });
     }
 
     onWheel(e) {
-        // Only horizontal wheel/trackpad scrolls drive the carousel.
-        // Vertical wheel passes through so the user can scroll past the
-        // projects section normally — hijacking vertical wheel here
-        // would trap the page when scrolling over the carousel.
+        // Don't navigate while a card is revealed — the user is reading,
+        // not browsing. We also preventDefault so the page itself doesn't
+        // scroll under the popped-out card.
+        if (this.revealedIdx >= 0) { e.preventDefault(); return; }
+        // Mobile: scroll-pin owns navigation, ignore wheel here.
+        if (this.isScrollPinActive()) return;
+        // Desktop: only horizontal wheel/trackpad scrolls drive the
+        // carousel. Vertical wheel passes through so the user can scroll
+        // past the projects section normally — hijacking vertical wheel
+        // here would trap the page when scrolling over the carousel.
         const primary = e.deltaX;
         if (!primary || Math.abs(primary) < Math.abs(e.deltaY) * 0.6) return;
         const now = performance.now();
@@ -806,9 +1007,16 @@ class ProjectsCarousel {
     }
 
     onPointerDown(e) {
-        if (this.modalOpen) return;
         // Only primary button (left mouse / single touch)
         if (e.button !== undefined && e.button !== 0) return;
+        // Locked while a card is revealed — the user is reading; outside
+        // clicks are handled by the document listener which will
+        // collapseReveal() before any drag could start.
+        if (this.revealedIdx >= 0) return;
+        // On mobile the carousel is scroll-pinned — let native scroll
+        // own the gesture so the page can flow. Touch taps still fire
+        // click events (handled in onCardClick) for tap-to-reveal.
+        if (this.isScrollPinActive() && e.pointerType === 'touch') return;
         this.dragging = true;
         this.dragStart = { x: e.clientX, y: e.clientY, pos: this.pos, t: performance.now() };
         this.dragLastT = this.dragStart.t;
@@ -864,8 +1072,15 @@ class ProjectsCarousel {
                     this.velocity *= 0.92;
                     this.pos = Math.max(-0.3, Math.min(this.n - 1 + 0.3, this.pos));
                     this.layout();
-                } else if (this.track.classList.contains('is-dragging')) {
+                } else if (
+                    this.track.classList.contains('is-dragging') &&
+                    !this.isScrollPinActive()
+                ) {
                     // Momentum settled — re-enable transitions and snap.
+                    // Skip when scroll-pin is active: the scroll handler
+                    // manages is-dragging + snap itself, and racing it
+                    // here causes per-frame add/remove cycles that read
+                    // as jitter while the user is scrolling.
                     this.velocity = 0;
                     const target = Math.max(0, Math.min(this.n - 1, Math.round(this.pos)));
                     this.track.classList.remove('is-dragging');
@@ -880,83 +1095,80 @@ class ProjectsCarousel {
 
     onCardClick(e, card, i) {
         // Distinguish a genuine click from the tail of a drag gesture.
-        // Real mouse clicks can wobble up to ~10-15px; we treat anything
-        // under 14px OR completed in under 220ms as a click. Beyond that
-        // it's a drag and we suppress the click so the carousel doesn't
-        // also open the detail at the end of a swipe.
         const movedPx = this.dragMovedPx || 0;
         const heldMs = this.pointerDownAt ? performance.now() - this.pointerDownAt : 0;
         const isClick = movedPx < 14 || heldMs < 220;
         this.dragMovedPx = 0;
         if (!isClick) return;
+        // Clicks on the inline CTA link follow the href naturally;
+        // don't intercept them.
+        if (e.target.closest('.proj-card__cta')) return;
         const activeIdx = Math.round(this.pos);
+        if (this.revealedIdx === i) {
+            this.collapseReveal();
+            return;
+        }
         if (i !== activeIdx) {
+            // Tapping a back card brings it to centre. If something else
+            // is revealed, collapse it first.
+            if (this.revealedIdx >= 0) this.collapseReveal();
             this.snapTo(i);
-        } else {
-            this.openDetail(i);
+            return;
         }
+        // Tap on the centred card → expand it inline.
+        this.expandReveal(i);
     }
 
-    openDetail(idx) {
+    expandReveal(idx) {
         const card = this.cards[idx];
-        if (!card || !this.detail) return;
-        const tagEl = card.querySelector('.proj-card__tag');
-        const nameEl = card.querySelector('.proj-card__name');
-        const quoteEl = card.querySelector('.proj-card__quote');
-        const href = card.getAttribute('data-href');
-        const target = card.getAttribute('data-target') || '_self';
-
-        if (this.detailTag) this.detailTag.textContent = tagEl ? tagEl.textContent : '';
-        if (this.detailName) this.detailName.textContent = nameEl ? nameEl.textContent : '';
-        if (this.detailQuote) this.detailQuote.textContent = quoteEl ? quoteEl.textContent : '';
-
-        if (this.detailCta) {
-            const labelEl = this.detailCta.querySelector('.proj-detail__cta-label');
-            if (href) {
-                this.detailCta.classList.remove('is-disabled');
-                this.detailCta.setAttribute('href', href);
-                if (target === '_blank') {
-                    this.detailCta.setAttribute('target', '_blank');
-                } else {
-                    this.detailCta.removeAttribute('target');
-                }
-                if (labelEl) labelEl.textContent = 'Open project';
-                this.detailCta.removeAttribute('aria-disabled');
-                this.detailCta.removeAttribute('tabindex');
-            } else {
-                this.detailCta.classList.add('is-disabled');
-                this.detailCta.removeAttribute('href');
-                this.detailCta.removeAttribute('target');
-                if (labelEl) labelEl.textContent = 'No external link';
-                this.detailCta.setAttribute('aria-disabled', 'true');
-                this.detailCta.setAttribute('tabindex', '-1');
-            }
+        if (!card) return;
+        // Collapse any previously-revealed card first.
+        if (this.revealedIdx >= 0 && this.revealedIdx !== idx) {
+            this.cards[this.revealedIdx].classList.remove('is-revealed');
+            this.cards[this.revealedIdx].setAttribute('aria-expanded', 'false');
         }
-
-        this.detail.removeAttribute('hidden');
-        this.detail.setAttribute('aria-hidden', 'false');
-        // Layout flush so the open transition fires from the hidden state.
-        void this.detail.offsetWidth;
-        this.detail.classList.add('is-open');
-        this.modalOpen = true;
-        this.modalReturnIdx = idx;
-        const panel = this.detail.querySelector('.proj-detail__panel');
-        if (panel) panel.focus({ preventScroll: true });
+        this.revealedIdx = idx;
+        card.classList.add('is-revealed');
+        card.setAttribute('aria-expanded', 'true');
+        // Scroll lock — overflow:hidden on BODY ONLY (not html). Setting
+        // `html { overflow: hidden }` can break `position: sticky` on
+        // descendants in some engines, which collapses .proj-carousel-pin
+        // back to its natural document position — visually that looks
+        // like the page goes blank/black on tap.
+        // We deliberately also do NOT use `position: fixed` here because
+        // the lock → unlock transition causes a 1-frame scroll-to-top
+        // flash on collapse. With body-only overflow lock + a touchmove
+        // preventer, scroll position is preserved and sticky still
+        // works through the reveal.
         document.body.style.overflow = 'hidden';
+        if (this.isVertical()) {
+            this._touchPreventer = (e) => {
+                if (e.target.closest && e.target.closest('.proj-carousel-pin')) return;
+                e.preventDefault();
+            };
+            document.addEventListener('touchmove', this._touchPreventer, { passive: false });
+        }
+        // Force a relayout so other cards spread out (geometryForOffset
+        // reads this.revealedIdx to widen their lateralStep).
+        this.layout();
     }
 
-    closeDetail() {
-        if (!this.detail) return;
-        this.detail.classList.remove('is-open');
-        this.detail.setAttribute('aria-hidden', 'true');
-        this.modalOpen = false;
+    collapseReveal() {
+        if (this.revealedIdx < 0) return;
+        const card = this.cards[this.revealedIdx];
+        if (card) {
+            card.classList.remove('is-revealed');
+            card.setAttribute('aria-expanded', 'false');
+        }
+        this.revealedIdx = -1;
+        // Release the scroll lock. No scrollTo / no position juggling
+        // means no flash back to the top of the page.
         document.body.style.overflow = '';
-        setTimeout(() => {
-            this.detail.setAttribute('hidden', '');
-            if (this.modalReturnIdx >= 0 && this.cards[this.modalReturnIdx]) {
-                this.cards[this.modalReturnIdx].focus({ preventScroll: true });
-            }
-        }, 420);
+        if (this._touchPreventer) {
+            document.removeEventListener('touchmove', this._touchPreventer);
+            this._touchPreventer = null;
+        }
+        this.layout();
     }
 }
 
@@ -970,10 +1182,26 @@ class App {
         this.testimonialDeck = new TestimonialDeck();
         // Binary "Matrix" cursor trail — desktop only. Touch-tap on phones
         // was spawning the same character trail and the "Right Click Me"
-        // bait, which read as cluttered noise on mobile.
-        if (window.innerWidth > 968) {
+        // bait, which read as cluttered noise on mobile. Also gate on
+        // hover capability so a touch-only laptop doesn't get the trail.
+        const isTouchPrimary = window.matchMedia && window.matchMedia('(hover: none)').matches;
+        if (window.innerWidth > 968 && !isTouchPrimary) {
             this.binaryTrail = new BinaryTrail();
         }
+
+        // Global mobile context-menu suppression — on touch devices a
+        // long-press triggers the OS callout / "copy / share" menu,
+        // which the user doesn't want appearing over the carousel.
+        // We can't conditionally bind only on touch (a hybrid device
+        // might switch), so we bind always and short-circuit only when
+        // the event came from a touch pointer.
+        document.addEventListener('contextmenu', (e) => {
+            const isCoarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+            if (e.pointerType === 'touch' || isCoarse) {
+                e.preventDefault();
+            }
+        });
+
         this.liquidGlass = new LiquidGlassCards();
         this.projectsCarousel = new ProjectsCarousel();
         this.splineManager = new SplinePerformanceManager();
