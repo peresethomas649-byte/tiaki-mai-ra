@@ -709,16 +709,16 @@ class ProjectsCarousel {
 
     // Compute the per-card transform values for a given offset (i - pos).
     //
-    // Two different visual models:
-    //
-    // DESKTOP — cards always tilted to the same side (no sign-dependent
-    // rotation that would jump 160° when pos crosses an integer). The
-    // active centered card is slightly LESS tilted (bend-toward-viewer
-    // hint) and protrudes via translateZ. Click to reveal face-on.
-    //
-    // MOBILE — the active centered card auto-faces the viewer (rotateX
-    // 0°) showing its full chrome (description + CTA). Adjacent cards
-    // tilt away (rotateX ±80°) along the vertical stack.
+    // ONE shared visual model now (mobile mirrors desktop):
+    // - Cards always sit edge-on (~68°) and glide past each other.
+    // - The active centred card bends slightly toward the viewer (~40°)
+    //   and protrudes via translateZ — a "tap me" hint.
+    // - DESKTOP tilts around the Y axis (cards glide left↔right) with a
+    //   downward Y arc; MOBILE tilts around the X axis (cards glide
+    //   up↕down) with no lateral arc.
+    // - The full description + CTA only appears when a card is tapped
+    //   (the .is-revealed CSS state) — not automatically — so neighbour
+    //   titles never collide with an open description during scroll.
     //
     // Spacing is tight — cards stacked like a deck. When any card is
     // revealed, the other cards spread outward to make room.
@@ -750,28 +750,18 @@ class ProjectsCarousel {
         // (per the user's reference screenshot of "Reactive Carousels").
         const arcCurve = vertical ? 0 : Math.pow(Math.min(abs, 5), 1.25) * 28;
 
-        // Rotation — see the docstring for the desktop vs mobile split.
-        let flipAngle;
-        if (vertical) {
-            // Mobile: active card faces user (0°), adjacent cards tilt
-            // off-axis. Continuous function so there are no jumps —
-            // rotateX scales smoothly with absolute offset.
-            //   offset 0   → 0°    (face-on, description visible)
-            //   offset 0.5 → 50°
-            //   offset 1+  → 80°   (clamp at edge)
-            // Sign of rotation matches sign of offset so cards above
-            // active (negative offset) tilt one way and cards below
-            // (positive offset) tilt the other — giving a 3D arc feel.
-            flipAngle = sign * Math.min(80, abs * 80);
-        } else {
-            // Desktop: ALL cards tilt the same direction (no sign-flip
-            // jump at offset=0). Active card bends toward viewer by
-            // reducing rotation magnitude — exponential bell centred
-            // on offset 0 so the transition is smooth.
-            const baseEdge = 68;
-            const bendOut = 28 * Math.exp(-offset * offset * 1.4);
-            flipAngle = baseEdge - bendOut;
-        }
+        // Rotation — SAME formula for desktop and mobile (mobile just
+        // applies it to rotateX instead of rotateY). All cards tilt the
+        // same direction (no sign-flip jump at offset=0); the active
+        // card bends toward the viewer by reducing the tilt magnitude
+        // along an exponential bell centred on offset 0, so the glide
+        // is smooth and the centred card reads as "lifted".
+        //   offset 0   → 40°  (active, bent toward viewer)
+        //   offset 1   → ~61°
+        //   offset 2+  → 68°  (full edge-on)
+        const baseEdge = 68;
+        const bendOut = 28 * Math.exp(-offset * offset * 1.4);
+        const flipAngle = baseEdge - bendOut;
 
         // Slight orbit-tilt around the OTHER axis for 3D depth.
         const tiltSecondary = vertical ? 0 : 4 * Math.sin(offset * 0.35);

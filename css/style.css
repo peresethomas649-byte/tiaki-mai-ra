@@ -709,8 +709,23 @@ button {
     align-items: center;
     gap: 8px;
     opacity: 0;
-    animation: fadeUp 1s var(--ease-out-expo) 1.5s forwards;
+    /* Use a CENTERED fade-in keyframe. The generic `fadeUp` ends on
+       `transform: translateY(0)`, which clobbered the `translateX(-50%)`
+       centering above and made the indicator drift right on animate-in.
+       fadeUpCentered keeps the -50% X offset in every keyframe. */
+    animation: fadeUpCentered 1s var(--ease-out-expo) 1.5s forwards;
     z-index: 10;
+}
+
+@keyframes fadeUpCentered {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
 }
 
 .hero__scroll-mouse {
@@ -2082,6 +2097,61 @@ button {
         display: flex;
     }
 
+    /* Hero scroll indicator on mobile: drop the mouse glyph, keep only
+       the bouncing double-chevron arrows. */
+    .hero__scroll-mouse {
+        display: none;
+    }
+
+    /* ---- Mobile nav: floating liquid-glass pill ----
+       Detach the bar from the screen edges, fully round it, and give
+       it an Apple-style frosted glass treatment — translucent,
+       backdrop-blurred, soft border + inner highlight. */
+    .nav {
+        top: 12px;
+        left: 14px;
+        right: 14px;
+        height: auto;
+        min-height: 52px;
+        padding: 8px 10px 8px 16px;
+        border-radius: 999px;
+        /* Very transparent / clear glass — low white tint + light blur
+           so it reads as crystal liquid-glass rather than a greyish
+           frosted bar. */
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(7px) saturate(125%);
+        -webkit-backdrop-filter: blur(7px) saturate(125%);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        box-shadow:
+            0 8px 26px -10px rgba(15, 30, 60, 0.14),
+            inset 0 1px 0 rgba(255, 255, 255, 0.45);
+        transition:
+            background var(--transition-medium),
+            box-shadow var(--transition-medium),
+            backdrop-filter var(--transition-medium);
+    }
+
+    /* A touch more tint once scrolled so the pill stays legible over
+       darker sections — still clearly transparent. */
+    .nav--scrolled {
+        background: rgba(255, 255, 255, 0.18);
+        box-shadow:
+            0 10px 32px -10px rgba(15, 30, 60, 0.22),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    /* Tuck the hamburger into a soft circular tap target on the right
+       of the pill. */
+    .nav__hamburger {
+        width: 38px;
+        height: 38px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        padding: 0;
+        gap: 5px;
+    }
+
     .hero {
         padding: var(--nav-height) var(--space-md) 0;
     }
@@ -3083,22 +3153,11 @@ body {
        navigation instead, so the on-screen buttons are noise. */
     .proj-carousel__hud { display: none; }
 
-    /* On mobile the active centred card auto-shows its description
-       + CTA link — no tap needed to read project info. The user just
-       scrolls to a card and sees it. Tap is reserved for the
-       "popped out" reveal state which spreads the other cards. */
-    .proj-card.is-active:not(.is-revealed) .proj-card__quote {
-        opacity: 1 !important;
-        max-height: 200px;
-        margin-top: 8px;
-        transition: opacity 380ms ease 100ms, max-height 480ms ease;
-    }
-    .proj-card.is-active:not(.is-revealed) .proj-card__cta {
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: auto;
-        transition-delay: 220ms;
-    }
+    /* NOTE: mobile no longer auto-shows the description on the active
+       card. Cards stay edge-on and glide past (like desktop); the
+       description + CTA only appear when a card is tapped (the
+       .is-revealed state). This stops neighbour titles colliding with
+       an open description during scroll. */
 
     /* Scroll-pin: the carousel sticks to the viewport while the
        user scrolls through all 11 cards. The .projects section is
