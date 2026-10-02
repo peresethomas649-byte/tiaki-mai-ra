@@ -90,7 +90,7 @@
   .phase-title small { display: block; font-family: var(--font-body); font-size: .66rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-3); -webkit-text-fill-color: var(--ink-3); margin-bottom: 8px; }
 
   /* stations: liquid-glass cards revealed with a circular mask */
-  .station { position: absolute; width: 440px; max-width: 86vw; border-radius: 22px; padding: 0; overflow: hidden;
+  .station { position: absolute; width: 440px; max-width: calc(100vw - 32px); border-radius: 22px; padding: 0; overflow: hidden;
     background: color-mix(in srgb, var(--paper) 86%, transparent);
     border: 1px solid color-mix(in srgb, var(--c) 35%, var(--line)); box-shadow: 0 1px 0 rgba(255,255,255,.5) inset;
     clip-path: circle(0% at 0% 50%); transition: clip-path 1s var(--ease-out), transform .8s var(--ease-out); transform: translateY(14px); }
@@ -112,7 +112,10 @@
   .glyph.circle { border-radius: 50%; } .glyph.square { border-radius: 3px; } .glyph.triangle { clip-path: polygon(50% 0, 100% 100%, 0 100%); } .glyph.hexagon { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); } .glyph.diamond { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 
   /* intro + outro cards */
-  .intro { position: absolute; width: 520px; max-width: 86vw; }
+  .intro { position: absolute; width: 520px; max-width: calc(100vw - 32px); }
+  html.narrow .intro { max-height: 52vh; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding-right: 4px; }
+  html.narrow .intro h1 { font-size: 2rem; }
+  html.narrow .phase-title { font-size: 1.9rem; white-space: normal; max-width: calc(100vw - 32px); }
   .intro h1 { font-size: clamp(2rem, 5vw, 3.6rem); line-height: 1.05; }
   .intro .kind { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 1rem; }
   .intro .chips { display: flex; flex-wrap: wrap; gap: 6px; } .intro .chip { font-size: .7rem; letter-spacing: .04em; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; color: var(--ink-2); } .intro .chip b { font-weight: 600; color: var(--ink); }
@@ -133,9 +136,34 @@
   html.calm .guide { display: none; }
   html.calm .rail, html.calm .controls { display: none; }
   @media (prefers-reduced-motion: reduce) { .station, .phase-title { transition: none; } }
+  /* loading screen: the page does not scroll until fonts, layout and the first frames are in */
+  .loader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--loader-bg, var(--paper)); color: var(--loader-ink, var(--ink)); transition: opacity .6s var(--ease-out); }
+  .loader.off { opacity: 0; pointer-events: none; }
+  .loader .box { text-align: center; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; }
+  .loader .pct { font-family: var(--font-display); font-size: 2.6rem; letter-spacing: 0; text-transform: none; display: block; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+  .loader .bar { width: 160px; height: 2px; background: color-mix(in srgb, currentColor 18%, transparent); margin: 14px auto 0; border-radius: 2px; overflow: hidden; }
+  .loader .bar i { display: block; height: 100%; width: 0; background: currentColor; transition: width .25s linear; }
+  html.loading { overflow: hidden; }
+  /* phones: cards collapse to their title, expand on tap (the current one opens by itself) and scroll inside themselves */
+  .st-toggle { display: none; }
+  html.narrow:not(.calm) .station { max-height: 52vh; display: flex; flex-direction: column; }
+  html.narrow .station .st-body { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; min-height: 0; }
+  html.narrow:not(.calm) .station:not(.open) .st-vis, html.narrow:not(.calm) .station:not(.open) .star, html.narrow:not(.calm) .station:not(.open) .st-status, html.narrow:not(.calm) .station:not(.open) .st-body > p, html.narrow:not(.calm) .station:not(.open) .chips, html.narrow:not(.calm) .station:not(.open) form, html.narrow:not(.calm) .station:not(.open) .st-links, html.narrow:not(.calm) .station:not(.open) .avatar { display: none; }
+  html.narrow .station .st-body h3 { cursor: pointer; }
+  html.narrow:not(.calm) .st-toggle { display: block; flex: none; width: 100%; border: 0; border-top: 1px solid var(--line); background: transparent; font: inherit; font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; padding: 9px; color: var(--c); cursor: pointer; }
+  html.narrow .station.now { z-index: 3; }
+  html.lite .station.now { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  /* phones: icon-only controls so the header never overflows */
+  html.narrow .top { padding: 10px 12px; gap: 8px; }
+  html.narrow .brand { font-size: .9rem; padding: 6px 10px; }
+  html.narrow .top .pill { width: 36px; height: 36px; padding: 0; display: inline-grid; place-items: center; font-size: 0; }
+  html.narrow #sound-toggle::after { content: '♪'; font-size: 16px; line-height: 1; }
+  html.narrow #motion-toggle::after { content: '◐'; font-size: 16px; line-height: 1; }
+  html.narrow #back-link::after { content: '←'; font-size: 16px; line-height: 1; }
 </style>
 </head>
 <body>
+<div class="loader" id="loader" role="status" aria-live="polite"><div class="box"><span class="pct" id="load-pct">0%</span>Loading<div class="bar"><i id="load-bar"></i></div></div></div>
 <div class="progress" id="progress" aria-hidden="true"></div>
 <canvas class="bg" id="bg" aria-hidden="true"></canvas>
 <canvas class="routecv" id="routecv" aria-hidden="true"></canvas>
@@ -143,9 +171,9 @@
 <header class="top">
   <a class="brand" href="/#make">Tiaki Mai Rā <small id="pname"></small></a>
   <div style="display:flex;gap:8px;align-items:center">
-    <a class="pill" href="/#make">← All projects</a>
-    <button class="pill" id="sound-toggle" aria-pressed="false" type="button">♪ Sound off</button>
-    <button class="pill" id="motion-toggle" aria-pressed="false" type="button">Calm motion</button>
+    <a class="pill" id="back-link" href="/#make" aria-label="All projects">← All projects</a>
+    <button class="pill" id="sound-toggle" aria-pressed="false" aria-label="Sound" type="button">♪ Sound off</button>
+    <button class="pill" id="motion-toggle" aria-pressed="false" aria-label="Calm motion" type="button">Calm motion</button>
   </div>
 </header>
 <nav class="rail" id="rail" aria-label="Phases"></nav>
@@ -214,6 +242,13 @@ const VIS = (() => {
 const hash = location.hash.replace('#', '').split('/');
 const pid = window.JOURNEYS[hash[0]] ? hash[0] : 'gom';
 const J = window.JOURNEYS[pid]; const stations = J.stations; const phases = J.phases; const phaseOf = id => phases.find(p => p.id === id) || phases[0];
+// ---------- loading: fonts, layout, then a dozen warm frames before the page is allowed to scroll
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';   // the page is driven by scroll: always start at the top, deep links re-seek themselves
+const LOAD = { pct: 0, ready: false, frames: 0 }; document.documentElement.classList.add('loading');
+function loadPct(p) { LOAD.pct = Math.max(LOAD.pct, p); const el = $('#load-pct'); if (el) el.textContent = Math.round(LOAD.pct) + '%'; const b = $('#load-bar'); if (b) b.style.width = LOAD.pct + '%'; }
+function loadDone() { if (LOAD.ready) return; LOAD.ready = true; loadPct(100); setTimeout(() => { $('#loader').classList.add('off'); document.documentElement.classList.remove('loading'); }, 180); }
+loadPct(12); (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => loadPct(45)); setTimeout(loadDone, 7000);   // never trap the visitor
+const lite = matchMedia('(pointer: coarse)').matches || innerWidth < 900 || (navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2; document.documentElement.classList.toggle('lite', lite);
 const SND = window.TMR_SOUND; SND.init($('#sound-toggle')); SND.ambient('organic'); let started = false; setTimeout(() => { started = true; }, 900);   // no arrival sounds while the page settles
 document.title = `${J.name} · Journey`; $('#pname').textContent = J.name;
 document.documentElement.style.setProperty('--glow', J.accent);
@@ -250,9 +285,10 @@ function drawRoute() {
 }
 const DIRS = { r: [1, 0], l: [-1, 0], d: [0, 1], u: [0, -1], dr: [1, 1], dl: [-1, 1], ur: [1, -1], ul: [-1, -1] };
 function build() {
-  narrow = vw < 900; const SX = narrow ? vw * .55 : 780, SY = narrow ? 520 : 600;
+  narrow = vw < 900; document.documentElement.classList.toggle('narrow', narrow); const SX = narrow ? vw * .55 : 780, SY = narrow ? 640 : 600;
   pts = [{ x: 0, y: 0 }];                                           // intro point
-  stations.forEach((st, i) => { const d = DIRS[phaseOf(st.phase).dir] || DIRS.d; const p = pts[pts.length - 1]; pts.push({ x: p.x + d[0] * (d[1] ? SX * .8 : SX), y: p.y + d[1] * (d[0] ? SY * .8 : SY) }); });
+  const NARROW_DIR = { r: 'dr', l: 'dl', u: 'd', ur: 'dr', ul: 'dl', d: 'd', dr: 'dr', dl: 'dl' };
+  stations.forEach((st, i) => { const d0 = phaseOf(st.phase).dir; const d = DIRS[narrow ? NARROW_DIR[d0] || 'd' : d0] || DIRS.d; const p = pts[pts.length - 1]; pts.push({ x: p.x + d[0] * (d[1] ? SX * .8 : SX), y: p.y + d[1] * (d[0] ? SY * .8 : SY) }); });
   { const p = pts[pts.length - 1]; pts.push({ x: p.x + SX * .8, y: p.y + SY * .4 }); }   // outro point
   // normalise to positive coords with margin
   const minX = Math.min(...pts.map(p => p.x)) - 700, minY = Math.min(...pts.map(p => p.y)) - 600;
@@ -272,18 +308,19 @@ function build() {
   marks = pts.map(p => { let best = 0, bd = 1e18; for (const [s0, x, y] of samples) { const dd = (x - p.x) ** 2 + (y - p.y) ** 2; if (dd < bd) { bd = dd; best = s0; } } return best; });
   phaseStartL = []; phases.forEach(ph => { const first = stations.findIndex(s => s.phase === ph.id); phaseStartL.push(first >= 0 ? marks[first] : routeLen); });
   // intro
-  const intro = document.createElement('div'); intro.className = 'intro'; intro.style.left = (pts[0].x + 40) + 'px'; intro.style.top = (pts[0].y - 120) + 'px';
+  const intro = document.createElement('div'); intro.className = 'intro'; const iw = narrow ? Math.min(520, vw - 32) : 520; intro.style.width = iw + 'px'; intro.style.left = (narrow ? pts[0].x - iw / 2 : pts[0].x + 40) + 'px'; intro.style.top = (narrow ? pts[0].y + 44 : pts[0].y - 120) + 'px';
   const people = (J.people || []).map(pp => `<span class="chip"><b>${esc(pp.name)}</b> · ${esc(pp.role)}</span>`).join('');
   intro.innerHTML = `<p class="kind">${esc(J.kind)}</p><h1>${esc(J.name)}</h1><p>${esc(J.intro)}</p>${people ? `<p class="kind" style="margin:1.1rem 0 .4rem">People</p><div class="chips">${people}</div>` : ''}<p class="hint">Scroll to travel · ← → to step · ${stations.length} decisions in ${phases.length} Double Diamond phases</p>`; world.appendChild(intro);
   // stations
   stations.forEach((st, i) => { const p = pts[i + 1], ph = phaseOf(st.phase); const el = document.createElement('article'); el.className = 'station'; el.id = 'st-' + i; el.style.setProperty('--c', ph.colour);
-    el.style.left = (narrow ? p.x - Math.min(440, vw * .86) / 2 : p.x + 48) + 'px'; el.style.top = (narrow ? p.y + 40 : p.y - 150) + 'px';
+    el.style.left = (narrow ? p.x - Math.min(440, vw - 32) / 2 : p.x + 48) + 'px'; el.style.top = (narrow ? p.y + 40 : p.y - 150) + 'px';
     el.innerHTML = `<i class="glyph ${ph.shape}"></i><div class="st-vis">${VIS.draw(st.vis, ph.colour)}</div><div class="st-body"><div class="st-meta"><span>${esc(ph.name)} · ${esc(st.date)}</span><span class="idx">${String(i + 1).padStart(2, '0')} / ${stations.length}</span></div><h3>${esc(st.title)}</h3>
-      <div class="star"><b>S</b><p>${esc(st.s)}</p><b>T</b><p>${esc(st.t)}</p><b>A</b><p>${esc(st.a)}</p><b>R</b><p>${esc(st.r)}</p></div><span class="st-status">${esc(st.status)}</span></div>`; world.appendChild(el); });
+      <div class="star"><b>S</b><p>${esc(st.s)}</p><b>T</b><p>${esc(st.t)}</p><b>A</b><p>${esc(st.a)}</p><b>R</b><p>${esc(st.r)}</p></div><span class="st-status">${esc(st.status)}</span></div><button class="st-toggle" type="button" aria-expanded="false">More ▾</button>`; world.appendChild(el); });
+  loadPct(70);
   // phase titles: placed near the first station of each phase, and inserted before it in DOM order so the calm (column) layout reads in sequence
-  phases.forEach((ph, k) => { const i = stations.findIndex(s => s.phase === ph.id); if (i < 0) return; const p = pts[i + 1]; const t = document.createElement('div'); t.className = 'phase-title'; t.dataset.phase = ph.id; t.style.setProperty('--c', ph.colour); t.style.left = (p.x - (narrow ? 0 : 60)) + 'px'; t.style.top = (p.y - (narrow ? 210 : 260)) + 'px'; t.innerHTML = `<small>Phase ${k + 1} of ${phases.length}</small>${esc(ph.name)}`; world.insertBefore(t, $('#st-' + i)); });
+  phases.forEach((ph, k) => { const i = stations.findIndex(s => s.phase === ph.id); if (i < 0) return; const p = pts[i + 1]; const t = document.createElement('div'); t.className = 'phase-title'; t.dataset.phase = ph.id; t.style.setProperty('--c', ph.colour); t.style.left = (narrow ? p.x - Math.min(440, vw - 32) / 2 : p.x - 60) + 'px'; t.style.top = (p.y - (narrow ? 110 : 260)) + 'px'; t.innerHTML = `<small>Phase ${k + 1} of ${phases.length}</small>${esc(ph.name)}`; world.insertBefore(t, $('#st-' + i)); });
   // outro
-  const o = pts[pts.length - 1]; const outro = document.createElement('div'); outro.className = 'outro'; outro.style.left = (o.x + 40) + 'px'; outro.style.top = (o.y - 80) + 'px';
+  const o = pts[pts.length - 1]; const outro = document.createElement('div'); outro.className = 'outro'; const ow = narrow ? Math.min(440, vw - 32) : 440; outro.style.width = ow + 'px'; outro.style.left = (narrow ? o.x - ow / 2 : o.x + 40) + 'px'; outro.style.top = (narrow ? o.y + 44 : o.y - 80) + 'px';
   outro.innerHTML = `<h2>End of the route, for now.</h2><p>Every station above is drawn from the project's own design records, told as it happened.</p><div class="links"><a class="cta" href="/#${pid}">Back to ${esc(J.name)}</a><a class="cta ghost" href="/#make">All projects</a></div>`; world.appendChild(outro);
   // rail
   $('#rail').innerHTML = phases.map((ph, k) => `<a href="#${pid}/${stations.findIndex(s => s.phase === ph.id)}" data-phase="${ph.id}" style="--c:${ph.colour}"><i></i><span>${esc(ph.name)}</span></a>`).join('');
@@ -305,6 +342,7 @@ function progress() {
   // station states
   const stIdx = clamp(Math.floor(u + .62) - 1, -1, stations.length - 1);   // which stations have been reached
   $$('.station').forEach((el, k) => { el.classList.toggle('on', k <= stIdx); if (k > stIdx) el.classList.remove('settled'); el.classList.toggle('now', k === stIdx); el.classList.toggle('near', Math.abs(k - stIdx) <= 1); });
+  if (stIdx !== idx) autoOpen(stIdx);
   $$('.phase-title').forEach(el => { const first = stations.findIndex(s => s.phase === el.dataset.phase); el.classList.toggle('on', first <= stIdx); });
   if (stIdx !== idx) { idx = stIdx; const st = stations[Math.max(0, idx)]; $('#count').textContent = idx < 0 ? `${J.name}` : `${idx + 1} / ${stations.length}`; $('#live').textContent = idx < 0 ? J.name : `${st.title}. ${phaseOf(st.phase).name}.`; history.replaceState(null, '', `#${pid}/${Math.max(0, idx)}`); if (started) SND.arrive(); }
   const ph = phaseOf((stations[Math.max(0, Math.min(stations.length - 1, Math.round(u - .5)))] || stations[0]).phase);
@@ -446,7 +484,7 @@ const PATTERNS = {
     for (let r = 24; r < Math.max(w, h) * .9; r += 26) { c.globalAlpha = A * .9 * (1 - r / (Math.max(w, h) * .9)); c.beginPath(); for (let a = 0; a <= Math.PI * 2 + .01; a += .06) { const rr = r + Math.sin(a * 5 + t * .0008 + r * .02) * 6 + Math.sin(a * 3 - t * .0005) * 4; const x = this.cx + Math.cos(a) * rr, y = this.cy + Math.sin(a) * rr; c.lineTo(x, y); } c.stroke(); } } },
   none: { init() {}, draw() {} },
 };
-function bgResize() { bgDPR = Math.min(1.5, devicePixelRatio || 1); bgW = innerWidth; bgH = innerHeight; bgCanvas.width = bgW * bgDPR; bgCanvas.height = bgH * bgDPR; bctx.setTransform(bgDPR, 0, 0, bgDPR, 0, 0); rcv.width = bgW * bgDPR; rcv.height = bgH * bgDPR; rctx.setTransform(bgDPR, 0, 0, bgDPR, 0, 0); if (BG.cur) BG.cur.pat.init(bgW, bgH); if (BG.prev) BG.prev.pat.init(bgW, bgH); }
+function bgResize() { bgDPR = lite ? 1 : Math.min(1.5, devicePixelRatio || 1); bgW = innerWidth; bgH = innerHeight; bgCanvas.width = bgW * bgDPR; bgCanvas.height = bgH * bgDPR; bctx.setTransform(bgDPR, 0, 0, bgDPR, 0, 0); rcv.width = bgW * bgDPR; rcv.height = bgH * bgDPR; rctx.setTransform(bgDPR, 0, 0, bgDPR, 0, 0); if (BG.cur) BG.cur.pat.init(bgW, bgH); if (BG.prev) BG.prev.pat.init(bgW, bgH); }
 function bgSet(name, color) { const pat = PATTERNS[name] || PATTERNS.none; if (BG.cur && BG.cur.name === name) { BG.color = color; BG.rgb = hexToRgb(color); return; } BG.prev = BG.cur; BG.cur = { name, pat }; BG.fade = 0; pat.init(bgW, bgH); BG.color = color; BG.rgb = hexToRgb(color); }
 function bgFrame(now) { if (!BG.cur || document.hidden) return; const c = bctx; c.clearRect(0, 0, bgW, bgH); BG.fade = Math.min(1, BG.fade + (calm ? 1 : .025)); const px = pointer.active ? pointer.x : -9999, py = pointer.active ? pointer.y : -9999;
   const nowEl = $('.station.now'); bgReading = nowEl && !calm ? nowEl.getBoundingClientRect() : null; const base = .15; c.fillStyle = BG.color; c.strokeStyle = BG.color; const T = calm ? 0 : now - BG.t0;
@@ -469,7 +507,7 @@ function frame(now) {
     for (let i = 1; i < N; i++) { const s = seg[i], p = seg[i - 1]; const dx = p.x - s.x, dy = p.y - s.y, d = Math.hypot(dx, dy) || 1; if (d > spacing) { const m = (d - spacing) * .38 * dt; s.x += dx / d * m; s.y += dy / d * m; } s.r = lerp(s.r, 7 * Math.pow(1 - i / N, .9) + 1, .16 * dt); circles[i].setAttribute('cx', s.x.toFixed(1)); circles[i].setAttribute('cy', s.y.toFixed(1)); circles[i].setAttribute('r', s.r.toFixed(1)); }
     drawHead(now, (narrow ? 20 : 26) * (1 + energy * .3));
   }
-  bgFrame(now); requestAnimationFrame(frame);
+  if (!lite || (LOAD.frames & 1)) bgFrame(now); if (!LOAD.ready) { LOAD.frames++; loadPct(70 + Math.min(30, LOAD.frames * 2.5)); if (LOAD.frames >= 12 && LOAD.pct >= 45) loadDone(); } requestAnimationFrame(frame);
 }
 
 // ---------- input
@@ -482,6 +520,8 @@ $('#rail').addEventListener('click', e => { const a = e.target.closest('a'); if 
 
 function layout() { vw = innerWidth; vh = innerHeight; $('#guide').setAttribute('viewBox', `0 0 ${vw} ${vh}`); bgResize(); build(); curPhase = null; if (calm) { $$('.station').forEach(el => el.classList.add('on')); $$('.phase-title').forEach(el => el.classList.add('on')); const ph = phases[0]; bgSet(ph.bg, ph.colour); } }
 addEventListener('resize', layout);
+document.addEventListener('click', e => { if (!narrow) return; const t = e.target.closest('.st-toggle, .station h3'); if (!t) return; const st = t.closest('.station'); const open = st.classList.toggle('open'); st.dataset.user = open ? 'open' : 'closed'; const b = st.querySelector('.st-toggle'); if (b) { b.textContent = open ? 'Less ▴' : 'More ▾'; b.setAttribute('aria-expanded', String(open)); } });
+function autoOpen(stIdx) { if (!narrow) return; $$('.station').forEach((el, k) => { const want = k === stIdx; if (el.dataset.user && el.dataset.user !== (want ? 'open' : 'closed') && el.dataset.now === '1') return; if (want !== el.classList.contains('open')) { el.classList.toggle('open', want); const b = el.querySelector('.st-toggle'); if (b) { b.textContent = want ? 'Less ▴' : 'More ▾'; b.setAttribute('aria-expanded', String(want)); } if (want) el.querySelector('.st-body').scrollTop = 0; } el.dataset.now = want ? '1' : '0'; if (!want) delete el.dataset.user; }); }
 applyCalm();
 // deep link to a station
 if (hash[1] !== undefined && !isNaN(+hash[1])) { setTimeout(() => goto(+hash[1]), 60); }

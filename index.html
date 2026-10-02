@@ -93,7 +93,7 @@
   .phase-title small { display: block; font-family: var(--font-body); font-size: .66rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-3); -webkit-text-fill-color: var(--ink-3); margin-bottom: 8px; }
 
   /* stations: liquid-glass cards revealed with a circular mask */
-  .station { position: absolute; width: 440px; max-width: 86vw; border-radius: 22px; padding: 0; overflow: hidden;
+  .station { position: absolute; width: 440px; max-width: calc(100vw - 32px); border-radius: 22px; padding: 0; overflow: hidden;
     background: color-mix(in srgb, var(--paper) 86%, transparent);
     border: 1px solid color-mix(in srgb, var(--c) 35%, var(--line)); box-shadow: 0 1px 0 rgba(255,255,255,.5) inset;
     clip-path: circle(0% at 0% 50%); transition: clip-path 1s var(--ease-out), transform .8s var(--ease-out); transform: translateY(14px); }
@@ -157,9 +157,34 @@
   html.calm .pre-text { position: static; transform: none; padding-top: 90px; }
   html.calm .stage { clip-path: none; }
   html.calm body, html.calm body.dark { background: var(--paper); color: var(--ink); }
+  /* loading screen: the page does not scroll until fonts, layout and the first frames are in */
+  .loader { --loader-bg: #0d0b16; --loader-ink: #eee8dc; position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: var(--loader-bg, var(--paper)); color: var(--loader-ink, var(--ink)); transition: opacity .6s var(--ease-out); }
+  .loader.off { opacity: 0; pointer-events: none; }
+  .loader .box { text-align: center; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; }
+  .loader .pct { font-family: var(--font-display); font-size: 2.6rem; letter-spacing: 0; text-transform: none; display: block; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+  .loader .bar { width: 160px; height: 2px; background: color-mix(in srgb, currentColor 18%, transparent); margin: 14px auto 0; border-radius: 2px; overflow: hidden; }
+  .loader .bar i { display: block; height: 100%; width: 0; background: currentColor; transition: width .25s linear; }
+  html.loading { overflow: hidden; }
+  /* phones: cards collapse to their title, expand on tap (the current one opens by itself) and scroll inside themselves */
+  .st-toggle { display: none; }
+  html.narrow:not(.calm) .station { max-height: 52vh; display: flex; flex-direction: column; }
+  html.narrow .station .st-body { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; min-height: 0; }
+  html.narrow:not(.calm) .station:not(.open) .st-vis, html.narrow:not(.calm) .station:not(.open) .star, html.narrow:not(.calm) .station:not(.open) .st-status, html.narrow:not(.calm) .station:not(.open) .st-body > p, html.narrow:not(.calm) .station:not(.open) .chips, html.narrow:not(.calm) .station:not(.open) form, html.narrow:not(.calm) .station:not(.open) .st-links, html.narrow:not(.calm) .station:not(.open) .avatar { display: none; }
+  html.narrow .station .st-body h3 { cursor: pointer; }
+  html.narrow:not(.calm) .st-toggle { display: block; flex: none; width: 100%; border: 0; border-top: 1px solid var(--line); background: transparent; font: inherit; font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; padding: 9px; color: var(--c); cursor: pointer; }
+  html.narrow .station.now { z-index: 3; }
+  html.lite .station.now { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  /* phones: icon-only controls so the header never overflows */
+  html.narrow .top { padding: 10px 12px; gap: 8px; }
+  html.narrow .brand { font-size: .9rem; padding: 6px 10px; }
+  html.narrow .top .pill { width: 36px; height: 36px; padding: 0; display: inline-grid; place-items: center; font-size: 0; }
+  html.narrow #sound-toggle::after { content: '♪'; font-size: 16px; line-height: 1; }
+  html.narrow #motion-toggle::after { content: '◐'; font-size: 16px; line-height: 1; }
+  html.narrow #back-link::after { content: '←'; font-size: 16px; line-height: 1; }
 </style>
 </head>
 <body class="dark">
+<div class="loader" id="loader" role="status" aria-live="polite"><div class="box"><span class="pct" id="load-pct">0%</span>Loading<div class="bar"><i id="load-bar"></i></div></div></div>
 <div class="progress" id="progress" aria-hidden="true"></div>
 <canvas class="bg" id="bg" aria-hidden="true"></canvas>
 <canvas class="routecv" id="routecv" aria-hidden="true"></canvas>
@@ -169,8 +194,8 @@
   <a class="brand" href="#top">Tiaki Mai Rā</a>
   <div style="display:flex;gap:8px;align-items:center">
     <a class="pill" href="#legal" id="legal-link">Legal</a>
-    <button class="pill" id="sound-toggle" aria-pressed="false" type="button">♪ Sound off</button>
-    <button class="pill" id="motion-toggle" aria-pressed="false" type="button">Calm motion</button>
+    <button class="pill" id="sound-toggle" aria-pressed="false" aria-label="Sound" type="button">♪ Sound off</button>
+    <button class="pill" id="motion-toggle" aria-pressed="false" aria-label="Calm motion" type="button">Calm motion</button>
   </div>
 </header>
 <div class="pre-text" id="pre-text"><h1 id="pre-l1"></h1><p id="pre-l2"></p><a class="cta" href="#core" id="pre-enter">Enter</a></div>
@@ -193,6 +218,13 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v)), lerp = (a, b, t) => a + (b - a) * t;
 const easeIO = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2, easeOut = t => 1 - Math.pow(1 - t, 3);
 const D = window.HOME; const nodes = D.nodes; const phases = D.phases; const phaseOf = id => phases.find(p => p.id === id) || phases[0];
+// ---------- loading: fonts, layout, then a dozen warm frames before the page is allowed to scroll
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';   // the page is driven by scroll: always start at the top, deep links re-seek themselves
+const LOAD = { pct: 0, ready: false, frames: 0 }; document.documentElement.classList.add('loading');
+function loadPct(p) { LOAD.pct = Math.max(LOAD.pct, p); const el = $('#load-pct'); if (el) el.textContent = Math.round(LOAD.pct) + '%'; const b = $('#load-bar'); if (b) b.style.width = LOAD.pct + '%'; }
+function loadDone() { if (LOAD.ready) return; LOAD.ready = true; loadPct(100); setTimeout(() => { $('#loader').classList.add('off'); document.documentElement.classList.remove('loading'); }, 180); }
+loadPct(12); (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => loadPct(45)); setTimeout(loadDone, 7000);   // never trap the visitor
+const lite = matchMedia('(pointer: coarse)').matches || innerWidth < 900 || (navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2; document.documentElement.classList.toggle('lite', lite);
 const SND = window.TMR_SOUND; SND.init($('#sound-toggle')); SND.ambient('digital');
 $('#pre-l1').textContent = D.prelude.line1; $('#pre-l2').textContent = D.prelude.line2;
 
@@ -206,12 +238,12 @@ let vw = innerWidth, vh = innerHeight, narrow = false; const PRE_VH = 2.4, OUT_V
 const world = $('#world'); let pts = [], marks = [], samples = [], routePath = null, routeLen = 0, W = 0, H = 0, phaseStartL = [], pos = {};
 const rcv = $('#routecv'), rctx = rcv.getContext('2d');
 function build() {
-  narrow = vw < 900; const k = narrow ? .62 : 1;
+  narrow = vw < 900; document.documentElement.classList.toggle('narrow', narrow); const k = narrow ? .62 : 1;
   pos = {}; nodes.forEach(n => { if (!n.parent) { pos[n.id] = { x: 0, y: 0 }; return; } const p = pos[n.parent]; const a = n.angle * Math.PI / 180; const leaf = n.parent !== 'core' ? 1.38 : 1;   // leaves sit further out so their cards never cover the branch card
     pos[n.id] = { x: p.x + Math.cos(a) * n.r * k * leaf, y: p.y + Math.sin(a) * n.r * k * leaf }; });
   pts = nodes.map(n => pos[n.id]);
   // stations first, so their measured heights can push overlapping cards apart before the route is drawn
-  world.innerHTML = ''; const cardW = narrow ? Math.min(460, vw * .86) : 460; const offX = narrow ? -cardW / 2 : 46, offY = narrow ? 40 : -120;
+  world.innerHTML = ''; const cardW = narrow ? Math.min(460, vw - 32) : 460; const offX = narrow ? -cardW / 2 : 46, offY = narrow ? 40 : -120;
   const els = nodes.map((n, i) => { const ph = phaseOf(n.phase); const c = n.accent || ph.colour; const el = document.createElement('article'); el.className = 'station' + (i === 0 ? ' core' : ''); el.id = 'st-' + i; el.style.setProperty('--c', c); el.style.width = cardW + 'px';
     const items = n.items ? `<div class="chips">${n.items.map(x => `<span class="chip">${esc(x)}</span>`).join('')}</div>` : '';
     const links = [];
@@ -220,9 +252,9 @@ function build() {
     if (i === 0) links.push(`<a class="cta ghost" href="#st-1">Begin →</a>`);
     const photo = n.photo !== undefined ? (n.photo ? `<img class="avatar" src="${n.photo}" alt="${esc(n.title)}">` : '<span class="avatar ph" aria-hidden="true"></span>') : '';
     const form = n.form ? `<form class="mini" id="contact-form" action="https://formspree.io/f/mgodwywl" method="POST"><input type="text" name="name" placeholder="Name" aria-label="Name" required autocomplete="name"><input type="email" name="email" placeholder="Email" aria-label="Email" required autocomplete="email"><textarea name="message" rows="3" placeholder="Your project" aria-label="Message" required></textarea><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><p class="notice" style="font-size:.74rem;color:var(--ink-3)">We use what you send only to reply to you. <a href="legal.html#privacy">Privacy statement</a>.</p><button class="cta" type="submit">Send</button><p class="form-status" aria-live="polite" style="font-size:.8rem;margin-top:.5rem"></p></form>` : '';
-    el.innerHTML = `<i class="glyph ${n.shape || ph.shape}" style="position:absolute;right:14px;top:12px;width:14px;height:14px;background:${c}"></i><div class="st-body"><span class="kicker">${esc(n.kicker)} </span>${photo}<h3>${esc(n.title)}</h3>${(n.body || []).map(b => `<p>${esc(b)}</p>`).join('')}${items}${form}${links.length ? `<div class="st-links">${links.join('')}</div>` : ''}</div>`;
+    el.innerHTML = `<i class="glyph ${n.shape || ph.shape}" style="position:absolute;right:14px;top:12px;width:14px;height:14px;background:${c}"></i><div class="st-body"><span class="kicker">${esc(n.kicker)} </span>${photo}<h3>${esc(n.title)}</h3>${(n.body || []).map(b => `<p>${esc(b)}</p>`).join('')}${items}${form}${links.length ? `<div class="st-links">${links.join('')}</div>` : ''}</div><button class="st-toggle" type="button" aria-expanded="false">More ▾</button>`;
     world.appendChild(el); return el; });
-  const hs = els.map(el => el.offsetHeight || 260);
+  const hs = els.map(el => el.offsetHeight || 260); loadPct(70);
   // relax: leaves (and branch hubs, more slowly) slide apart until no two cards overlap; the core stays put
   const wgt = nodes.map(n => !n.parent ? 0 : n.parent === 'core' ? .25 : 1); const M = 28;
   for (let it = 0; it < 60; it++) { let moved = 0; for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const a = pts[i], b = pts[j]; if (!wgt[i] && !wgt[j]) continue;
@@ -264,6 +296,7 @@ function progress() {
   const dwell = .4; const travel = f < dwell ? 0 : easeIO((f - dwell) / (1 - dwell)); L = out > 0 ? lerp(marks[n], routeLen, Math.min(1, out * 3)) : lerp(marks[i], marks[Math.min(i + 1, n)], travel); travelAmt = out > 0 ? 0 : travel;
   const stIdx = inside ? clamp(Math.floor(u + .6), 0, nodes.length - 1) : -1;
   $$('.station').forEach((el, k) => { el.classList.toggle('on', k <= stIdx); if (k > stIdx) el.classList.remove('settled'); el.classList.toggle('now', k === stIdx && out === 0); });
+  if (stIdx !== idx) autoOpen(stIdx);
   if (stIdx !== idx) { idx = stIdx; const nd = nodes[Math.max(0, idx)]; $('#count').textContent = idx < 0 ? (out > 0 ? 'Returning' : 'Approaching') : `${idx + 1} / ${nodes.length}`; $('#live').textContent = idx < 0 ? D.prelude.line1 : `${nd.title}. ${phaseOf(nd.phase).name}.`; if (idx >= 0) { history.replaceState(null, '', '#' + nd.id); if (inside && wasInsideOnce) SND.arrive(); } }
   const ph = phaseOf(nodes[clamp(Math.round(u), 0, nodes.length - 1)].phase);
   if (ph !== curPhase) { curPhase = ph; document.documentElement.style.setProperty('--guide', ph.colour); setShape(ph.shape); bgSet(ph.bg, ph.colour); $$('#rail a').forEach(a => a.classList.toggle('on', a.dataset.phase === ph.id)); energy = 1; if (inside && wasInsideOnce) SND.phase(phases.indexOf(ph)); }
@@ -310,7 +343,7 @@ function drawRoute() {
 
 // ---------- the prelude: a tesseract in dark space, code streaming in along three axes
 const pcv = $('#pre'), pctx = pcv.getContext('2d'); let pW = 0, pH = 0, pDPR = 1; const motes = [];
-function preResize() { pDPR = Math.min(1.5, devicePixelRatio || 1); pW = innerWidth; pH = innerHeight; pcv.width = pW * pDPR; pcv.height = pH * pDPR; pctx.setTransform(pDPR, 0, 0, pDPR, 0, 0); motes.length = 0; for (let i = 0; i < 140; i++) motes.push({ axis: i % 3, t: Math.random(), sp: .0015 + Math.random() * .003, g: Math.random() < .35 ? (Math.random() < .5 ? '0' : '1') : (Math.random() < .5 ? 'sq' : 'ring'), s: 2 + Math.random() * 4, side: Math.random() < .5 ? 1 : -1 }); }
+function preResize() { pDPR = lite ? 1 : Math.min(1.5, devicePixelRatio || 1); pW = innerWidth; pH = innerHeight; pcv.width = pW * pDPR; pcv.height = pH * pDPR; pctx.setTransform(pDPR, 0, 0, pDPR, 0, 0); motes.length = 0; for (let i = 0; i < 140; i++) motes.push({ axis: i % 3, t: Math.random(), sp: .0015 + Math.random() * .003, g: Math.random() < .35 ? (Math.random() < .5 ? '0' : '1') : (Math.random() < .5 ? 'sq' : 'ring'), s: 2 + Math.random() * 4, side: Math.random() < .5 ? 1 : -1 }); }
 const AX = [[.86, -.5], [-.86, -.5], [0, 1]]; const AXC = ['#6fe7ff', '#ff5fb4', '#f3eee3'];   // isometric axes and their colours
 function project(v, R) { // v in cube space, R = rotation angles
   let [x, y, z, w] = v; const [a, b, g] = R; // 4D → 3D: fold w into scale (the inner cube); 3D → 2D: isometric-ish with a slow turn
@@ -459,7 +492,7 @@ const PATTERNS = {
     for (let r = 24; r < Math.max(w, h) * .9; r += 26) { c.globalAlpha = A * .9 * (1 - r / (Math.max(w, h) * .9)); c.beginPath(); for (let a = 0; a <= Math.PI * 2 + .01; a += .06) { const rr = r + Math.sin(a * 5 + t * .0008 + r * .02) * 6 + Math.sin(a * 3 - t * .0005) * 4; const x = this.cx + Math.cos(a) * rr, y = this.cy + Math.sin(a) * rr; c.lineTo(x, y); } c.stroke(); } } },
   none: { init() {}, draw() {} },
 };
-function bgResize() { bgDPR = Math.min(1.5, devicePixelRatio || 1); bgW = innerWidth; bgH = innerHeight; bgCanvas.width = bgW * bgDPR; bgCanvas.height = bgH * bgDPR; bctx.setTransform(bgDPR, 0, 0, bgDPR, 0, 0); rcv.width = bgW * bgDPR; rcv.height = bgH * bgDPR; rctx.setTransform(bgDPR, 0, 0, bgDPR, 0, 0); if (BG.cur) BG.cur.pat.init(bgW, bgH); if (BG.prev) BG.prev.pat.init(bgW, bgH); }
+function bgResize() { bgDPR = lite ? 1 : Math.min(1.5, devicePixelRatio || 1); bgW = innerWidth; bgH = innerHeight; bgCanvas.width = bgW * bgDPR; bgCanvas.height = bgH * bgDPR; bctx.setTransform(bgDPR, 0, 0, bgDPR, 0, 0); rcv.width = bgW * bgDPR; rcv.height = bgH * bgDPR; rctx.setTransform(bgDPR, 0, 0, bgDPR, 0, 0); if (BG.cur) BG.cur.pat.init(bgW, bgH); if (BG.prev) BG.prev.pat.init(bgW, bgH); }
 function bgSet(name, color) { const pat = PATTERNS[name] || PATTERNS.none; if (BG.cur && BG.cur.name === name) { BG.color = color; BG.rgb = hexToRgb(color); return; } BG.prev = BG.cur; BG.cur = { name, pat }; BG.fade = 0; pat.init(bgW, bgH); BG.color = color; BG.rgb = hexToRgb(color); }
 function bgFrame(now) { if (!BG.cur || document.hidden) return; const c = bctx; c.clearRect(0, 0, bgW, bgH); BG.fade = Math.min(1, BG.fade + (calm ? 1 : .025)); const px = pointer.active ? pointer.x : -9999, py = pointer.active ? pointer.y : -9999;
   const nowEl = $('.station.now'); bgReading = nowEl && !calm ? nowEl.getBoundingClientRect() : null; const base = .15; c.fillStyle = BG.color; c.strokeStyle = BG.color; const T = calm ? 0 : now - BG.t0;
@@ -493,7 +526,7 @@ function frame(now) {
       SND.motion(Math.hypot(cam.vx, cam.vy) + speed * .6, inside ? travelAmt > .05 : (pre > .05 && pre < .95), inside ? (curPhase && curPhase.id) : (out > 0 ? 'exit' : 'pre'));
     }
   }
-  bgFrame(now); requestAnimationFrame(frame);
+  if (!lite || (LOAD.frames & 1)) bgFrame(now); if (!LOAD.ready) { LOAD.frames++; loadPct(70 + Math.min(30, LOAD.frames * 2.5)); if (LOAD.frames >= 12 && LOAD.pct >= 45) loadDone(); } requestAnimationFrame(frame);
 }
 addEventListener('pointermove', e => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.active = e.pointerType !== 'touch'; pointer.lastMove = performance.now(); }, { passive: true });
 addEventListener('pointerleave', () => { pointer.active = false; });
@@ -511,6 +544,8 @@ document.addEventListener('submit', async e => { const f = e.target; if (!f.matc
 $('#pre-enter').addEventListener('click', e => { if (!calm) { e.preventDefault(); goto(0); } });
 function layout() { vw = innerWidth; vh = innerHeight; $('#guide').setAttribute('viewBox', `0 0 ${vw} ${vh}`); bgResize(); preResize(); build(); curPhase = null; if (calm) { document.body.classList.remove('dark'); $$('.station').forEach(el => el.classList.add('on')); const ph = phases[0]; bgSet(ph.bg, ph.colour); } }
 addEventListener('resize', layout); applyCalm();
+document.addEventListener('click', e => { if (!narrow) return; const t = e.target.closest('.st-toggle, .station h3'); if (!t) return; const st = t.closest('.station'); const open = st.classList.toggle('open'); st.dataset.user = open ? 'open' : 'closed'; const b = st.querySelector('.st-toggle'); if (b) { b.textContent = open ? 'Less ▴' : 'More ▾'; b.setAttribute('aria-expanded', String(open)); } });
+function autoOpen(stIdx) { if (!narrow) return; $$('.station').forEach((el, k) => { const want = k === stIdx; if (el.dataset.user && el.dataset.user !== (want ? 'open' : 'closed') && el.dataset.now === '1') return; if (want !== el.classList.contains('open')) { el.classList.toggle('open', want); const b = el.querySelector('.st-toggle'); if (b) { b.textContent = want ? 'Less ▴' : 'More ▾'; b.setAttribute('aria-expanded', String(want)); } if (want) el.querySelector('.st-body').scrollTop = 0; } el.dataset.now = want ? '1' : '0'; if (!want) delete el.dataset.user; }); }
 const want = location.hash.slice(1); const wi = nodes.findIndex(n => n.id === want); if (wi >= 0) setTimeout(() => goto(wi), 80);
 requestAnimationFrame(frame);
 })();
