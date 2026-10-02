@@ -1,611 +1,519 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tiaki Mai Rā — Māori-led digital product studio</title>
+<meta name="description" content="Tiaki Mai Rā is a Māori-led digital product studio from Aotearoa New Zealand: UI/UX design and product development across web, mobile, AR and spatial computing, with AI inside and cultural grounding at the centre of the work.">
+<link rel="canonical" href="https://tiakimaira.com/">
+<meta property="og:type" content="website"><meta property="og:url" content="https://tiakimaira.com/">
+<meta property="og:title" content="Tiaki Mai Rā — Māori-led digital product studio"><meta property="og:description" content="Tiaki Mai Rā is a Māori-led digital product studio from Aotearoa New Zealand: UI/UX design and product development across web, mobile, AR and spatial computing, with AI inside and cultural grounding at the centre of the work.">
+<meta name="twitter:title" content="Tiaki Mai Rā — Māori-led digital product studio"><meta name="twitter:description" content="Tiaki Mai Rā is a Māori-led digital product studio from Aotearoa New Zealand: UI/UX design and product development across web, mobile, AR and spatial computing, with AI inside and cultural grounding at the centre of the work.">
+<link rel="icon" type="image/png" href="/assets/images/logo.png">
+<link rel="apple-touch-icon" href="/assets/images/logo.png">
+<meta name="theme-color" content="#0d0b16" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3eee3" media="(prefers-color-scheme: light)">
+<meta property="og:site_name" content="Tiaki Mai Rā">
+<meta property="og:image" content="https://tiakimaira.com/assets/images/og-image.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tiakimaira.com/assets/images/og-image.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ProfessionalService","name":"Tiaki Mai Rā","description":"Tiaki Mai Rā is a Māori-led digital product studio from Aotearoa New Zealand: UI/UX design and product development across web, mobile, AR and spatial computing, with AI inside and cultural grounding at the centre of the work.","url":"https://tiakimaira.com","logo":"https://tiakimaira.com/assets/images/logo.png","image":"https://tiakimaira.com/assets/images/og-image.png","email":"peresethomas649@gmail.com","areaServed":[{"@type":"Country","name":"New Zealand"},{"@type":"City","name":"New York","containedInPlace":{"@type":"Country","name":"United States"}},{"@type":"Country","name":"Australia"}],"knowsAbout":["UI/UX design","Digital product development","Augmented Reality","Virtual Reality","Spatial computing","Apple Vision Pro","Artificial Intelligence","Digital transformation","Cultural storytelling","Māori design"],"sameAs":["https://github.com/peresethomas649-byte","https://www.linkedin.com/in/thomas-perese-140441190","https://www.linkedin.com/in/ray-jonson-tui-hikaka-5973a1213/"],"founder":[{"@type":"Person","name":"Thomas Kereama Perese"},{"@type":"Person","name":"Ray Jonson Tui Hikaka"}]}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@300;400;500;600&display=swap">
+<style>
+:root {
+    --paper: #f3eee3; --paper-2: #ebe4d5; --ink: #16130f; --ink-2: #4a4439; --ink-3: #8a8272;
+    --line: rgba(22,19,15,.12);
+    --guide: var(--ink);
+    --gutter: clamp(16px, 5vw, 72px);
+    --font-display: 'Young Serif', Georgia, serif;      /* swap in one place */
+    --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+    --glow: #d99a2b;                                     /* route glow outside projects; projects override it with their accent */
+    --ease-out: cubic-bezier(.22,.9,.3,1); --spring: cubic-bezier(.34,1.56,.64,1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #14120f; --paper-2: #1c1915; --ink: #f1ebdf; --ink-2: #c9c1b1; --ink-3: #8b8474; --line: rgba(241,235,223,.14); }
+  }
+  :root[data-theme="dark"] { --paper: #14120f; --paper-2: #1c1915; --ink: #f1ebdf; --ink-2: #c9c1b1; --ink-3: #8b8474; --line: rgba(241,235,223,.14); }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: auto; }
+  .sr { position: fixed; left: 0; top: 0; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-weight: 300; line-height: 1.55; overflow-x: hidden; }
+  h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 400; letter-spacing: -.01em; margin: 0 0 .4em; }
+  p { color: var(--ink-2); }
+  a { color: inherit; }
+  .mock { display:inline-block; font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; border:1px solid var(--line); border-radius:999px; padding:.2em .7em; color:var(--ink-3); margin-left:.5em; vertical-align:middle; white-space: nowrap; }
+  .mock.warn { border-color: rgba(217,82,27,.5); color: #b8461a; }
 
-    <!-- ===== PRIMARY SEO META TAGS ===== -->
-    <title>Tiaki Mai Rā — Māori-led AI, AR, VR & XR Creative Technology Studio</title>
-    <meta name="description"
-        content="Tiaki Mai Rā is a Māori-led creative technology studio delivering Agentic AI, Automations, digital transformations, and immersive AR / VR / XR solutions through culturally grounded design, modern websites, and innovative user experiences. Serving New York, New Zealand, and Australia.">
-    <meta name="keywords"
-        content="Māori creative technology studio, AI agency New Zealand, AR VR XR development New York, immersive digital experiences Australia, agentic AI automation agency, cultural technology design, digital transformation New Zealand, augmented reality development New Zealand, virtual reality training solutions, mixed reality experiences, HoloLens development studio, spatial computing agency, Apple Vision Pro development, immersive 3D experiences, AI automation studio, AI digital transformation agency, generative AI solutions, AI workflow automation, LLM powered applications, creative technology studio, modern website design agency, interactive web experiences, 3D web design agency, creative tech studio Auckland, digital agency New York, Māori led digital agency, indigenous technology design, culturally grounded digital experiences, Pacific tech innovation">
-    <meta name="author" content="Tiaki Mai Rā">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0A0F1A">
+  /* fixed chrome */
+  .top { position: fixed; inset: 0 0 auto 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px var(--gutter); pointer-events: none; }
+  .top > * { pointer-events: auto; }
+  .brand { font-family: var(--font-display); font-size: 1rem; text-decoration: none; background: var(--paper); padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); white-space: nowrap; }
+  .brand small { font-family: var(--font-body); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin-left: 8px; }
+  .pill { font: inherit; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; background: var(--paper); color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+  .pill[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .progress { position: fixed; left: 0; top: 0; height: 2px; width: 0; background: var(--glow); z-index: 41; }
 
-    <!-- ===== CANONICAL URL ===== -->
-    <link rel="canonical" href="https://tiakimaira.com">
+  .rail { position: fixed; left: var(--gutter); top: 50%; transform: translateY(-50%); z-index: 40; display: grid; gap: 10px; }
+  .rail a { display: flex; align-items: center; gap: 10px; text-decoration: none; font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .rail a i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); opacity: .35; transition: transform .4s var(--spring), opacity .3s; }
+  .rail a.on { color: var(--ink); } .rail a.on i { opacity: 1; transform: scale(1.5); }
+  .rail a span { opacity: 0; transition: opacity .3s; } .rail a.on span, .rail:hover a span { opacity: 1; }
+  @media (max-width: 900px) { .rail { display: none; } #legal-link { display: none; } .brand small { display: none; } .pill { padding: 7px 9px; font-size: .64rem; }
+    html:not(.calm) .station.on:not(.now) { opacity: .28; filter: saturate(.6); } html:not(.calm) .station.now { opacity: 1; } }   /* on a phone, neighbours recede so the card you are on reads clearly */
 
-    <!-- ===== FAVICON / SITE ICON ===== -->
-    <link rel="icon" type="image/png" href="/assets/images/logo.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo.png">
-    <link rel="shortcut icon" type="image/png" href="/assets/images/logo.png">
+  .controls { position: fixed; right: var(--gutter); bottom: 22px; z-index: 40; display: flex; gap: 8px; align-items: center; }
+  .controls button { font: inherit; background: var(--paper); border: 1px solid var(--line); color: var(--ink); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; transition: transform .35s var(--spring), border-color .2s; }
+  .controls button:hover, .controls button:focus-visible { border-color: var(--ink); transform: scale(1.08); outline: none; }
+  .controls .count { font-size: .7rem; letter-spacing: .14em; color: var(--ink-3); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 9px 12px; }
 
-    <!-- ===== OPEN GRAPH (Facebook, LinkedIn, iMessage, WhatsApp) ===== -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tiakimaira.com">
-    <meta property="og:title" content="Tiaki Mai Rā — Māori-led AI, AR, VR & XR Creative Technology Studio">
-    <meta property="og:description"
-        content="Tiaki Mai Rā is a Māori-led creative technology studio delivering Agentic AI, Automations, digital transformations, and immersive AR / VR / XR solutions through culturally grounded design, modern websites, and innovative user experiences.">
-    <meta property="og:image" content="https://tiakimaira.com/assets/images/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Tiaki Mai Rā — Māori-led Creative Technology Studio">
-    <meta property="og:site_name" content="Tiaki Mai Rā">
-    <meta property="og:locale" content="en_US">
+  /* layers */
+  .bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+  .routecv { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+  .stage { position: fixed; inset: 0; z-index: 2; overflow: hidden; }
+  .geom { position: absolute; width: 0; height: 0; overflow: hidden; }
+  .world { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+  .world svg.route { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+  .route .dim { fill: none; stroke: var(--ink); stroke-opacity: .12; stroke-width: 1.5; stroke-dasharray: 3 9; stroke-linecap: round; }
+  .route .ph { fill: none; stroke-linecap: round; }
+  .route .ph.a { stroke-width: 22; stroke-opacity: .10; } .route .ph.b { stroke-width: 8; stroke-opacity: .22; } .route .ph.c { stroke-width: 2.4; stroke-opacity: .95; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .route .ph.a { stroke-opacity: .2; } :root:not([data-theme="light"]) .route .ph.b { stroke-opacity: .38; } }
+  :root[data-theme="dark"] .route .ph.a { stroke-opacity: .2; } :root[data-theme="dark"] .route .ph.b { stroke-opacity: .38; }
+  .guide { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; overflow: visible; }
+  .guide .body, .guide .head { fill: var(--guide); }
 
-    <!-- ===== TWITTER / X CARD ===== -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://tiakimaira.com">
-    <meta name="twitter:title" content="Tiaki Mai Rā — Māori-led AI, AR, VR & XR Creative Technology Studio">
-    <meta name="twitter:description"
-        content="Tiaki Mai Rā is a Māori-led creative technology studio delivering Agentic AI, Automations, digital transformations, and immersive AR / VR / XR solutions.">
-    <meta name="twitter:image" content="https://tiakimaira.com/assets/images/og-image.png">
+  /* phase titles in the world: masked gradient reveal */
+  .phase-title { position: absolute; font-family: var(--font-display); font-size: clamp(2.4rem, 6vw, 5.6rem); line-height: 1; white-space: nowrap; letter-spacing: -.02em; pointer-events: none;
+    background: linear-gradient(90deg, var(--c) 0 40%, transparent 60%); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 300% 100%; background-position: 100% 0; transition: background-position 1.4s var(--ease-out); opacity: .9; }
+  .phase-title.on { background-position: 0% 0; }
+  .phase-title small { display: block; font-family: var(--font-body); font-size: .66rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-3); -webkit-text-fill-color: var(--ink-3); margin-bottom: 8px; }
 
-    <!-- ===== JSON-LD STRUCTURED DATA (Google Rich Results) ===== -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "ProfessionalService",
-        "name": "Tiaki Mai Rā",
-        "description": "Tiaki Mai Rā is a Māori-led creative technology studio delivering Agentic AI, Automations, digital transformations, and immersive AR / VR / XR solutions through culturally grounded design, modern websites, and innovative user experiences.",
-        "url": "https://tiakimaira.com",
-        "logo": "https://tiakimaira.com/assets/images/logo.png",
-        "image": "https://tiakimaira.com/assets/images/og-image.png",
-        "email": "peresethomas649@gmail.com",
-        "areaServed": [
-            { "@type": "City", "name": "New York", "containedInPlace": { "@type": "Country", "name": "United States" } },
-            { "@type": "Country", "name": "New Zealand" },
-            { "@type": "Country", "name": "Australia" }
-        ],
-        "knowsAbout": [
-            "Agentic AI", "Artificial Intelligence", "Augmented Reality", "Virtual Reality",
-            "Mixed Reality", "Extended Reality", "Digital Transformation", "Creative Technology",
-            "Māori Design", "Immersive Experiences", "3D Web Design", "Spatial Computing"
-        ],
-        "sameAs": [
-            "https://github.com/peresethomas649-byte"
-        ],
-        "founder": {
-            "@type": "Person",
-            "name": "Thomas Perese"
-        }
-    }
-    </script>
+  /* stations: liquid-glass cards revealed with a circular mask */
+  .station { position: absolute; width: 440px; max-width: 86vw; border-radius: 22px; padding: 0; overflow: hidden;
+    background: color-mix(in srgb, var(--paper) 86%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c) 35%, var(--line)); box-shadow: 0 1px 0 rgba(255,255,255,.5) inset;
+    clip-path: circle(0% at 0% 50%); transition: clip-path 1s var(--ease-out), transform .8s var(--ease-out); transform: translateY(14px); }
+  .station.on { clip-path: circle(150% at 0% 50%); transform: none; }
+  .station.on.settled { clip-path: none; }   /* the reveal mask is dropped once it has played: a live clip-path on every card costs frames */
+  .station.now { background: color-mix(in srgb, var(--paper) 70%, transparent); backdrop-filter: blur(10px) saturate(1.2); -webkit-backdrop-filter: blur(10px) saturate(1.2); }   /* liquid glass on the active card only: cheap, and it is the one you are reading */
+  .station.now { border-color: var(--c); box-shadow: 0 1px 0 rgba(255,255,255,.5) inset, 0 24px 60px -30px color-mix(in srgb, var(--c) 70%, transparent); }
+  .st-vis { padding: 12px 16px 6px; background: color-mix(in srgb, var(--paper) 50%, color-mix(in srgb, var(--c) 18%, transparent)); display: flex; justify-content: center; }
+  .st-vis svg { height: 128px; width: auto; max-width: 100%; display: block; }
+  .st-body { padding: 14px 20px 18px; font-size: .86rem; }
+  .st-meta { display: flex; justify-content: space-between; gap: 10px; font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; color: var(--c); margin-bottom: 4px; }
+  .st-meta .idx { color: var(--ink-3); }
+  .st-body h3 { font-size: 1.2rem; margin: .1rem 0 .6rem; line-height: 1.2; }
+  .star { display: grid; grid-template-columns: 22px 1fr; gap: 4px 10px; }
+  .star b { font-family: var(--font-display); font-weight: 400; color: var(--c); font-size: 1rem; line-height: 1.5; }
+  .star p { margin: 0 0 .35rem; }
+  .st-status { display: inline-block; margin-top: .6rem; font-size: .64rem; letter-spacing: .12em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; color: var(--ink-3); }
+  .station .glyph { position: absolute; right: 14px; top: 12px; width: 14px; height: 14px; background: var(--c); opacity: .9; }
+  .glyph.circle { border-radius: 50%; } .glyph.square { border-radius: 3px; } .glyph.triangle { clip-path: polygon(50% 0, 100% 100%, 0 100%); } .glyph.hexagon { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); } .glyph.diamond { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 
-    <!-- ===== FONTS & STYLES ===== -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Inter:wght@400;500;700&family=Playfair+Display:ital@0;1&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+
+  /* prelude: dark space, the cube, code streaming in */
+  body { background: var(--paper); transition: none; }
+  body.dark { background: #0d0b16; color: #eee8dc; }
+  .pre { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+  .pre-text { position: fixed; left: 50%; bottom: 12vh; transform: translateX(-50%); z-index: 4; text-align: center; pointer-events: none; color: #eee8dc; }
+  .pre-text h1 { font-size: clamp(1.6rem, 3.6vw, 2.6rem); margin: 0 0 .3rem; }
+  .pre-text p { color: #b9b2a3; font-size: .74rem; letter-spacing: .16em; text-transform: uppercase; margin: 0; }
+  .pre-text .cta { pointer-events: auto; margin-top: 14px; display: none; }
+  html.calm .pre-text .cta { display: inline-flex; }
+  .stage { clip-path: inset(50% round 24px); }
+  .stage.open { clip-path: inset(0 round 0); }
+  .top.pre-mode .brand, .top.pre-mode .pill { background: rgba(13,11,22,.6); color: #eee8dc; border-color: rgba(255,255,255,.18); }
+  body.dark .progress { background: #fff; }
+
+  /* home stations */
+  .station { width: 460px; }
+  .st-body h3 { font-size: 1.45rem; }
+  .station.core .st-body h3 { font-size: 1.9rem; }
+  .kicker { font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; color: var(--c); margin-bottom: 6px; display: block; }
+  .st-body p { margin: .35rem 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+  .chip { display: inline-block; font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; color: var(--ink-2); text-decoration: none; }
+  .avatar { display: block; width: 84px; height: 84px; border-radius: 50%; object-fit: cover; margin: 4px 0 12px; border: 1px solid var(--line); }
+  .avatar.ph { background: color-mix(in srgb, var(--paper-2) 70%, var(--ink-3)); }
+  .st-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .cta { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; border: 1px solid var(--ink); border-radius: 999px; padding: 10px 16px; background: var(--paper); color: var(--ink); transition: transform .35s var(--spring); }
+  .cta:hover, .cta:focus-visible { transform: scale(1.04); outline: none; }
+  .cta.accent { background: var(--c); border-color: var(--c); color: #fff; }
+  .cta.ghost { border-color: var(--line); color: var(--ink-2); }
+  form.mini { display: grid; gap: 8px; margin-top: 10px; }
+  form.mini input, form.mini textarea { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--ink); }
+  .glyph-node { position: absolute; width: 14px; height: 14px; }
+  /* calm / reduced motion: no cube, no camera; the node system as a readable column */
+  html.calm .stage { position: static; overflow: visible; clip-path: none; }
+  html.calm .world { position: static; transform: none !important; display: flex; flex-direction: column; gap: 22px; padding: 40px var(--gutter) 80px; max-width: 60rem; margin: 0 auto; width: auto !important; height: auto !important; }
+  html.calm .routecv, html.calm .scroller, html.calm .guide, html.calm .rail, html.calm .controls { display: none; }
+  html.calm .station { position: static; clip-path: none; transform: none; width: auto !important; max-width: 44rem; }
+  html.calm .top.pre-mode .brand, html.calm .top.pre-mode .pill { background: var(--paper); color: var(--ink); border-color: var(--line); }
+  html.calm .pre, html.calm .pre-text h1, html.calm .pre-text p { display: none; }
+  html.calm .pre-text { position: static; transform: none; padding-top: 90px; }
+  html.calm .stage { clip-path: none; }
+  html.calm body, html.calm body.dark { background: var(--paper); color: var(--ink); }
+</style>
 </head>
+<body class="dark">
+<div class="progress" id="progress" aria-hidden="true"></div>
+<canvas class="bg" id="bg" aria-hidden="true"></canvas>
+<canvas class="routecv" id="routecv" aria-hidden="true"></canvas>
+<canvas class="pre" id="pre" aria-hidden="true"></canvas>
+<svg class="geom" aria-hidden="true"><path id="geom-path" d=""/></svg>
+<header class="top pre-mode" id="top">
+  <a class="brand" href="#top">Tiaki Mai Rā</a>
+  <div style="display:flex;gap:8px;align-items:center">
+    <a class="pill" href="#legal" id="legal-link">Legal</a>
+    <button class="pill" id="sound-toggle" aria-pressed="false" type="button">♪ Sound off</button>
+    <button class="pill" id="motion-toggle" aria-pressed="false" type="button">Calm motion</button>
+  </div>
+</header>
+<div class="pre-text" id="pre-text"><h1 id="pre-l1"></h1><p id="pre-l2"></p><a class="cta" href="#core" id="pre-enter">Enter</a></div>
+<nav class="rail" id="rail" aria-label="Branches"></nav>
+<div class="controls"><button type="button" id="prev" aria-label="Previous">←</button><button type="button" id="next" aria-label="Next">→</button><span class="count" id="count"></span></div>
+<div class="stage" id="stage"><div class="world" id="world"></div></div>
+<svg class="guide" id="guide" aria-hidden="true">
+  <defs><filter id="goo" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="goo"/><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></defs>
+  <g id="g-body" filter="url(#goo)"><path id="head" class="head" d=""/></g>
+</svg>
+<div class="scroller" id="scroller" aria-hidden="true"></div>
+<p class="sr" id="live" aria-live="polite"></p>
+<script src="home-data.js"></script>
+<script src="sound.js"></script>
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v)), lerp = (a, b, t) => a + (b - a) * t;
+const easeIO = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2, easeOut = t => 1 - Math.pow(1 - t, 3);
+const D = window.HOME; const nodes = D.nodes; const phases = D.phases; const phaseOf = id => phases.find(p => p.id === id) || phases[0];
+const SND = window.TMR_SOUND; SND.init($('#sound-toggle')); SND.ambient('digital');
+$('#pre-l1').textContent = D.prelude.line1; $('#pre-l2').textContent = D.prelude.line2;
 
-<body>
-    <!-- ===== NAVIGATION ===== -->
-    <header class="nav" id="main-nav">
-        <a href="/" class="nav__logo" id="nav-logo">
-            <img src="assets/images/logo.png" alt="Tiaki Mai Rā Logo" class="nav__logo-img">
-        </a>
-        <nav class="nav__links" id="nav-links">
-            <a href="#home" class="nav__link" id="nav-home">HOME</a>
-            <a href="#projects" class="nav__link" id="nav-projects">PROJECTS</a>
-            <a href="#testimonials" class="nav__link" id="nav-testimonials">TESTIMONIALS</a>
-            <a href="#contact" class="nav__link" id="nav-contact">CONTACT</a>
-        </nav>
-        <a href="#contact" class="nav__cta" id="nav-cta">GET IN TOUCH</a>
-        <button class="nav__hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-    </header>
+document.addEventListener('transitionend', e => { if (e.propertyName === 'clip-path' && e.target.classList && e.target.classList.contains('station')) { if (e.target.classList.contains('on')) e.target.classList.add('settled'); } });
+const mq = matchMedia('(prefers-reduced-motion: reduce)'); const toggle = $('#motion-toggle'); let calm = mq.matches;
+const applyCalm = () => { document.documentElement.classList.toggle('calm', calm); toggle.setAttribute('aria-pressed', String(calm)); layout(); };
+toggle.addEventListener('click', () => { calm = !calm; applyCalm(); }); mq.addEventListener('change', e => { calm = e.matches; applyCalm(); });
 
-    <!-- ===== MOBILE MENU ===== -->
-    <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-        <a href="#home" class="mobile-menu__link">HOME</a>
-        <a href="#projects" class="mobile-menu__link">PROJECTS</a>
-        <a href="#testimonials" class="mobile-menu__link">TESTIMONIALS</a>
-        <a href="#contact" class="mobile-menu__link">CONTACT</a>
-        <a href="#contact" class="mobile-menu__link mobile-menu__cta">GET IN TOUCH</a>
-    </div>
+// ---------- graph layout: positions from parent + angle + distance; route through nodes in order
+let vw = innerWidth, vh = innerHeight, narrow = false; const PRE_VH = 2.4, OUT_VH = 3.4;   // viewport-heights of scroll spent approaching the cube, and leaving it at the end
+const world = $('#world'); let pts = [], marks = [], samples = [], routePath = null, routeLen = 0, W = 0, H = 0, phaseStartL = [], pos = {};
+const rcv = $('#routecv'), rctx = rcv.getContext('2d');
+function build() {
+  narrow = vw < 900; const k = narrow ? .62 : 1;
+  pos = {}; nodes.forEach(n => { if (!n.parent) { pos[n.id] = { x: 0, y: 0 }; return; } const p = pos[n.parent]; const a = n.angle * Math.PI / 180; const leaf = n.parent !== 'core' ? 1.38 : 1;   // leaves sit further out so their cards never cover the branch card
+    pos[n.id] = { x: p.x + Math.cos(a) * n.r * k * leaf, y: p.y + Math.sin(a) * n.r * k * leaf }; });
+  pts = nodes.map(n => pos[n.id]);
+  // stations first, so their measured heights can push overlapping cards apart before the route is drawn
+  world.innerHTML = ''; const cardW = narrow ? Math.min(460, vw * .86) : 460; const offX = narrow ? -cardW / 2 : 46, offY = narrow ? 40 : -120;
+  const els = nodes.map((n, i) => { const ph = phaseOf(n.phase); const c = n.accent || ph.colour; const el = document.createElement('article'); el.className = 'station' + (i === 0 ? ' core' : ''); el.id = 'st-' + i; el.style.setProperty('--c', c); el.style.width = cardW + 'px';
+    const items = n.items ? `<div class="chips">${n.items.map(x => `<span class="chip">${esc(x)}</span>`).join('')}</div>` : '';
+    const links = [];
+    if (n.journey) links.push(`<a class="cta accent" href="/journey.html#${n.journey}">Travel the ${esc(n.title)} roadmap →</a>`);
+    (n.links || []).forEach(l => links.push(`<a class="cta ghost" href="${l.href}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`));
+    if (i === 0) links.push(`<a class="cta ghost" href="#st-1">Begin →</a>`);
+    const photo = n.photo !== undefined ? (n.photo ? `<img class="avatar" src="${n.photo}" alt="${esc(n.title)}">` : '<span class="avatar ph" aria-hidden="true"></span>') : '';
+    const form = n.form ? `<form class="mini" id="contact-form" action="https://formspree.io/f/mgodwywl" method="POST"><input type="text" name="name" placeholder="Name" aria-label="Name" required autocomplete="name"><input type="email" name="email" placeholder="Email" aria-label="Email" required autocomplete="email"><textarea name="message" rows="3" placeholder="Your project" aria-label="Message" required></textarea><input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><p class="notice" style="font-size:.74rem;color:var(--ink-3)">We use what you send only to reply to you. <a href="legal.html#privacy">Privacy statement</a>.</p><button class="cta" type="submit">Send</button><p class="form-status" aria-live="polite" style="font-size:.8rem;margin-top:.5rem"></p></form>` : '';
+    el.innerHTML = `<i class="glyph ${n.shape || ph.shape}" style="position:absolute;right:14px;top:12px;width:14px;height:14px;background:${c}"></i><div class="st-body"><span class="kicker">${esc(n.kicker)} </span>${photo}<h3>${esc(n.title)}</h3>${(n.body || []).map(b => `<p>${esc(b)}</p>`).join('')}${items}${form}${links.length ? `<div class="st-links">${links.join('')}</div>` : ''}</div>`;
+    world.appendChild(el); return el; });
+  const hs = els.map(el => el.offsetHeight || 260);
+  // relax: leaves (and branch hubs, more slowly) slide apart until no two cards overlap; the core stays put
+  const wgt = nodes.map(n => !n.parent ? 0 : n.parent === 'core' ? .25 : 1); const M = 28;
+  for (let it = 0; it < 60; it++) { let moved = 0; for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const a = pts[i], b = pts[j]; if (!wgt[i] && !wgt[j]) continue;
+      const ax0 = a.x + offX - M, ay0 = a.y + offY - M, ax1 = ax0 + cardW + 2 * M, ay1 = ay0 + hs[i] + 2 * M; const bx0 = b.x + offX - M, by0 = b.y + offY - M, bx1 = bx0 + cardW + 2 * M, by1 = by0 + hs[j] + 2 * M;
+      const ox = Math.min(ax1, bx1) - Math.max(ax0, bx0), oy = Math.min(ay1, by1) - Math.max(ay0, by0); if (ox <= 0 || oy <= 0) continue; moved++;
+      const tw = wgt[i] + wgt[j]; const acx = (ax0 + ax1) / 2, bcx = (bx0 + bx1) / 2, acy = (ay0 + ay1) / 2, bcy = (by0 + by1) / 2;
+      if (ox < oy) { const sgn = acx <= bcx ? 1 : -1; a.x -= sgn * ox * wgt[i] / tw * .55; b.x += sgn * ox * wgt[j] / tw * .55; } else { const sgn = acy <= bcy ? 1 : -1; a.y -= sgn * oy * wgt[i] / tw * .55; b.y += sgn * oy * wgt[j] / tw * .55; } }
+    if (!moved) break; }
+  const minX = Math.min(...pts.map(p => p.x)) - 900, minY = Math.min(...pts.map(p => p.y)) - 900; pts = pts.map(p => ({ x: p.x - minX, y: p.y - minY })); nodes.forEach((n, i) => pos[n.id] = pts[i]);
+  W = Math.max(...pts.map(p => p.x)) + 1100; H = Math.max(...pts.map(p => p.y)) + 1000;
+  els.forEach((el, i) => { const p = pts[i]; el.style.left = (p.x + offX) + 'px'; el.style.top = (p.y + offY) + 'px'; });
+  const rp = []; for (let i = 0; i < pts.length; i++) { rp.push(pts[i]); if (i < pts.length - 1) { const a = pts[i], b = pts[i + 1]; const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1; let nx = -dy / L, ny = dx / L; if (Math.abs(dx) >= Math.abs(dy) ? ny > 0 : nx > 0) { nx = -nx; ny = -ny; } const bul = Math.min(220, L * .28); rp.push({ x: (a.x + b.x) / 2 + nx * bul, y: (a.y + b.y) / 2 + ny * bul }); } }
+  let d = `M ${rp[0].x} ${rp[0].y}`; for (let i = 0; i < rp.length - 1; i++) { const p0 = rp[Math.max(i - 1, 0)], p1 = rp[i], p2 = rp[i + 1], p3 = rp[Math.min(i + 2, rp.length - 1)]; d += ` C ${p1.x + (p2.x - p0.x) / 6} ${p1.y + (p2.y - p0.y) / 6} ${p2.x - (p3.x - p1.x) / 6} ${p2.y - (p3.y - p1.y) / 6} ${p2.x} ${p2.y}`; }
+  world.style.width = W + 'px'; world.style.height = H + 'px';
+  routePath = $('#geom-path'); routePath.setAttribute('d', d); routeLen = routePath.getTotalLength();
+  samples = []; for (let s0 = 0; s0 <= routeLen; s0 += 10) { const q = routePath.getPointAtLength(s0); samples.push([s0, q.x, q.y]); }
+  marks = pts.map(p => { let best = 0, bd = 1e18; for (const [s0, x, y] of samples) { const dd = (x - p.x) ** 2 + (y - p.y) ** 2; if (dd < bd) { bd = dd; best = s0; } } return best; });
+  phaseStartL = phases.map(ph => { const first = nodes.findIndex(n => n.phase === ph.id); return first >= 0 ? marks[first] : routeLen; });
+  $('#rail').innerHTML = phases.map(ph => `<a href="#${nodes.findIndex(n => n.phase === ph.id)}" data-phase="${ph.id}" style="--c:${ph.colour}"><i></i><span>${esc(ph.name)}</span></a>`).join('');
+  $('#scroller').style.height = calm ? '0px' : ((PRE_VH + nodes.length + 1 + OUT_VH) * vh * 1.1) + 'px';
+}
 
-    <!-- ===== HERO SECTION ===== -->
-    <main>
-        <section class="hero" id="home">
+// ---------- scroll: prelude first (approach the cube), then the node system
+let L = 0, travelAmt = 0, idx = -1, curPhase = null, pre = 0, inside = false, wasInsideOnce = false, out = 0, needColour = true;
+function progress() {
+  if (calm) { inside = true; return; }
+  const max = Math.max(1, $('#scroller').offsetHeight - vh); const y = scrollY; const preLen = PRE_VH * vh * 1.1, outLen = OUT_VH * vh * 1.1, nodeLen = Math.max(1, max - preLen - outLen);
+  // the loop: past the last node the camera pulls back to show the whole network, the dark returns and the cube closes over it;
+  // the final frame is the first frame, so the page silently rewinds and you can go through again
+  out = clamp((y - preLen - nodeLen) / outLen, 0, 1);
+  if (out > .999) { scrollTo(0, 0); cam.z = 1.6; out = 0; }
+  pre = y < preLen ? clamp(y / preLen, 0, 1) : out > .5 ? 1 - easeIO((out - .5) * 2) : 1;
+  const wasInside = inside; inside = pre >= 1;
+  if (inside !== wasInside) { SND.ambient(inside ? 'organic' : 'digital'); if (inside) SND.enter(); else SND.exit(); }
+  document.body.classList.toggle('dark', pre < .92); $('#stage').classList.toggle('open', pre > .72); $('#top').classList.toggle('pre-mode', pre < .9);
+  $('#pre-text').style.opacity = String(clamp(1 - pre * 2.2, 0, 1));
+  $('#progress').style.width = (clamp(y / max, 0, 1) * 100).toFixed(2) + '%';
+  const t = clamp((y - preLen) / nodeLen, 0, 1); const n = pts.length - 1; const u = t * n; let i = Math.floor(u), f = u - i; if (i >= n) { i = n; f = 0; }
+  const dwell = .4; const travel = f < dwell ? 0 : easeIO((f - dwell) / (1 - dwell)); L = out > 0 ? lerp(marks[n], routeLen, Math.min(1, out * 3)) : lerp(marks[i], marks[Math.min(i + 1, n)], travel); travelAmt = out > 0 ? 0 : travel;
+  const stIdx = inside ? clamp(Math.floor(u + .6), 0, nodes.length - 1) : -1;
+  $$('.station').forEach((el, k) => { el.classList.toggle('on', k <= stIdx); if (k > stIdx) el.classList.remove('settled'); el.classList.toggle('now', k === stIdx && out === 0); });
+  if (stIdx !== idx) { idx = stIdx; const nd = nodes[Math.max(0, idx)]; $('#count').textContent = idx < 0 ? (out > 0 ? 'Returning' : 'Approaching') : `${idx + 1} / ${nodes.length}`; $('#live').textContent = idx < 0 ? D.prelude.line1 : `${nd.title}. ${phaseOf(nd.phase).name}.`; if (idx >= 0) { history.replaceState(null, '', '#' + nd.id); if (inside && wasInsideOnce) SND.arrive(); } }
+  const ph = phaseOf(nodes[clamp(Math.round(u), 0, nodes.length - 1)].phase);
+  if (ph !== curPhase) { curPhase = ph; document.documentElement.style.setProperty('--guide', ph.colour); setShape(ph.shape); bgSet(ph.bg, ph.colour); $$('#rail a').forEach(a => a.classList.toggle('on', a.dataset.phase === ph.id)); energy = 1; if (inside && wasInsideOnce) SND.phase(phases.indexOf(ph)); }
+}
 
-            <div class="hero__orb hero__orb--left" id="hero-orb-left">
-                <div class="hero__orb-inner">
-                    <div class="hero__orb-void"></div>
-                    <div class="hero__orb-ring hero__orb-ring--1"></div>
-                    <div class="hero__orb-ring hero__orb-ring--2"></div>
-                    <div class="hero__orb-ring hero__orb-ring--3"></div>
-                    <div class="hero__orb-ring hero__orb-ring--4"></div>
-                    <div class="hero__orb-ring hero__orb-ring--5"></div>
-                </div>
-            </div>
-            <div class="hero__orb hero__orb--right" id="hero-orb-right">
-                <div class="hero__orb-inner">
-                    <div class="hero__orb-void"></div>
-                    <div class="hero__orb-ring hero__orb-ring--1"></div>
-                    <div class="hero__orb-ring hero__orb-ring--2"></div>
-                    <div class="hero__orb-ring hero__orb-ring--3"></div>
-                    <div class="hero__orb-ring hero__orb-ring--4"></div>
-                    <div class="hero__orb-ring hero__orb-ring--5"></div>
-                </div>
-            </div>
+// ---------- camera
+const cam = { x: 0, y: 0, z: 1, vx: 0, vy: 0 };
+function camera(dt) {
+  if (calm) return null; const rp = routePath.getPointAtLength(L); const core = pts[0];
+  const zFit = Math.min(vw / W, vh / H) * .92; const k = easeIO(Math.min(1, out * 2));        // out: pull back until the whole network fits, centred on the core
+  const zoomIn = out > 0 ? (inside ? lerp(1, zFit, k) : zFit * lerp(1, .45, easeIO((out - .5) * 2))) : inside ? 1 : lerp(1.6, 1, easeOut(pre));        // we arrive from above: the world settles from 1.6× to 1× as we enter
+  cam.z += (zoomIn - cam.z) * (out > 0 ? .04 : .06) * dt; if (Math.abs(zoomIn - cam.z) < .0006) cam.z = zoomIn;   // snap, or the creeping scale re-rasterises the world every frame
+  const p = { x: lerp(rp.x, core.x, k), y: lerp(rp.y, core.y, k) };
+  const ax = lerp(narrow ? vw * .5 : vw * .42, vw * .5, k), ay = lerp(narrow ? vh * .3 : vh * .5, vh * .5, k); const tx = ax - p.x * cam.z, ty = ay - p.y * cam.z;
+  if (!inside && pre < .6 && out === 0) { cam.x = tx; cam.y = ty; cam.vx = cam.vy = 0; } else { cam.vx = (cam.vx + (tx - cam.x) * .06) * .8; cam.vy = (cam.vy + (ty - cam.y) * .06) * .8; cam.x += cam.vx * dt; cam.y += cam.vy * dt; }
+  if (Math.abs(tx - cam.x) < .08 && Math.abs(cam.vx) < .02) { cam.x = tx; cam.vx = 0; } if (Math.abs(ty - cam.y) < .08 && Math.abs(cam.vy) < .02) { cam.y = ty; cam.vy = 0; }
+  const tf = `translate(${cam.x.toFixed(1)}px, ${cam.y.toFixed(1)}px) scale(${cam.z.toFixed(4)})`; if (tf !== cam.tf) { cam.tf = tf; world.style.transform = tf; } return { x: p.x * cam.z + cam.x, y: p.y * cam.z + cam.y };
+}
 
-            <!-- Spline 3D Robot — Cinematic hero background -->
-            <div class="hero__spline-robot" id="hero-spline-robot">
-                <div class="hero__spline-loader" id="spline-loader">
-                    <div class="hero__spline-loader-pulse"></div>
-                </div>
-                <spline-viewer url="https://prod.spline.design/Y9ut7mO0JN3DIM9l/scene.splinecode"
-                    id="spline-robot-viewer"></spline-viewer>
-            </div>
+// ---------- the node graph + the glowing route, drawn in viewport space
+const seedOf = s => { let h = 0; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
+const srnd = seed => () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+function phaseAtL(l) { let k = 0; for (let i = 1; i < phases.length; i++) if (l >= phaseStartL[i]) k = i; return phases[k]; }
+function drawRoute() {
+  const c = rctx; c.clearRect(0, 0, vw, vh); if (!samples.length) return; const toV = (x, y) => [x * cam.z + cam.x, y * cam.z + cam.y];
+  const dark = matchMedia('(prefers-color-scheme: dark)').matches; const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  // graph edges (parent → child) and satellite dots: the node system
+  nodes.forEach((n, i) => { const p = pts[i]; const [X, Y] = toV(p.x, p.y); if (X < -600 || X > vw + 600 || Y < -600 || Y > vh + 600) return; const col = n.accent || phaseOf(n.phase).colour; const visited = i <= idx;
+    if (n.parent) { const q = pos[n.parent]; const [QX, QY] = toV(q.x, q.y); c.globalAlpha = visited ? .35 : .16; c.strokeStyle = ink; c.lineWidth = 1; c.beginPath(); c.moveTo(QX, QY); c.lineTo(X, Y); c.stroke(); }
+    const r = srnd(seedOf(n.id)); const sats = 3 + Math.floor(r() * 4);
+    for (let k = 0; k < sats; k++) { const a = r() * Math.PI * 2, d = (40 + r() * 90) * cam.z, rr = (1.5 + r() * 3.5) * cam.z; const sx = X + Math.cos(a) * d, sy = Y + Math.sin(a) * d; c.globalAlpha = (visited ? .5 : .22); c.strokeStyle = ink; c.lineWidth = .8; c.beginPath(); c.moveTo(X, Y); c.lineTo(sx, sy); c.stroke(); c.fillStyle = col; c.globalAlpha = visited ? .7 : .3; c.beginPath(); c.arc(sx, sy, rr, 0, 7); c.fill(); }
+    c.fillStyle = col; c.globalAlpha = visited ? .95 : .4; c.beginPath(); c.arc(X, Y, (n.size || 12) * cam.z, 0, 7); c.fill();
+    if (i === idx) { c.globalAlpha = .25; c.strokeStyle = col; c.lineWidth = 2; c.beginPath(); c.arc(X, Y, ((n.size || 12) + 10) * cam.z, 0, 7); c.stroke(); } });
+  // dim route
+  c.setLineDash([3, 9]); c.lineWidth = 1.5; c.strokeStyle = ink; c.globalAlpha = .14; c.beginPath(); let pen = false;
+  for (const [s0, x, y] of samples) { const [X, Y] = toV(x, y); const vis = X > -200 && X < vw + 200 && Y > -200 && Y < vh + 200; if (vis) { if (!pen) { c.moveTo(X, Y); pen = true; } else c.lineTo(X, Y); } else pen = false; } c.stroke(); c.setLineDash([]);
+  // lit route, phase-coloured, three passes
+  for (const [w, a] of [[22, dark ? .2 : .1], [8, dark ? .38 : .22], [2.4, .95]]) { c.lineWidth = w; c.globalAlpha = a; let cur = null; c.beginPath();
+    for (const [s0, x, y] of samples) { if (s0 > L) break; const ph = phaseAtL(s0); const [X, Y] = toV(x, y); if (ph !== cur) { if (cur) c.stroke(); c.beginPath(); c.strokeStyle = ph.colour; cur = ph; c.moveTo(X, Y); } else c.lineTo(X, Y); }
+    if (cur) { const q = routePath.getPointAtLength(L); const [X, Y] = toV(q.x, q.y); c.lineTo(X, Y); c.stroke(); } }
+  c.globalAlpha = 1;
+}
 
-            <div class="hero__content">
-                <h1 class="hero__title" id="hero-title">
-                    We craft experiences beyond
-                    <span class="hero__title--italic">the&nbsp;imaginable</span>
-                </h1>
-                <p class="hero__subtitle" id="hero-subtitle">
-                    Fusing Generative AI, Immersive 3D, and Creative Technology<br>
-                    to Build What's Never Been Built Before
-                </p>
-                <a href="#contact" class="hero__cta" id="hero-cta">
-                    <span>START YOUR JOURNEY</span>
-                    <svg class="hero__cta-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="1.5"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </a>
-            </div>
+// ---------- the prelude: a tesseract in dark space, code streaming in along three axes
+const pcv = $('#pre'), pctx = pcv.getContext('2d'); let pW = 0, pH = 0, pDPR = 1; const motes = [];
+function preResize() { pDPR = Math.min(1.5, devicePixelRatio || 1); pW = innerWidth; pH = innerHeight; pcv.width = pW * pDPR; pcv.height = pH * pDPR; pctx.setTransform(pDPR, 0, 0, pDPR, 0, 0); motes.length = 0; for (let i = 0; i < 140; i++) motes.push({ axis: i % 3, t: Math.random(), sp: .0015 + Math.random() * .003, g: Math.random() < .35 ? (Math.random() < .5 ? '0' : '1') : (Math.random() < .5 ? 'sq' : 'ring'), s: 2 + Math.random() * 4, side: Math.random() < .5 ? 1 : -1 }); }
+const AX = [[.86, -.5], [-.86, -.5], [0, 1]]; const AXC = ['#6fe7ff', '#ff5fb4', '#f3eee3'];   // isometric axes and their colours
+function project(v, R) { // v in cube space, R = rotation angles
+  let [x, y, z, w] = v; const [a, b, g] = R; // 4D → 3D: fold w into scale (the inner cube); 3D → 2D: isometric-ish with a slow turn
+  const sw = 1 + w * .45; x *= sw; y *= sw; z *= sw;
+  let x1 = x * Math.cos(a) - z * Math.sin(a), z1 = x * Math.sin(a) + z * Math.cos(a); let y1 = y * Math.cos(b) - z1 * Math.sin(b), z2 = y * Math.sin(b) + z1 * Math.cos(b);
+  const px = x1 * Math.cos(g) - y1 * Math.sin(g), py = x1 * Math.sin(g) + y1 * Math.cos(g); return [px, py, z2];
+}
+function drawPrelude(now) {
+  const c = pctx; c.clearRect(0, 0, pW, pH); if (calm || inside) { pcv.style.display = 'none'; return; } pcv.style.display = ''; pcv.style.opacity = String(clamp((1 - pre) * 3, 0, 1));
+  const cx = pW / 2, cy = pH * .47; const e = easeIO(pre); const size = lerp(Math.min(pW, pH) * .16, Math.min(pW, pH) * 1.9, Math.pow(pre, 2.2));
+  // axes with glow
+  for (let k = 0; k < 3; k++) { const [ax, ay] = AX[k]; const Lx = Math.max(pW, pH) * 1.3; for (const [w, a] of [[8, .08], [2.5, .25], [1, .9]]) { c.lineWidth = w; c.globalAlpha = a * (1 - e * .6); c.strokeStyle = AXC[k]; c.beginPath(); c.moveTo(cx - ax * Lx, cy - ay * Lx); c.lineTo(cx + ax * Lx, cy + ay * Lx); c.stroke(); } }
+  // motes: code and glyphs flowing toward the centre, faster the closer we get
+  c.font = `500 11px 'Hanken Grotesk', monospace`; c.textAlign = 'center'; c.textBaseline = 'middle';
+  for (const m of motes) { m.t -= m.sp * (1 + pre * 6); if (m.t < .02) { m.t = 1; if (Math.random() < .12) SND.tick(); } const [ax, ay] = AX[m.axis]; const dist = m.t * Math.max(pW, pH) * .9 * m.side; const px = cx + ax * dist + (-ay) * 18 * (m.axis - 1), py = cy + ay * dist + ax * 18 * (m.axis - 1); const al = clamp(1 - Math.abs(m.t - .5) * .4, .2, 1) * (1 - e * .5); c.globalAlpha = al; c.fillStyle = AXC[m.axis]; c.strokeStyle = AXC[m.axis]; c.lineWidth = 1;
+    if (m.g === '0' || m.g === '1') c.fillText(m.g, px, py); else if (m.g === 'sq') c.fillRect(px - m.s / 2, py - m.s / 2, m.s, m.s); else { c.beginPath(); c.rect(px - m.s / 2, py - m.s / 2, m.s, m.s); c.stroke(); } }
+  // the tesseract: outer cube (w = 0) and inner cube (w = -1), connected; turning slowly
+  const R = [now * .00025 + .6, .5 + Math.sin(now * .0002) * .12, -.1]; const V = []; for (let i = 0; i < 16; i++) V.push([(i & 1 ? 1 : -1), (i & 2 ? 1 : -1), (i & 4 ? 1 : -1), (i & 8 ? 0 : -1)]);
+  const P = V.map(v => project(v, R)).map(([x, y, z]) => [cx + x * size * .5, cy + y * size * .5, z]);
+  const edges = []; for (let i = 0; i < 16; i++) for (let j = i + 1; j < 16; j++) { const diff = (i ^ j); if ((diff & (diff - 1)) === 0) edges.push([i, j, (diff === 8)]); }   // vertices differing in one bit share an edge
+  // faces of the outer cube, faint white glass
+  c.globalAlpha = .07 * (1 - e * .3); c.fillStyle = '#ffffff'; const faces = [[0, 1, 3, 2], [4, 5, 7, 6], [0, 1, 5, 4], [2, 3, 7, 6], [0, 2, 6, 4], [1, 3, 7, 5]]; for (const f of faces) { c.beginPath(); f.forEach((vi, k) => { const [x, y] = P[vi + 8]; k ? c.lineTo(x, y) : c.moveTo(x, y); }); c.closePath(); c.fill(); }
+  for (const [w, a] of [[10, .08], [3, .35], [1.2, 1]]) { for (const [i, j, link] of edges) { const inner = i < 8 && j < 8; c.lineWidth = w * (inner ? .6 : 1); c.globalAlpha = a * (link ? .45 : inner ? .55 : 1) * (1 - e * .35); c.strokeStyle = link ? '#9ad7ff' : '#ffffff'; c.beginPath(); c.moveTo(P[i][0], P[i][1]); c.lineTo(P[j][0], P[j][1]); c.stroke(); } }
+  // core light
+  const g = c.createRadialGradient(cx, cy, 0, cx, cy, size * .55); g.addColorStop(0, 'rgba(255,255,255,.55)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.globalAlpha = .6 + .4 * Math.sin(now * .002) * .2; c.fillStyle = g; c.beginPath(); c.arc(cx, cy, size * .55, 0, 7); c.fill(); c.globalAlpha = 1;
+}
 
-            <!-- Hero Scroll Down Indicator -->
-            <div class="hero__scroll-indicator">
-                <div class="hero__scroll-mouse">
-                    <div class="hero__scroll-wheel"></div>
-                </div>
-                <!-- Double Chevron Down Arrow -->
-                <svg class="hero__scroll-arrows" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M6 7l6 6 6-6M6 13l6 6 6-6" stroke="var(--color-accent-azure)" stroke-width="2.5"
-                        stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </div>
-        </section>
+// ---------- the guide: same creature as the main site, leading slightly ahead along the route
+const K = 40, N = 10; const seg = Array.from({ length: N }, () => ({ x: vw * .42, y: vh * .5, r: 0 })); const head = { x: vw * .42, y: vh * .5 }, vel = { x: 0, y: 0 };
+const pointer = { x: -1, y: -1, active: false, lastMove: 0 }; let energy = 0, liquid = 0, shapeName = 'circle', shapeFrom = 'circle', shapeT = 1;
+const gBody = $('#g-body'), headPath = $('#head'); const circles = seg.map((_, i) => { const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('class', 'body'); if (i) gBody.appendChild(c); return c; });
+function polygon(n, rot) { const v = []; for (let i = 0; i < n; i++) { const a = rot + i / n * Math.PI * 2; v.push([Math.cos(a), Math.sin(a)]); } return v; }
+function sampleOutline(verts) { const segs = []; let total = 0; for (let i = 0; i < verts.length; i++) { const a = verts[i], b = verts[(i + 1) % verts.length]; const L2 = Math.hypot(b[0] - a[0], b[1] - a[1]); segs.push({ a, b, L: L2 }); total += L2; } const out = []; let si = 0, acc = 0; for (let k = 0; k < K; k++) { const d = k / K * total; while (d > acc + segs[si].L) { acc += segs[si].L; si++; } const s = segs[si], t = (d - acc) / s.L; out.push([lerp(s.a[0], s.b[0], t), lerp(s.a[1], s.b[1], t)]); } return out; }
+const SHAPES = {};
+function polygon(n, rot) { const v = []; for (let i = 0; i < n; i++) { const a = rot + i / n * Math.PI * 2; v.push([Math.cos(a), Math.sin(a)]); } return v; }
+function sampleOutline(verts) { // K points by arc length along the closed polygon
+  const segs = []; let total = 0;
+  for (let i = 0; i < verts.length; i++) { const a = verts[i], b = verts[(i + 1) % verts.length]; const L = Math.hypot(b[0] - a[0], b[1] - a[1]); segs.push({ a, b, L }); total += L; }
+  const out = []; let si = 0, acc = 0;
+  for (let k = 0; k < K; k++) { const d = k / K * total; while (d > acc + segs[si].L) { acc += segs[si].L; si++; } const s = segs[si], t = (d - acc) / s.L; out.push([lerp(s.a[0], s.b[0], t), lerp(s.a[1], s.b[1], t)]); }
+  return out;
+}
+SHAPES.circle = sampleOutline(polygon(K, -Math.PI / 2));
+SHAPES.square = sampleOutline(polygon(4, -Math.PI / 4).map(([x, y]) => [x * 1.05, y * 1.05]));
+SHAPES.triangle = sampleOutline(polygon(3, -Math.PI / 2).map(([x, y]) => [x * 1.15, y * 1.15 + .12]));
+SHAPES.hexagon = sampleOutline(polygon(6, 0));
+SHAPES.diamond = sampleOutline(polygon(4, -Math.PI / 2).map(([x, y]) => [x * .8, y * 1.15]));
 
-        <!-- ===== TRUSTED BY SECTION ===== -->
-        <section class="trusted" id="trusted">
-            <p class="trusted__label" id="trusted-label">TRUSTED BY LEADING INNOVATORS WORLDWIDE</p>
-            <div class="trusted__logos" id="trusted-logos">
-                <!-- Placeholder logos — replace with actual brand logos later -->
-                <div class="trusted__logo" id="trusted-logo-1">
-                    <svg class="trusted__logo-svg" width="120" height="36" viewBox="0 0 120 36" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <rect x="0" y="8" width="20" height="20" rx="4" fill="currentColor" opacity="0.6" />
-                        <rect x="28" y="10" width="92" height="6" rx="3" fill="currentColor" opacity="0.4" />
-                        <rect x="28" y="20" width="60" height="6" rx="3" fill="currentColor" opacity="0.25" />
-                    </svg>
-                </div>
-                <div class="trusted__logo" id="trusted-logo-2">
-                    <svg class="trusted__logo-svg" width="110" height="36" viewBox="0 0 110 36" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="18" cy="18" r="12" fill="currentColor" opacity="0.5" />
-                        <circle cx="18" cy="18" r="7" fill="white" opacity="0.8" />
-                        <rect x="36" y="12" width="74" height="6" rx="3" fill="currentColor" opacity="0.4" />
-                        <rect x="36" y="22" width="50" height="4" rx="2" fill="currentColor" opacity="0.2" />
-                    </svg>
-                </div>
-                <div class="trusted__logo" id="trusted-logo-3">
-                    <svg class="trusted__logo-svg" width="100" height="36" viewBox="0 0 100 36" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <polygon points="14,4 24,28 4,28" fill="currentColor" opacity="0.5" />
-                        <rect x="30" y="10" width="70" height="6" rx="3" fill="currentColor" opacity="0.4" />
-                        <rect x="30" y="20" width="45" height="6" rx="3" fill="currentColor" opacity="0.25" />
-                    </svg>
-                </div>
-                <div class="trusted__logo" id="trusted-logo-4">
-                    <svg class="trusted__logo-svg" width="115" height="36" viewBox="0 0 115 36" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <rect x="0" y="6" width="12" height="24" rx="2" fill="currentColor" opacity="0.45" />
-                        <rect x="15" y="10" width="12" height="16" rx="2" fill="currentColor" opacity="0.35" />
-                        <rect x="30" y="14" width="12" height="8" rx="2" fill="currentColor" opacity="0.5" />
-                        <rect x="50" y="12" width="65" height="6" rx="3" fill="currentColor" opacity="0.4" />
-                        <rect x="50" y="22" width="42" height="4" rx="2" fill="currentColor" opacity="0.2" />
-                    </svg>
-                </div>
-                <div class="trusted__logo" id="trusted-logo-5">
-                    <svg class="trusted__logo-svg" width="105" height="36" viewBox="0 0 105 36" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14 6 L26 18 L14 30 L2 18Z" fill="currentColor" opacity="0.5" />
-                        <rect x="34" y="11" width="71" height="6" rx="3" fill="currentColor" opacity="0.4" />
-                        <rect x="34" y="21" width="48" height="5" rx="2.5" fill="currentColor" opacity="0.22" />
-                    </svg>
-                </div>
-            </div>
-        </section>
+function setShape(name) { if (name === shapeName) return; shapeFrom = shapeName; shapeName = name; shapeT = 0; liquid = 1; if (inside) SND.morph(); }
+function drawHead(now, radius) { const A = SHAPES[shapeFrom], B = SHAPES[shapeName]; const t = calm ? 1 : shapeT; const e = easeIO(t); const wob = calm ? 0 : (.035 + .22 * liquid); let d = ''; for (let k = 0; k < K; k++) { const ph = k / K * Math.PI * 2; const n = Math.sin(ph * 3 + now * .0021) * .6 + Math.sin(ph * 5 - now * .0034) * .3 + Math.sin(ph * 2 + now * .0013) * .4; const s = 1 + wob * n; const x = lerp(A[k][0], B[k][0], e) * radius * s, y = lerp(A[k][1], B[k][1], e) * radius * s; d += (k ? ' L ' : 'M ') + (head.x + x).toFixed(1) + ' ' + (head.y + y).toFixed(1); } headPath.setAttribute('d', d + ' Z'); }
 
-        <!-- ===== PROJECTS SECTION ===== -->
-        <section class="projects" id="projects">
-            <!-- Spline 3D Background -->
-            <div class="projects__spline-bg" id="projects-spline-bg">
-                <div class="spline-lazy" data-spline-url="https://prod.spline.design/tyWEALp7LIbK8lej/scene.splinecode" data-spline-id="projects-spline-viewer" aria-hidden="true"></div>
-            </div>
+// ---------- living backgrounds (same engine as the main site)
+const bgCanvas = $('#bg'), bctx = bgCanvas.getContext('2d'); let bgW = 0, bgH = 0, bgDPR = 1, bgReading = null;
+const BG = { cur: null, prev: null, fade: 1, color: '#16130f', rgb: [22, 19, 15], t0: performance.now() };
+const rnd = (() => { let x = 12345; return () => (x = (x * 1664525 + 1013904223) >>> 0) / 4294967296; })();
+const smooth = t => t * t * (3 - 2 * t);
+const fall = (d, R) => d >= R ? 0 : smooth(1 - d / R);
+function readingMask(x, y) {           // 1 in the open, ~.25 over the reading column, soft edge
+  if (!bgReading) return 1; const r = bgReading, pad = 36;
+  const dx = Math.max(r.left - pad - x, 0, x - (r.right + pad)), dy = Math.max(r.top - pad - y, 0, y - (r.bottom + pad));
+  const d = Math.hypot(dx, dy); return .1 + .9 * smooth(Math.min(1, d / 170));
+}
+function hexToRgb(h) { h = h.trim(); if (h.startsWith('#')) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; } const m = h.match(/\d+/g); return m ? m.slice(0, 3).map(Number) : [22, 19, 15]; }
+function ink(a) { const [r, g, b] = BG.rgb; return `rgba(${r},${g},${b},${a})`; }
 
-            <div class="projects__content">
-                <p class="projects__label scroll-reveal" id="projects-label">SELECTED WORK</p>
-                <h2 class="projects__heading scroll-reveal" id="projects-heading">Projects that push<br><span
-                        class="projects__heading--italic">boundaries</span></h2>
-
-                <!-- 3D perspective carousel.
-                     The first four cards are featured (glowing border).
-                     My Story additionally gets `is-hero` (brightest glow) and
-                     is the default-active card. Cards further back fade into
-                     the dark background; tap a back card to bring it forward,
-                     tap the front card to open the detail panel with a link
-                     to the project page. JS controller in js/script.js
-                     (class ProjectsCarousel).
-
-                     The .proj-carousel-pin wrapper goes sticky on mobile
-                     so the carousel pins to the viewport while the user
-                     scrolls through all 11 cards before continuing to
-                     the next section. -->
-                <div class="proj-carousel-pin" id="projects-carousel-pin">
-                <div class="proj-carousel scroll-reveal" id="projects-carousel"
-                     role="region" aria-roledescription="carousel" aria-label="Selected projects">
-                    <div class="proj-carousel__stage">
-                        <ol class="proj-carousel__track" id="proj-track">
-                            <li class="proj-card is-featured is-hero" data-idx="0"
-                                data-href="my-story/" data-target="_self"
-                                tabindex="0" role="button"
-                                aria-label="My Story project"
-                                style="--card-bg: linear-gradient(200deg, #7DD3FC 0%, #0077B6 45%, #020617 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">Personal · Scroll Cinema</span>
-                                        <strong class="proj-card__name">My Story</strong>
-                                        <p class="proj-card__quote">A scroll-driven cinematic memoir told as eleven drifting islands — a personal journey through the places, people, and craft that have shaped a life.</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="proj-card is-featured" data-idx="1"
-                                data-href="guardians-of-matariki/" data-target="_self"
-                                tabindex="0" role="button"
-                                aria-label="Guardians of Matariki project"
-                                style="--card-bg: linear-gradient(135deg, #0077B6 0%, #00D4FF 60%, #7DD3FC 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">XR · VisionOS</span>
-                                        <strong class="proj-card__name">Guardians of Matariki</strong>
-                                        <p class="proj-card__quote">An immersive spatial storytelling experience for Apple VisionOS, bridging cutting-edge RealityKit environments with indigenous cultural narratives.</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="proj-card is-featured" data-idx="2"
-                                data-href="kinsafe/" data-target="_self"
-                                tabindex="0" role="button"
-                                aria-label="KINSafe project"
-                                style="--card-bg: linear-gradient(170deg, #00A8E8 0%, #7DD3FC 30%, #0077B6 70%, #020617 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">AR · Safety Protocols</span>
-                                        <strong class="proj-card__name">KINSafe</strong>
-                                        <p class="proj-card__quote">An innovative proof-of-concept augmented reality toolkit, engineered to gamify and visualize critical hazard identification in the field.</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="proj-card is-featured" data-idx="3"
-                                data-href="https://youtu.be/ezRUdjYpfCM?si=EBV8lt5MTKJsWo0j" data-target="_blank"
-                                tabindex="0" role="button"
-                                aria-label="Microsoft HoloLens project"
-                                style="--card-bg: linear-gradient(180deg, #7DD3FC 0%, #00A8E8 40%, #020617 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">Mixed Reality</span>
-                                        <strong class="proj-card__name">Microsoft HoloLens</strong>
-                                        <p class="proj-card__quote">A comprehensive spatial industrial training module engineered specifically for HoloLens 2 hardware, transforming complex workflows.</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="proj-card" data-idx="4"
-                                data-href="https://youtu.be/n2o9SX4FM3c" data-target="_blank"
-                                tabindex="0" role="button"
-                                aria-label="HoloLens 2 MRTK project"
-                                style="--card-bg: linear-gradient(110deg, #0A0F1A 0%, #0077B6 40%, #00D4FF 80%, #7DD3FC 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">XR · Software Dev</span>
-                                        <strong class="proj-card__name">HoloLens 2 MRTK</strong>
-                                        <p class="proj-card__quote">An intensive software development exploration of the Mixed Reality Toolkit (MRTK) SDK, prototyping advanced spatial interactions for HoloLens 2.</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="proj-card" data-idx="5"
-                                data-href="https://www.linkedin.com/posts/thomas-perese-140441190_mentalwellness-immersivetechnology-vrtraining-activity-6981319841764827136-eb1U?utm_source=share&utm_medium=member_desktop&rcm=ACoAACzqO4ABsgDZSxdOosHSbz38uYWFHW-3hwM"
-                                data-target="_blank"
-                                tabindex="0" role="button"
-                                aria-label="SkillsVR Training Modules project"
-                                style="--card-bg: linear-gradient(160deg, #020617 0%, #0A0F1A 40%, #0077B6 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">VR · Enterprise</span>
-                                        <strong class="proj-card__name">SkillsVR Training Modules</strong>
-                                        <p class="proj-card__quote">High-fidelity, interactive VR safety simulations architected in Unity to deliver scalable, hyper-realistic instructional design.</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="proj-card" data-idx="6"
-                                data-href="https://youtu.be/cHgGJdDxML8?si=fxr7_j06RbcumndU" data-target="_blank"
-                                tabindex="0" role="button"
-                                aria-label="Indigenous AR Concepts project"
-                                style="--card-bg: linear-gradient(120deg, #1B3A5C 0%, #00A8E8 50%, #00D4FF 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">AR · Mobile Prototypes</span>
-                                        <strong class="proj-card__name">Indigenous AR Concepts</strong>
-                                        <p class="proj-card__quote">Bespoke iOS augmented reality prototypes leveraging ARKit to seamlessly weave traditional Māori and Polynesian narratives into the physical world.</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="proj-card" data-idx="7"
-                                data-href="https://youtu.be/CEmShMY31d4?si=II7od-1hXOzZlOoH" data-target="_blank"
-                                tabindex="0" role="button"
-                                aria-label="Smart Stop project"
-                                style="--card-bg: linear-gradient(200deg, #00D4FF 0%, #0077B6 60%, #0A0F1A 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">IoT · Mobile Infrastructure</span>
-                                        <strong class="proj-card__name">Smart Stop</strong>
-                                        <p class="proj-card__quote">An integrated IoT passenger mobile application designed to orchestrate seamless, real-time communication protocols between urban bus fleets and commuters.</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="proj-card" data-idx="8"
-                                data-href="https://youtu.be/OfG2aAhmLfo?si=V5wdXjJYXBlcV-xc" data-target="_blank"
-                                tabindex="0" role="button"
-                                aria-label="Tiaki AI Chatbot project"
-                                style="--card-bg: linear-gradient(90deg, #020617 0%, #1B3A5C 30%, #00A8E8 70%, #7DD3FC 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">AI · Conversational</span>
-                                        <strong class="proj-card__name">Tiaki AI (Chatbot)</strong>
-                                        <p class="proj-card__quote">An intelligent, LLM-powered natural language chatbot meticulously trained to deliver personalized, localized insights for the New Zealand tourism sector.</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="proj-card" data-idx="9"
-                                tabindex="0" role="button"
-                                aria-label="Accenture Song project"
-                                style="--card-bg: linear-gradient(145deg, #0077B6 0%, #020617 50%, #00D4FF 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">Strategy · Consulting</span>
-                                        <strong class="proj-card__name">Accenture Song</strong>
-                                        <p class="proj-card__quote">Digital transformation and creative technology strategies developed alongside global enterprise clients as a Business Analyst intern.</p>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="proj-card" data-idx="10"
-                                tabindex="0" role="button"
-                                aria-label="Full-Stack Architectures project"
-                                style="--card-bg: linear-gradient(135deg, #1B3A5C 0%, #00D4FF 100%)">
-                                <div class="proj-card__face">
-                                    <div class="proj-card__chrome">
-                                        <span class="proj-card__tag">Web · React UI</span>
-                                        <strong class="proj-card__name">Full-Stack Architectures</strong>
-                                        <p class="proj-card__quote">A diverse portfolio of high-performance modern web architectures driven by robust React frontends and dynamic, scalable full-stack environments.</p>
-                                    </div>
-                                </div>
-                            </li>
-                        </ol>
-                    </div>
-                    <div class="proj-carousel__hud" aria-hidden="true">
-                        <button type="button" class="proj-nav-btn proj-nav-btn--prev" id="proj-prev" aria-label="Previous project">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-                        </button>
-                        <div class="proj-carousel__counter">
-                            <span class="proj-carousel__counter-cur" id="proj-counter-cur">01</span>
-                            <span class="proj-carousel__counter-sep">/</span>
-                            <span class="proj-carousel__counter-tot" id="proj-counter-tot">11</span>
-                        </div>
-                        <button type="button" class="proj-nav-btn proj-nav-btn--next" id="proj-next" aria-label="Next project">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-                        </button>
-                    </div>
-                </div>
-                </div><!-- /.proj-carousel-pin -->
-            </div>
-        </section>
-
-        <!-- ===== TESTIMONIALS SECTION ===== -->
-        <section class="testimonials" id="testimonials">
-            <!-- ===== CLOUDINARY VIDEO SEPARATOR: externally hosted, no Netlify video bandwidth ===== -->
-            <div class="section-separator" aria-hidden="true">
-                <video
-                    class="section-separator__video"
-                    src="https://res.cloudinary.com/dsqhj32yo/video/upload/q_auto/f_auto/v1778173238/AnimantedBridge_p5ctt2.mov"
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                    preload="metadata">
-                </video>
-            </div>
-
-            <div class="testimonials__sticky-wrapper">
-                <div class="testimonials__spline-bg" id="testimonials-spline-bg">
-                    <div class="spline-lazy" data-spline-url="https://prod.spline.design/RT2Mz6w07HyIAY05/scene.splinecode" data-spline-id="testimonials-spline-viewer" aria-hidden="true"></div>
-                </div>
-
-                <div class="testimonials__content">
-                    <p class="testimonials__label scroll-reveal">TRUSTED BY LEADING INNOVATORS WORLDWIDE</p>
-                    <h2 class="testimonials__heading scroll-reveal">Stories from our <br><span
-                            class="testimonials__heading--italic">community</span></h2>
-
-                    <div class="card-deck" id="card-deck">
-                        <div class="deck-card" data-index="0">
-                            <div class="deck-card__stars">★★★★★</div>
-                            <p class="deck-card__quote">Their innovative solutions and quick turnaround time made our
-                                collaboration incredibly successful. Highly recommended!</p>
-                            <div class="deck-card__author">
-                                <img class="deck-card__avatar"
-                                    src="https://media.licdn.com/dms/image/v2/D4E03AQEgq5a5gbYFIQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1664495146898?e=1778112000&v=beta&t=d1_3pk4hleWQmdkb09hFTHDEElZkIXtRwCx7GGDKLYM"
-                                    alt="Jon M. — Head of Global Marketing, Citi New York" loading="lazy" decoding="async" referrerpolicy="no-referrer">
-                                <div><strong class="deck-card__name">Jon M.</strong><span class="deck-card__role">Head
-                                        of Global Marketing, Citi New York</span></div>
-                            </div>
-
-                            <!-- Animated Scroll Hint (Only on Top Card) -->
-                            <div class="deck-scroll-hint">
-                                <div class="deck-scroll-hint__mouse">
-                                    <div class="deck-scroll-hint__wheel"></div>
-                                </div>
-                                <span>Scroll</span>
-                            </div>
-                        </div>
-                        <div class="deck-card" data-index="1">
-                            <div class="deck-card__stars">★★★★★</div>
-                            <p class="deck-card__quote">The level of detail and user experience in their work is
-                                exceptional. I'm thoroughly impressed with the final product.</p>
-                            <div class="deck-card__author">
-                                <img class="deck-card__avatar"
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYMUOxEy6LzZ7E78B60yCD3y-2am_J85mDAuVTMf2R7Vx4CM4M_T7fqv3fy1jnYIWlIofZ9k_62_oEkZ_L3nSyTClH6Q5E&s&ec=121635968"
-                                    alt="Marco B. — CEO, 3Ccodes New York" loading="lazy" decoding="async" referrerpolicy="no-referrer">
-                                <div><strong class="deck-card__name">Marco B.</strong><span class="deck-card__role">CEO,
-                                        3Ccodes New York</span></div>
-                            </div>
-
-                            <!-- Animated Scroll Hint -->
-                            <div class="deck-scroll-hint">
-                                <div class="deck-scroll-hint__mouse">
-                                    <div class="deck-scroll-hint__wheel"></div>
-                                </div>
-                                <span>Scroll</span>
-                            </div>
-                        </div>
-                        <div class="deck-card" data-index="2">
-                            <div class="deck-card__stars">★★★★★</div>
-                            <p class="deck-card__quote">Working with them was a game-changer for our project. Their
-                                expertise and professionalism exceeded our expectations.</p>
-                            <div class="deck-card__author">
-                                <img class="deck-card__avatar"
-                                    src="https://media.licdn.com/dms/image/v2/C5603AQFkjumkx-HAJg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1659605431994?e=1778112000&v=beta&t=9CZTHlMgIoDEgn6VNdDvpLTNJTdHeldQt3LH_SG8FJA"
-                                    alt="Donna P. — CEO, Chamber of Commerce New Zealand" loading="lazy" decoding="async" referrerpolicy="no-referrer">
-                                <div><strong class="deck-card__name">Donna P.</strong><span class="deck-card__role">CEO,
-                                        Chamber of Commerce, New Zealand</span></div>
-                            </div>
-
-                            <!-- Animated Scroll Hint -->
-                            <div class="deck-scroll-hint">
-                                <div class="deck-scroll-hint__mouse">
-                                    <div class="deck-scroll-hint__wheel"></div>
-                                </div>
-                                <span>Scroll</span>
-                            </div>
-                        </div>
-                        <div class="deck-card" data-index="3">
-                            <div class="deck-card__stars">★★★★★</div>
-                            <p class="deck-card__quote">The quality of work and communication throughout the project was
-                                outstanding. They delivered exactly what we needed.</p>
-                            <div class="deck-card__author">
-                                <img class="deck-card__avatar"
-                                    src="https://www.pwc.co.nz/people/2021/otene-hopa-500x500.jpg"
-                                    alt="Otene H. — National Cultural Lead, PwC New Zealand" loading="lazy" decoding="async" referrerpolicy="no-referrer">
-                                <div><strong class="deck-card__name">Otene H.</strong><span
-                                        class="deck-card__role">National Cultural Lead, PwC New Zealand</span></div>
-                            </div>
-
-                            <!-- Animated Scroll Hint -->
-                            <div class="deck-scroll-hint">
-                                <div class="deck-scroll-hint__mouse">
-                                    <div class="deck-scroll-hint__wheel"></div>
-                                </div>
-                                <span>Scroll</span>
-                            </div>
-                        </div>
-                        <div class="deck-card" data-index="4">
-                            <div class="deck-card__stars">★★★★★</div>
-                            <p class="deck-card__quote">Absolutely brilliant execution. The creative direction and
-                                technical skill combined to produce something truly special.</p>
-                            <div class="deck-card__author">
-                                <img class="deck-card__avatar"
-                                    src="https://media.licdn.com/dms/image/v2/D4D03AQHBMEy_Q8PFtQ/profile-displayphoto-crop_800_800/B4DZulZlW9IAAI-/0/1768006506361?e=1778112000&v=beta&t=xSTOP0U8157oZmlh1SC783rr36DEhw-_Xgl0X-ndw6g"
-                                    alt="Auon K. — Director, AWS New York" loading="lazy" decoding="async" referrerpolicy="no-referrer">
-                                <div><strong class="deck-card__name">Auon K.</strong><span
-                                        class="deck-card__role">Director, AWS New York</span></div>
-                            </div>
-
-                            <!-- Animated Scroll Hint -->
-                            <div class="deck-scroll-hint">
-                                <div class="deck-scroll-hint__mouse">
-                                    <div class="deck-scroll-hint__wheel"></div>
-                                </div>
-                                <span>Scroll</span>
-                            </div>
-
-                            <!-- Seamless Exit Hint (Hidden until finished) -->
-                            <div class="deck-final-hint">
-                                <svg class="hero__scroll-arrows" width="32" height="32" viewBox="0 0 24 24" fill="none">
-                                    <path d="M6 7l6 6 6-6M6 13l6 6 6-6" stroke="var(--color-accent-azure)"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+// Each pattern: init(w,h) then draw(ctx, t, px, py, w, h, A) where A is the global alpha budget for this pattern.
+const PATTERNS = {
+  // Guardians: dot halftone that grows and merges into a solid mass (R3)
+  dots: { init(w, h) { this.s = 34; }, draw(c, t, px, py, w, h, A) {
+    const s = this.s; for (let y = s / 2; y < h + s; y += s) for (let x = s / 2; x < w + s; x += s) {
+      const g = .18 + .62 * Math.pow(y / h, 1.4) + Math.sin(x * .01 + t * .0006) * .06;   // small at the top, fusing into a mass at the bottom
+      let r = s * g + 12 * fall(Math.hypot(x - px, y - py), 240);                  // pointer swells them until they fuse
+      if (r < .6) continue; c.globalAlpha = A * readingMask(x, y) * (r > s * .5 ? .9 : .7);
+      c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); } } },
+  // Tiaki: rounded-square halftone, dense at a centre that drifts toward the pointer (R2)
+  squares: { init(w, h) { this.s = 30; this.cx = w * .5; this.cy = h * .5; }, draw(c, t, px, py, w, h, A) {
+    const s = this.s; this.cx += ((px > 0 ? px : w * .5) - this.cx) * .04; this.cy += ((py > 0 ? py : h * .5) - this.cy) * .04;
+    const R = Math.max(w, h) * .75;
+    for (let y = s / 2; y < h + s; y += s) for (let x = s / 2; x < w + s; x += s) {
+      const d = Math.hypot(x - this.cx, y - this.cy); const k = Math.max(0, 1 - d / R); const size = s * .78 * Math.pow(k, .8) + 1.5;
+      if (size < 2.2) continue; c.globalAlpha = A * readingMask(x, y);
+      c.save(); c.translate(x, y); c.rotate(Math.PI / 4 + Math.sin(t * .0004 + d * .01) * .08); const rr = Math.min(6, size * .28);
+      c.beginPath(); c.roundRect(-size / 2, -size / 2, size, size, rr); c.fill(); c.restore(); } } },
+  // Nearby Stock: hexagon halftone, gradient sweeping from the pointer's side (R4)
+  hexes: { init(w, h) { this.s = 30; this.ox = 0; }, draw(c, t, px, py, w, h, A) {
+    const s = this.s, hx = s * .88; this.ox += ((px > 0 ? px : 0) - this.ox) * .03; let row = 0;
+    for (let y = 0; y < h + s; y += s * .76, row++) for (let x = (row % 2) * hx / 2; x < w + s; x += hx) {
+      const k = Math.max(0, 1 - Math.abs(x - this.ox) / (w * .9)); const r = s * .5 * Math.pow(k, 1.3) * (1 + .08 * Math.sin(t * .001 + y * .02)) + 1;
+      if (r < 1.5) continue; c.globalAlpha = A * readingMask(x, y); c.beginPath();
+      for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + Math.PI / 6; c.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); } c.closePath(); c.fill(); } } },
+  // KINsafe: triangle halftone, alternating up/down, heavier at the top; pointer pushes a ripple through it (original)
+  triangles: { init(w, h) { this.s = 30; this.rip = []; }, draw(c, t, px, py, w, h, A) {
+    const s = this.s; let row = 0;
+    for (let y = 0; y < h + s; y += s * .87, row++) for (let x = (row % 2) * s / 2; x < w + s; x += s) {
+      const up = ((x / s + row) | 0) % 2 === 0; const g = 1 - y / h * .85; const d = Math.hypot(x - px, y - py);
+      const ring = Math.abs(d - ((t * .18) % 700)) < 40 ? .35 : 0;                      // a slow ripple radiating from the pointer
+      const r = s * .5 * g + 8 * fall(d, 200) + ring * s * .3; if (r < 1.5) continue;
+      c.globalAlpha = A * readingMask(x, y); c.beginPath();
+      for (let i = 0; i < 3; i++) { const a = (up ? -Math.PI / 2 : Math.PI / 2) + i / 3 * Math.PI * 2; c.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); } c.closePath(); c.fill(); } } },
+  // WAGA: diamond lattice, solid at the top thinning to hairlines at the bottom; pointer thickens the mesh nearby (R1)
+  lattice: { init(w, h) { this.s = 26; }, draw(c, t, px, py, w, h, A) {
+    const s = this.s; c.lineCap = 'butt';
+    for (let y = -s; y < h + s; y += s) for (let x = -s; x < w + 2 * s; x += s) {
+      const k = 1 - y / h; const lw = 1 + (s * .8) * Math.pow(Math.max(0, k), 2.2) + 6 * fall(Math.hypot(x - px, y - py), 220);
+      c.globalAlpha = A * readingMask(x, y) * .9; c.lineWidth = lw; c.beginPath(); c.moveTo(x, y); c.lineTo(x + s, y + s * 1.6); c.moveTo(x + s, y); c.lineTo(x, y + s * 1.6); c.stroke(); } } },
+  // Hero: curved flow lines with nodes, bending around the pointer (R7)
+  flow: { init(w, h) { this.lines = []; for (let i = 0; i < 22; i++) this.lines.push({ y: rnd() * h, amp: 40 + rnd() * 120, ph: rnd() * 6, f: .002 + rnd() * .003, lw: .6 + rnd() * 1.6, nodes: Array.from({ length: 2 + (rnd() * 4 | 0) }, () => ({ u: rnd(), r: 2 + rnd() * 5, open: rnd() < .4 })) }); }, draw(c, t, px, py, w, h, A) {
+    c.lineCap = 'round';
+    for (const L of this.lines) { c.globalAlpha = A * .9; c.lineWidth = L.lw; c.beginPath();
+      const pts = []; for (let x = -20; x <= w + 20; x += 24) { let y = L.y + Math.sin(x * L.f + L.ph + t * .00025) * L.amp * (x / w); const d = Math.hypot(x - px, y - py); y += (y - py) / (d + 1) * 60 * fall(d, 200); pts.push([x, y]); }
+      c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length - 1; i++) { const mx = (pts[i][0] + pts[i + 1][0]) / 2, my = (pts[i][1] + pts[i + 1][1]) / 2; c.quadraticCurveTo(pts[i][0], pts[i][1], mx, my); } c.stroke();
+      for (const n of L.nodes) { const p = pts[Math.min(pts.length - 1, (n.u * pts.length) | 0)]; c.globalAlpha = A * readingMask(p[0], p[1]); c.beginPath(); c.arc(p[0], p[1], n.r, 0, 7); if (n.open) { c.lineWidth = 1.2; c.stroke(); } else c.fill(); } } } },
+  // About: a binary field whose digits darken and flip near the pointer (R8)
+  binary: { init(w, h) { this.s = 22; this.cells = []; const cols = Math.ceil(w / this.s) + 1, rows = Math.ceil(h / this.s) + 1; for (let i = 0; i < cols * rows; i++) this.cells.push({ v: rnd() < .5 ? '0' : '1', k: rnd(), flip: rnd() * 9000 }); this.cols = cols; }, draw(c, t, px, py, w, h, A) {
+    const s = this.s; c.font = `500 ${s * .62}px 'Hanken Grotesk', monospace`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    for (let i = 0; i < this.cells.length; i++) { const cell = this.cells[i], x = (i % this.cols) * s + s / 2, y = ((i / this.cols) | 0) * s + s / 2;
+      if (((t + cell.flip) % 9000) < 16) cell.v = cell.v === '0' ? '1' : '0';
+      const near = fall(Math.hypot(x - px, y - py), 180); const a = (.12 + .55 * Math.pow(cell.k, 3) + .8 * near); c.globalAlpha = A * a * readingMask(x, y); c.fillText(cell.v, x, y); } } },
+  // Portfolio: branching lines from the top that grow toward their dot terminals as the pointer nears (R6)
+  branches: { init(w, h) { this.b = []; const roots = 5 + (w / 260 | 0); for (let i = 0; i < roots; i++) { const x0 = w * (i + .5) / roots + (rnd() - .5) * 60; this.grow(x0, -10, h * (.25 + rnd() * .2), 0, 0); } },
+    grow(x, y, len, dir, depth) { const pts = [[x, y]]; let cx = x, cy = y; const segs = 2 + (rnd() * 2 | 0); for (let i = 0; i < segs; i++) { const l = len / segs; cy += l; cx += (i === segs - 1 ? 0 : (rnd() - .5) * l * 1.2); pts.push([cx, cy]); }
+      this.b.push({ pts, r: 3 + rnd() * 5, p: 0 }); if (depth < 2) { const n = 1 + (rnd() * 2 | 0); for (let k = 0; k < n; k++) this.grow(cx, cy, len * .7, dir, depth + 1); } },
+    draw(c, t, px, py, w, h, A) { c.lineCap = 'round'; c.lineWidth = 1.4;
+      for (const B of this.b) { const e = B.pts[B.pts.length - 1]; const near = fall(Math.hypot(e[0] - px, e[1] - py), 260); B.p += ((.5 + .5 * near) - B.p) * .05;   // half grown at rest, full near the pointer
+        c.globalAlpha = A * .8; c.beginPath(); c.moveTo(B.pts[0][0], B.pts[0][1]); let total = 0; const L = []; for (let i = 1; i < B.pts.length; i++) { L.push(Math.hypot(B.pts[i][0] - B.pts[i - 1][0], B.pts[i][1] - B.pts[i - 1][1])); total += L[i - 1]; }
+        let budget = total * B.p; for (let i = 1; i < B.pts.length && budget > 0; i++) { const f = Math.min(1, budget / L[i - 1]); c.lineTo(B.pts[i - 1][0] + (B.pts[i][0] - B.pts[i - 1][0]) * f, B.pts[i - 1][1] + (B.pts[i][1] - B.pts[i - 1][1]) * f); budget -= L[i - 1]; } c.stroke();
+        if (B.p > .95) { c.globalAlpha = A * readingMask(e[0], e[1]); c.beginPath(); c.arc(e[0], e[1], B.r, 0, 7); c.fill(); } } } },
+  // Experience: circuit traces with pads, chips and travelling signals (R5)
+  circuit: { init(w, h) { this.tr = []; this.chips = [{ x: w * .2, y: h * .3, s: 90 }, { x: w * .72, y: h * .62, s: 110 }]; for (const ch of this.chips) for (let i = 0; i < 14; i++) { const side = i % 4; let x = ch.x, y = ch.y; const k = (i / 14 - .5) * ch.s; if (side === 0) { x += k; y -= ch.s / 2; } if (side === 1) { x += ch.s / 2; y += k; } if (side === 2) { x += k; y += ch.s / 2; } if (side === 3) { x -= ch.s / 2; y += k; }
+      const pts = [[x, y]]; let dx = side === 1 ? 1 : side === 3 ? -1 : 0, dy = side === 0 ? -1 : side === 2 ? 1 : 0; for (let sgm = 0; sgm < 3 + (rnd() * 3 | 0); sgm++) { const l = 40 + rnd() * 160; x += dx * l; y += dy * l; pts.push([x, y]); if (rnd() < .6) { const turn = rnd() < .5 ? 1 : -1; if (dx) { dy = turn; dx = rnd() < .5 ? 0 : dx; } else { dx = turn; dy = rnd() < .5 ? 0 : dy; } } }
+      this.tr.push({ pts, end: rnd() < .5 ? 'dot' : rnd() < .5 ? 'ring' : 'pad', lw: rnd() < .3 ? 2.4 : 1.2, sig: -1 }); } },
+    draw(c, t, px, py, w, h, A) { c.lineCap = 'round'; c.lineJoin = 'round';
+      for (const ch of this.chips) { c.globalAlpha = A * 1.3; c.lineWidth = 2.5; c.strokeRect(ch.x - ch.s / 2, ch.y - ch.s / 2, ch.s, ch.s); c.lineWidth = 1.2; c.strokeRect(ch.x - ch.s / 2 + 12, ch.y - ch.s / 2 + 12, ch.s - 24, ch.s - 24); }
+      for (const T of this.tr) { c.globalAlpha = A * 1.3; c.lineWidth = T.lw * 1.3; c.beginPath(); c.moveTo(T.pts[0][0], T.pts[0][1]); for (let i = 1; i < T.pts.length; i++) c.lineTo(T.pts[i][0], T.pts[i][1]); c.stroke();
+        const e = T.pts[T.pts.length - 1]; c.globalAlpha = A * readingMask(e[0], e[1]); c.beginPath(); if (T.end === 'dot') { c.arc(e[0], e[1], 4, 0, 7); c.fill(); } else if (T.end === 'ring') { c.arc(e[0], e[1], 5, 0, 7); c.lineWidth = 1.5; c.stroke(); } else c.fillRect(e[0] - 4, e[1] - 6, 8, 12);
+        // signals: the pointer near a trace launches one; it runs to the terminal
+        const near = T.pts.some(p => Math.hypot(p[0] - px, p[1] - py) < 60); if (T.sig < 0 && near && rnd() < .05) T.sig = 0; if (T.sig >= 0) { T.sig += .012; if (T.sig > 1) T.sig = -1; else { let total = 0; const L = []; for (let i = 1; i < T.pts.length; i++) { L.push(Math.hypot(T.pts[i][0] - T.pts[i - 1][0], T.pts[i][1] - T.pts[i - 1][1])); total += L[i - 1]; } let d = total * T.sig; for (let i = 1; i < T.pts.length; i++) { if (d <= L[i - 1]) { const f = d / L[i - 1]; const sx = T.pts[i - 1][0] + (T.pts[i][0] - T.pts[i - 1][0]) * f, sy = T.pts[i - 1][1] + (T.pts[i][1] - T.pts[i - 1][1]) * f; c.globalAlpha = A; c.beginPath(); c.arc(sx, sy, 3.5, 0, 7); c.fill(); break; } d -= L[i - 1]; } } } } } },
+  // Team: foam cells, packed circles with paper membranes, nudged by the pointer (R9)
+  foam: { init(w, h) { this.cells = []; for (let i = 0; i < 70; i++) this.cells.push({ x: rnd() * w, y: rnd() * h, r: 18 + Math.pow(rnd(), 2) * 70, vx: 0, vy: 0 }); for (let k = 0; k < 40; k++) this.relax(w, h); },
+    relax(w, h) { const C = this.cells; for (let i = 0; i < C.length; i++) for (let j = i + 1; j < C.length; j++) { const a = C[i], b = C[j]; const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1, min = a.r + b.r - 6; if (d < min) { const m = (min - d) / 2; a.x -= dx / d * m; a.y -= dy / d * m; b.x += dx / d * m; b.y += dy / d * m; } } for (const a of C) { a.x = clamp(a.x, -a.r, w + a.r); a.y = clamp(a.y, -a.r, h + a.r); } },
+    draw(c, t, px, py, w, h, A) { for (const a of this.cells) { const d = Math.hypot(a.x - px, a.y - py); const f = fall(d, 220) * 1.4; a.vx += (a.x - px) / (d + 1) * f + Math.sin(t * .0007 + a.y * .02) * .05; a.vy += (a.y - py) / (d + 1) * f + Math.cos(t * .0006 + a.x * .02) * .05; a.vx *= .9; a.vy *= .9; a.x += a.vx; a.y += a.vy; } this.relax(w, h);
+      c.lineWidth = 5; c.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim();
+      for (const a of this.cells) { const near = fall(Math.hypot(a.x - px, a.y - py), 160); c.globalAlpha = A * readingMask(a.x, a.y) * (.75 + .25 * near); c.beginPath(); c.arc(a.x, a.y, a.r * (.96 + .04 * near), 0, 7); c.fill(); c.globalAlpha = 1; c.stroke(); } c.strokeStyle = BG.color; } },
+  // Testimonials: wavy contour rings around a centre that follows the pointer (original)
+  contours: { init(w, h) { this.cx = w * .5; this.cy = h * .5; }, draw(c, t, px, py, w, h, A) { this.cx += ((px > 0 ? px : w * .5) - this.cx) * .03; this.cy += ((py > 0 ? py : h * .5) - this.cy) * .03; c.lineWidth = 1.1;
+    for (let r = 24; r < Math.max(w, h) * .9; r += 26) { c.globalAlpha = A * .9 * (1 - r / (Math.max(w, h) * .9)); c.beginPath(); for (let a = 0; a <= Math.PI * 2 + .01; a += .06) { const rr = r + Math.sin(a * 5 + t * .0008 + r * .02) * 6 + Math.sin(a * 3 - t * .0005) * 4; const x = this.cx + Math.cos(a) * rr, y = this.cy + Math.sin(a) * rr; c.lineTo(x, y); } c.stroke(); } } },
+  none: { init() {}, draw() {} },
+};
+function bgResize() { bgDPR = Math.min(1.5, devicePixelRatio || 1); bgW = innerWidth; bgH = innerHeight; bgCanvas.width = bgW * bgDPR; bgCanvas.height = bgH * bgDPR; bctx.setTransform(bgDPR, 0, 0, bgDPR, 0, 0); rcv.width = bgW * bgDPR; rcv.height = bgH * bgDPR; rctx.setTransform(bgDPR, 0, 0, bgDPR, 0, 0); if (BG.cur) BG.cur.pat.init(bgW, bgH); if (BG.prev) BG.prev.pat.init(bgW, bgH); }
+function bgSet(name, color) { const pat = PATTERNS[name] || PATTERNS.none; if (BG.cur && BG.cur.name === name) { BG.color = color; BG.rgb = hexToRgb(color); return; } BG.prev = BG.cur; BG.cur = { name, pat }; BG.fade = 0; pat.init(bgW, bgH); BG.color = color; BG.rgb = hexToRgb(color); }
+function bgFrame(now) { if (!BG.cur || document.hidden) return; const c = bctx; c.clearRect(0, 0, bgW, bgH); BG.fade = Math.min(1, BG.fade + (calm ? 1 : .025)); const px = pointer.active ? pointer.x : -9999, py = pointer.active ? pointer.y : -9999;
+  const nowEl = $('.station.now'); bgReading = nowEl && !calm ? nowEl.getBoundingClientRect() : null; const base = .15; c.fillStyle = BG.color; c.strokeStyle = BG.color; const T = calm ? 0 : now - BG.t0;
+  if (BG.prev && BG.fade < 1) BG.prev.pat.draw(c, T, px, py, bgW, bgH, base * (1 - smooth(BG.fade))); BG.cur.pat.draw(c, T, px, py, bgW, bgH, base * smooth(BG.fade)); c.globalAlpha = 1; }
 
 
-        <!-- ===== CONTACT SECTION ===== -->
-        <section class="contact" id="contact">
-            <div class="contact__spline-bg" id="contact-spline-bg">
-                <div class="spline-lazy" data-spline-url="https://prod.spline.design/J5pGJ-AIw6Z47fRw/scene.splinecode" data-spline-id="contact-spline-viewer" aria-hidden="true"></div>
-            </div>
+// ---------- frame
+let last = performance.now();
+function frame(now) {
+  const dt = clamp((now - last) / 16.67, .5, 2.5); last = now;
+  progress(); const sp = camera(dt); if (!calm) drawRoute(); drawPrelude(now);
+  if (!calm) {
+    let tx, ty;
+    if (!inside) { // during the approach the guide leads you into the cube from the top of the screen
+      const cx = vw / 2, cy = vh * .47; tx = cx + Math.sin(now * .0012) * 30 * (1 - pre); ty = lerp(vh * .16, cy, easeIO(pre)) + Math.cos(now * .0009) * 10 * (1 - pre);
+      gBody.style.filter = `drop-shadow(0 0 ${8 + 10 * pre}px rgba(255,255,255,.9))`; document.documentElement.style.setProperty('--guide', '#ffffff'); if (shapeName !== 'circle') setShape('circle'); needColour = true;
+    } else if (sp && out > 0) { // the whole network in view: the guide rests at the centre as a circle
+      wasInsideOnce = true; tx = vw / 2 + Math.sin(now * .0011) * 24; ty = vh / 2 + Math.cos(now * .0008) * 16; gBody.style.filter = ''; if (shapeName !== 'circle') setShape('circle');
+    } else if (sp) {
+      if (needColour) { needColour = false; wasInsideOnce = true; if (curPhase) document.documentElement.style.setProperty('--guide', curPhase.colour); }
+      // dwelling: park just left of the node, outside its ring; travelling: lead ahead along the route
+      const nd = nodes[clamp(idx, 0, nodes.length - 1)], np = pts[clamp(idx, 0, nodes.length - 1)]; const parkX = np.x * cam.z + cam.x - ((nd.size || 12) + 38) * cam.z, parkY = np.y * cam.z + cam.y;
+      const ahead = routePath.getPointAtLength(clamp(L + 70, 0, routeLen)); tx = lerp(parkX, ahead.x * cam.z + cam.x, travelAmt); ty = lerp(parkY, ahead.y * cam.z + cam.y, travelAmt); gBody.style.filter = ''; if (pointer.active) { const dx = pointer.x - tx, dy = pointer.y - ty, d = Math.hypot(dx, dy) || 1; const pull = clamp(d / 420, 0, 1) * 60; tx += dx / d * pull; ty += dy / d * pull; } }
+    if (tx !== undefined) {
+      vel.x = (vel.x + (tx - head.x) * .09) * .78; vel.y = (vel.y + (ty - head.y) * .09) * .78; head.x += vel.x * dt; head.y += vel.y * dt;
+      const speed = Math.hypot(vel.x, vel.y); energy = lerp(energy, 0, .06 * dt); liquid = Math.max(0, liquid - .012 * dt); shapeT = Math.min(1, shapeT + .03 * dt);
+      $('#goo feGaussianBlur').setAttribute('stdDeviation', (2 + 4 * liquid).toFixed(2));
+      const spacing = clamp(8 + speed * 2.2, 8, 30); seg[0].x = head.x; seg[0].y = head.y;
+      for (let i = 1; i < N; i++) { const s = seg[i], p = seg[i - 1]; const dx = p.x - s.x, dy = p.y - s.y, d = Math.hypot(dx, dy) || 1; if (d > spacing) { const m = (d - spacing) * .38 * dt; s.x += dx / d * m; s.y += dy / d * m; } s.r = lerp(s.r, 7 * Math.pow(1 - i / N, .9) + 1, .16 * dt); circles[i].setAttribute('cx', s.x.toFixed(1)); circles[i].setAttribute('cy', s.y.toFixed(1)); circles[i].setAttribute('r', s.r.toFixed(1)); }
+      drawHead(now, (narrow ? 18 : 24) * (1 + energy * .3) * (inside ? 1 : lerp(.7, 1.3, pre)));
+      SND.motion(Math.hypot(cam.vx, cam.vy) + speed * .6, inside ? travelAmt > .05 : (pre > .05 && pre < .95), inside ? (curPhase && curPhase.id) : (out > 0 ? 'exit' : 'pre'));
+    }
+  }
+  bgFrame(now); requestAnimationFrame(frame);
+}
+addEventListener('pointermove', e => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.active = e.pointerType !== 'touch'; pointer.lastMove = performance.now(); }, { passive: true });
+addEventListener('pointerleave', () => { pointer.active = false; });
+function goto(i) { i = clamp(i, 0, nodes.length - 1); if (calm) { const el = $('#st-' + i); if (el) el.scrollIntoView({ block: 'start' }); return; } const max = $('#scroller').offsetHeight - vh; const preLen = PRE_VH * vh * 1.1, outLen = OUT_VH * vh * 1.1; const n = pts.length - 1; scrollTo({ top: preLen + (i / n) * (max - preLen - outLen) + 1, behavior: 'smooth' }); }
+$('#prev').addEventListener('click', () => goto(idx - 1)); $('#next').addEventListener('click', () => goto(idx + 1));
+addEventListener('keydown', e => { if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key) && !e.target.matches('button, a, input, textarea')) { e.preventDefault(); goto(idx + 1); } if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key) && !e.target.matches('input, textarea')) { e.preventDefault(); goto(idx - 1); } });
+$('#rail').addEventListener('click', e => { const a = e.target.closest('a'); if (!a) return; e.preventDefault(); goto(+a.getAttribute('href').slice(1)); });
+document.addEventListener('click', e => { const a = e.target.closest('a[href^="#"]'); if (!a || calm) return; const id = a.getAttribute('href').slice(1); let i = nodes.findIndex(n => n.id === id); if (id.startsWith('st-')) i = +id.slice(3); if (i >= 0) { e.preventDefault(); goto(i); } });
+document.addEventListener('click', e => { if (e.target.closest('a.cta.accent')) SND.open(); });
 
-            <div class="contact__content">
-                <p class="contact__label scroll-reveal">GET IN TOUCH</p>
-                <h2 class="contact__heading scroll-reveal">Let's build something <span
-                        class="contact__heading--italic">extraordinary</span></h2>
-
-                <div data-fs-success class="contact__success">Thanks! We'll be in touch soon.</div>
-                <div data-fs-error class="contact__error"></div>
-
-                <form id="contact-form" class="contact__form scroll-reveal">
-                    <div class="contact__field">
-                        <label for="contact-name">Name</label>
-                        <input type="text" id="contact-name" name="name" placeholder="Your name" required data-fs-field>
-                        <span data-fs-error="name" class="contact__field-error"></span>
-                    </div>
-                    <div class="contact__field">
-                        <label for="contact-email">Email</label>
-                        <input type="email" id="contact-email" name="email" placeholder="you@example.com" required
-                            data-fs-field>
-                        <span data-fs-error="email" class="contact__field-error"></span>
-                    </div>
-                    <div class="contact__field">
-                        <label for="contact-message">Message</label>
-                        <textarea id="contact-message" name="message" placeholder="Tell us about your project..."
-                            rows="5" required data-fs-field></textarea>
-                        <span data-fs-error="message" class="contact__field-error"></span>
-                    </div>
-                    <button type="submit" class="contact__submit" data-fs-submit-btn>Send Message</button>
-                </form>
-            </div>
-        </section>
-    </main>
-
-    <script src="js/script.js"></script>
-    <script>
-        window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
-        formspree('initForm', { formElement: '#contact-form', formId: 'mgodwywl' });
-    </script>
-    <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
+// contact form: posts to Formspree in the background, with the plain POST as fallback
+document.addEventListener('submit', async e => { const f = e.target; if (!f.matches('#contact-form')) return; e.preventDefault(); const st = f.querySelector('.form-status'), btn = f.querySelector('button'); btn.disabled = true; st.textContent = 'Sending…';
+  try { const r = await fetch(f.action, { method: 'POST', headers: { 'Accept': 'application/json' }, body: new FormData(f) }); if (r.ok) { f.reset(); st.textContent = 'Kia ora, received. We will reply by email.'; SND.pop(1.2); } else { st.textContent = 'That did not send. Please email us directly.'; } }
+  catch (err) { st.textContent = 'That did not send. Please email us directly.'; } btn.disabled = false; });
+$('#pre-enter').addEventListener('click', e => { if (!calm) { e.preventDefault(); goto(0); } });
+function layout() { vw = innerWidth; vh = innerHeight; $('#guide').setAttribute('viewBox', `0 0 ${vw} ${vh}`); bgResize(); preResize(); build(); curPhase = null; if (calm) { document.body.classList.remove('dark'); $$('.station').forEach(el => el.classList.add('on')); const ph = phases[0]; bgSet(ph.bg, ph.colour); } }
+addEventListener('resize', layout); applyCalm();
+const want = location.hash.slice(1); const wi = nodes.findIndex(n => n.id === want); if (wi >= 0) setTimeout(() => goto(wi), 80);
+requestAnimationFrame(frame);
+})();
+</script>
 </body>
-
 </html>
