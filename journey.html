@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>document.documentElement.classList.add('js');</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Project journey — Tiaki Mai Rā</title>
 <meta name="description" content="Travel a Tiaki Mai Rā project from the first question to where it is now: every design decision as a station, in Double Diamond phases.">
@@ -160,6 +161,7 @@
   html.narrow #sound-toggle::after { content: '♪'; font-size: 16px; line-height: 1; }
   html.narrow #motion-toggle::after { content: '◐'; font-size: 16px; line-height: 1; }
   html.narrow #back-link::after { content: '←'; font-size: 16px; line-height: 1; }
+  .loader { display: none; } html.js .loader { display: grid; }
 </style>
 </head>
 <body>
