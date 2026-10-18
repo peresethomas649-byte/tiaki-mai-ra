@@ -567,7 +567,8 @@ function layout() { vw = innerWidth; vh = innerHeight; $('#guide').setAttribute(
 addEventListener('resize', layout); applyCalm();
 document.addEventListener('click', e => { if (!narrow) return; const t = e.target.closest('.st-toggle, .station h3'); if (!t) return; const st = t.closest('.station'); const open = st.classList.toggle('open'); st.dataset.user = open ? 'open' : 'closed'; const b = st.querySelector('.st-toggle'); if (b) { b.textContent = open ? 'Less ▴' : 'More ▾'; b.setAttribute('aria-expanded', String(open)); } });
 function autoOpen(stIdx) { if (!narrow) return; $$('.station').forEach((el, k) => { const want = k === stIdx; if (el.dataset.user && el.dataset.user !== (want ? 'open' : 'closed') && el.dataset.now === '1') return; if (want !== el.classList.contains('open')) { el.classList.toggle('open', want); const b = el.querySelector('.st-toggle'); if (b) { b.textContent = want ? 'Less ▴' : 'More ▾'; b.setAttribute('aria-expanded', String(want)); } if (want) el.querySelector('.st-body').scrollTop = 0; } el.dataset.now = want ? '1' : '0'; if (!want) delete el.dataset.user; }); }
-const want = location.hash.slice(1); const wi = nodes.findIndex(n => n.id === want); if (wi >= 0) setTimeout(() => goto(wi), 80);
+const STATIC_MAP = { 's-business': 'do', 's-services': 'do', 's-team': 'who', 's-products': 'make', 's-how': 'how', 's-skills': 'skills', 's-contact': 'connect' };   // anchors of the static (no-JS) version land on the matching node
+let want = location.hash.slice(1); want = STATIC_MAP[want] || want; const wi = nodes.findIndex(n => n.id === want); if (wi >= 0) setTimeout(() => goto(wi), 80);
 requestAnimationFrame(frame);
 })();
 </script>
